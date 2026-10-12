@@ -1,20 +1,14 @@
-# v1.1.0
+# v1.2.0
 
-- New notes are created directly in the selected folder instead of being asked of Obsidian — a
-  note could previously land in the vault root when the vault couldn't be located, reported on
-  Reddit and reproduced by granting access to a subfolder only
-- Choose how a tapped note opens: Obsidian, the device's default Markdown app, or ask every time
-- Fixed: deleting a note that no longer existed (e.g. removed some other way) kept failing with
-  the same error on every retry instead of just disappearing from the list
-- Fixed: swiping a note to delete it could remove the wrong file after the list changed
-- Fixed: the widget could stop redrawing after its first refresh until something restarted the
-  app process — refresh now reliably shows the current state, with a small spinner while it loads
-- Widget refresh diagnostics are logged under one filterable tag for easier bug reports
+- Extra notes: add single Markdown files from anywhere on your device, one at a time, and they
+  show on the widget next to the notes from your folder. Settings → Extra Notes → Add File
+- Removing an extra note, by swiping either way or with its remove button, only takes it off the
+  widget. The file stays where it is
+- A file that is already in your notes folder, or is not a `.md` file, is refused with a message
+- Play build only: after five days the app may ask Google Play to show its rating dialog, at most
+  every 90 days, and settings have a "Rate on Google Play" link. The foss build has neither
 
 Two builds: `foss` has no `INTERNET` permission, `play` adds analytics and crash reporting that can
 be switched off. Take `foss` unless you want to send crash reports.
-
-Updates are not instant — Android decides when to tell the widget a folder changed. See Limitations
-in the README.
 
 Android 11+. GPL-3.0, as is, without warranty.

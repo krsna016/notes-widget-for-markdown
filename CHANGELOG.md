@@ -2,6 +2,13 @@
 
 All notable public changes will be documented in this file.
 
+## v1.2.0 - 2026-10-12
+
+- Extra notes: single Markdown files from anywhere on the device can be added to the widget one at a time, next to the notes from the folder. Removing one, by swiping either way or with its remove button, only takes it off the widget and never deletes the file. A file that is already in the notes folder, or is not a `.md` file, is refused with a message.
+- A file that was added and later moved or deleted is skipped on the widget and marked as not available in settings.
+- Play build: five days after it first runs, the app may ask Google Play to show its rating dialog after a quick note is saved or when settings open, at most every 90 days. Settings also have a "Rate on Google Play" link. The foss build has neither.
+- Fixed: once a single file had been granted, the sync chip could report the git repo as unreadable.
+
 ## v1.1.0 - 2026-09-04
 
 - New notes are created directly in the selected folder instead of being asked of Obsidian — a note could previously land in the vault root when the vault couldn't be located, reported on Reddit and reproduced by granting access to a subfolder only.
