@@ -44,14 +44,27 @@ aside to delete the file. Light and dark can be forced or left to the system.
 
 ## Install
 
-No Play Store or F-Droid listing yet.
+Requires Android 11 (API 30) or newer.
+
+**Google Play.** [Get it on Google Play](https://play.google.com/store/apps/details?id=com.marfolog.noteswidgetformarkdown).
+This is the `play` build, which includes crash reporting.
+
+**APK from GitHub.** No F-Droid listing yet.
 
 1. Download the APK from [Releases](https://github.com/marfolog/notes-widget-for-markdown/releases)
    — take the `foss` one unless you want the Play build's crash reporting.
 2. Allow installs from unknown sources when Android asks.
-3. Requires Android 11 (API 30) or newer.
 
 Every release lists a SHA-256 so you can check what you downloaded.
+
+**Getting notified of new versions.** The app itself never checks — doing that would need the
+`INTERNET` permission the `foss` build deliberately does not have. Two ways that don't need it:
+
+- [Obtainium](https://github.com/ImranR98/Obtainium): add this repo once, and it watches GitHub
+  Releases and notifies you when a new one lands, without the widget app itself going online.
+- F-Droid, once listed there, updates the normal F-Droid way.
+
+The `play` build updates through the Play Store like anything else installed from it.
 
 ## How to use it
 
@@ -62,6 +75,10 @@ Every release lists a SHA-256 so you can check what you downloaded.
 
 The app works the vault out on its own by looking for `.obsidian`, so the root folder only has to be
 picked when that fails.
+
+A note that lives somewhere else, like a single list in another folder, can be added on its own under
+**Extra Notes → Add File**, one file at a time. It shows on the widget next to the folder notes.
+Swiping it away only takes it off the widget; the file stays where it is.
 
 Tapping a note opens it in Obsidian and the **+** button creates one there. Everything else —
 reading, previewing, ordering, deleting — works without Obsidian installed.
