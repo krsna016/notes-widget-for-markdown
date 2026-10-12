@@ -1,6 +1,7 @@
 package com.marfolog.noteswidgetformarkdown.presentation.widget
 
 import android.content.Context
+import com.marfolog.noteswidgetformarkdown.data.preferences.ExtraNotesStore
 import com.marfolog.noteswidgetformarkdown.data.preferences.NoteCardSettingsStore
 import com.marfolog.noteswidgetformarkdown.data.repository.GitSyncStatusReader
 import com.marfolog.noteswidgetformarkdown.data.repository.ObsidianVaultLocator
@@ -27,7 +28,9 @@ internal data class WidgetData(
     val vaultName: String?,
     val noteFolderPath: String?,
     val cardSettings: Map<String, NoteCardAppearance>,
-    val gitSyncStatus: GitSyncStatus?
+    val gitSyncStatus: GitSyncStatus?,
+    /** Vault-relative folder of each extra note inside the vault, keyed by its uri. */
+    val extraNoteFolders: Map<String, String> = emptyMap()
 )
 
 /**
@@ -69,7 +72,7 @@ internal suspend fun loadWidgetData(context: Context): WidgetData {
         runCatching {
             val getNotesUseCase = get<GetNotesUseCase>(GetNotesUseCase::class.java)
             val notes = cardSettingsStore.applyOrder(
-                getNotesUseCase(folderUri).firstOrNull() ?: emptyList()
+                getNotesUseCase(folderUri, ExtraNotesStore(context).getAll()).firstOrNull() ?: emptyList()
             )
             if (notes.isEmpty()) WidgetState.Empty else WidgetState.Success(notes)
         }.getOrElse { e ->
@@ -86,13 +89,26 @@ internal suspend fun loadWidgetData(context: Context): WidgetData {
     // aby se slozka nechodila prochazet dvakrat.
     val gitSyncStatus: GitSyncStatus? = when (syncMode) {
         "git" -> GitSyncStatusReader(context).read(prefs.getString(SetupActivity.KEY_VAULT_URI, null))
+        // Extra notes live outside the synced folder, so they say nothing about the sync.
         "other" -> (state as? WidgetState.Success)
             ?.notes
+            ?.filterNot { it.isExtra }
             ?.maxOfOrNull { it.lastModified }
             ?.takeIf { it > 0 }
             ?.let { GitSyncStatus.FileActivity(it) }
         else -> null
     }
+
+    // Worked out once here rather than per tap: each extra note can sit in a different folder of
+    // the vault, or outside it altogether.
+    val extraNoteFolders = detectedVault?.let { vault ->
+        (state as? WidgetState.Success)?.notes
+            ?.filter { it.isExtra }
+            ?.mapNotNull { note ->
+                ObsidianVaultLocator.folderOfNote(vault, note.fileUri)?.let { note.fileUri to it }
+            }
+            ?.toMap()
+    }.orEmpty()
 
     AppLog.d(
         "WidgetData",
@@ -104,6 +120,7 @@ internal suspend fun loadWidgetData(context: Context): WidgetData {
         vaultName = vaultName,
         noteFolderPath = noteFolderPath,
         cardSettings = cardSettingsStore.getAll(),
-        gitSyncStatus = gitSyncStatus
+        gitSyncStatus = gitSyncStatus,
+        extraNoteFolders = extraNoteFolders
     )
 }

@@ -49,13 +49,20 @@ internal fun noteOpenIntent(
     noteFolderPath: String?
 ): Intent = when (OpenWith.current(context)) {
 
+    // An extra note outside the vault has no path Obsidian could resolve — a deep link would open
+    // whatever note Obsidian had up last. The file itself can still be opened, so do that.
+    //
     // CLEAR_TOP matters when Obsidian is already running: without it, some launches just bring
     // its existing window forward without delivering the new file — the app opens, but stays on
     // whatever note it already had up, which reads as "the wrong note opened".
-    OpenWith.Obsidian -> Intent(
-        Intent.ACTION_VIEW,
-        Uri.parse(obsidianDeepLink(vaultName, noteFolderPath, note.fileName))
-    ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+    OpenWith.Obsidian -> if (note.isExtra && noteFolderPath == null) {
+        fileIntent(note)
+    } else {
+        Intent(
+            Intent.ACTION_VIEW,
+            Uri.parse(obsidianDeepLink(vaultName, noteFolderPath, note.fileName))
+        ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+    }
 
     OpenWith.DefaultApp -> fileIntent(note)
 
@@ -76,6 +83,16 @@ private fun fileIntent(note: NoteSummary): Intent =
                 Intent.FLAG_ACTIVITY_NEW_TASK
         )
     }
+
+/**
+ * The folder to hand to [noteOpenIntent]. Folder notes share the notes folder's path; an extra
+ * note has its own, and none at all when it lives outside the vault.
+ */
+internal fun noteFolderPathFor(
+    note: NoteSummary,
+    noteFolderPath: String?,
+    extraNoteFolders: Map<String, String>
+): String? = if (note.isExtra) extraNoteFolders[note.fileUri] else noteFolderPath
 
 internal fun obsidianDeepLink(
     vaultName: String?,

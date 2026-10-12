@@ -4,7 +4,15 @@ import com.marfolog.noteswidgetformarkdown.domain.model.NoteSummary
 import kotlinx.coroutines.flow.Flow
 
 interface FileRepository {
-    fun getNotes(folderUri: String): Flow<List<NoteSummary>>
+    /**
+     * The folder's notes plus the [extraFileUris] added on their own. An extra note that can no
+     * longer be read is skipped, and one that also lives in the folder is listed once.
+     */
+    fun getNotes(folderUri: String, extraFileUris: List<String> = emptyList()): Flow<List<NoteSummary>>
+
+    /** A single extra note. Fails when the file is gone or access to it was revoked. */
+    suspend fun getExtraNote(fileUri: String): Result<NoteSummary>
+
     /** Returns the uri of the file the provider actually created, which is not always the
      *  name that was asked for — SAF providers pick their own name on a collision. */
     suspend fun createNote(folderUri: String, title: String, content: String): Result<String>

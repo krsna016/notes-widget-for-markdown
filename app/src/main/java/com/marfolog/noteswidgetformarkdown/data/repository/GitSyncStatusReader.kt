@@ -2,6 +2,7 @@ package com.marfolog.noteswidgetformarkdown.data.repository
 
 import android.content.Context
 import android.net.Uri
+import android.provider.DocumentsContract
 import android.util.Log
 import androidx.documentfile.provider.DocumentFile
 import com.marfolog.noteswidgetformarkdown.data.parser.GitPackedRefsParser
@@ -33,7 +34,9 @@ class GitSyncStatusReader(
     suspend fun read(vaultUri: String?): GitSyncStatus = withContext(Dispatchers.IO) {
         val candidates = (listOfNotNull(vaultUri.takeUnless { it.isNullOrEmpty() }) +
             context.contentResolver.persistedUriPermissions
-                .filter { it.isReadPermission }
+                // Only folders can hold a .git. A single-file grant (an extra note) would make
+                // fromTreeUri throw and turn "no git anywhere" into a red "unreadable" error.
+                .filter { it.isReadPermission && DocumentsContract.isTreeUri(it.uri) }
                 .map { it.uri.toString() })
             .distinct()
 

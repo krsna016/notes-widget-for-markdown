@@ -152,4 +152,17 @@
     <string name="open_with_hint_ask">Android asks which app to use each time.</string>
     <string name="open_note_with">Open note with</string>
     <string name="new_note_failed">Could not create the note</string>
+    <string name="extra_notes_title">Extra Notes</string>
+    <string name="extra_notes_desc">Optional. Single Markdown files from anywhere on your device, shown on the widget together with the notes from your folder. Add them one at a time.</string>
+    <string name="extra_notes_add">Add File</string>
+    <string name="extra_notes_unavailable">Not available. The file was moved or deleted, or access to it was lost.</string>
+    <string name="extra_notes_unknown_name">Unknown file</string>
+    <string name="extra_notes_already_added">This file is already on the widget</string>
+    <string name="extra_notes_in_folder">This file is already in your notes folder.</string>
+    <string name="extra_notes_not_markdown">Only Markdown (.md) files can be added</string>
+    <string name="extra_notes_add_failed">Could not keep access to this file</string>
+    <string name="action_remove_from_widget">Remove from widget</string>
+    <string name="remove_extra_note_title">Remove %1$s from the widget?</string>
+    <string name="remove_extra_note_body">The file stays on your device. Only the widget stops showing it.</string>
+    <string name="card_remove_from_widget">Remove from widget, the file stays</string>
 </resources>

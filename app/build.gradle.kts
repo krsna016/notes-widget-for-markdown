@@ -156,6 +156,7 @@ dependencies {
     implementation(libs.commonmark.ext.gfm.strikethrough)
 
     testImplementation(libs.junit)
+    testImplementation(libs.org.json)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))

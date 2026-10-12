@@ -10,6 +10,7 @@ import android.net.Uri
 import android.provider.DocumentsContract
 import android.provider.MediaStore
 import androidx.documentfile.provider.DocumentFile
+import com.marfolog.noteswidgetformarkdown.data.preferences.ExtraNotesStore
 import com.marfolog.noteswidgetformarkdown.presentation.setup.SetupActivity
 import com.marfolog.noteswidgetformarkdown.presentation.widget.NotesWidget
 import com.marfolog.noteswidgetformarkdown.util.AppLog
@@ -88,7 +89,15 @@ class NotesFolderObserverJob : JobService() {
                 val markdown = folder.listFiles()
                     .filter { it.isFile && it.name?.endsWith(".md", ignoreCase = true) == true }
                 val newest = markdown.maxOfOrNull { it.lastModified() } ?: 0L
-                "${markdown.size}:$newest"
+                // Extra notes sit outside the folder, so the listing above never sees them
+                // change. The MediaStore trigger does fire for them; without their own times in
+                // the fingerprint that event would be thrown away as "nothing new".
+                val extras = ExtraNotesStore(context).getAll().joinToString(",") { fileUri ->
+                    runCatching {
+                        DocumentFile.fromSingleUri(context, Uri.parse(fileUri))?.lastModified() ?: 0L
+                    }.getOrDefault(0L).toString()
+                }
+                "${markdown.size}:$newest|$extras"
             }.getOrNull() ?: run {
                 AppLog.d(AREA, "Fingerprint check failed, assuming changed")
                 return true

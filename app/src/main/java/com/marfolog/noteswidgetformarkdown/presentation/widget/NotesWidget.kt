@@ -95,7 +95,8 @@ class NotesWidget : GlanceAppWidget() {
                         current.noteFolderPath,
                         current.cardSettings,
                         current.gitSyncStatus,
-                        isLoading
+                        isLoading,
+                        current.extraNoteFolders
                     )
                 }
             }
@@ -138,7 +139,8 @@ private fun WidgetRoot(
     noteFolderPath: String?,
     cardSettings: Map<String, NoteCardAppearance>,
     gitSyncStatus: GitSyncStatus?,
-    isLoading: Boolean = false
+    isLoading: Boolean = false,
+    extraNoteFolders: Map<String, String> = emptyMap()
 ) {
     Box(
         modifier = GlanceModifier
@@ -149,7 +151,7 @@ private fun WidgetRoot(
         when (state) {
             is WidgetState.Uninitialized -> UninitializedContent()
             is WidgetState.PermissionLost -> PermissionLostContent()
-            is WidgetState.Success -> ConfiguredContent(state.notes, vaultName, noteFolderPath, cardSettings, gitSyncStatus, isLoading)
+            is WidgetState.Success -> ConfiguredContent(state.notes, vaultName, noteFolderPath, cardSettings, gitSyncStatus, isLoading, extraNoteFolders)
             is WidgetState.Empty -> ConfiguredContentEmpty(vaultName, noteFolderPath, gitSyncStatus, isLoading)
             is WidgetState.Error -> ConfiguredContentError(state.message, vaultName, noteFolderPath, gitSyncStatus, isLoading)
         }
@@ -287,10 +289,11 @@ private fun ConfiguredContent(
     noteFolderPath: String?,
     cardSettings: Map<String, NoteCardAppearance>,
     gitSyncStatus: GitSyncStatus?,
-    isLoading: Boolean = false
+    isLoading: Boolean = false,
+    extraNoteFolders: Map<String, String> = emptyMap()
 ) {
     ConfiguredScaffold(vaultName, noteFolderPath, gitSyncStatus, isLoading) {
-        NotesList(notes, vaultName, noteFolderPath, cardSettings)
+        NotesList(notes, vaultName, noteFolderPath, cardSettings, extraNoteFolders)
     }
 }
 
@@ -328,7 +331,8 @@ private fun NotesList(
     notes: List<NoteSummary>,
     vaultName: String?,
     noteFolderPath: String?,
-    cardSettings: Map<String, NoteCardAppearance>
+    cardSettings: Map<String, NoteCardAppearance>,
+    extraNoteFolders: Map<String, String>
 ) {
     LazyColumn(
         modifier = GlanceModifier
@@ -344,7 +348,7 @@ private fun NotesList(
                 NoteCard(
                     note,
                     vaultName,
-                    noteFolderPath,
+                    noteFolderPathFor(note, noteFolderPath, extraNoteFolders),
                     cardSettings[note.fileUri] ?: NoteCardAppearance()
                 )
                 Spacer(modifier = GlanceModifier.height(8.dp))

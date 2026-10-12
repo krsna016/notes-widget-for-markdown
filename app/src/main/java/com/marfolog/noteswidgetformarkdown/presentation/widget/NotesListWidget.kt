@@ -88,7 +88,8 @@ class NotesListWidget : GlanceAppWidget() {
                                     notes = state.notes,
                                     vaultName = current.vaultName,
                                     noteFolderPath = current.noteFolderPath,
-                                    cardSettings = current.cardSettings
+                                    cardSettings = current.cardSettings,
+                                    extraNoteFolders = current.extraNoteFolders
                                 )
                                 else -> StatusMessage(state)
                             }
@@ -118,7 +119,8 @@ private fun NoteNameList(
     notes: List<NoteSummary>,
     vaultName: String?,
     noteFolderPath: String?,
-    cardSettings: Map<String, NoteCardAppearance>
+    cardSettings: Map<String, NoteCardAppearance>,
+    extraNoteFolders: Map<String, String>
 ) {
     LazyColumn(modifier = GlanceModifier.fillMaxSize()) {
         items(notes, itemId = { note ->
@@ -131,7 +133,7 @@ private fun NoteNameList(
                 NoteNameRow(
                     note = note,
                     vaultName = vaultName,
-                    noteFolderPath = noteFolderPath,
+                    noteFolderPath = noteFolderPathFor(note, noteFolderPath, extraNoteFolders),
                     appearance = cardSettings[note.fileUri] ?: NoteCardAppearance()
                 )
                 Spacer(modifier = GlanceModifier.height(4.dp))

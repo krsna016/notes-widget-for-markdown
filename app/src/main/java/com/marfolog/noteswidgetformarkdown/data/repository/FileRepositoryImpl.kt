@@ -27,7 +27,7 @@ class FileRepositoryImpl(
 
     private val contentResolver get() = context.contentResolver
 
-    override fun getNotes(folderUri: String): Flow<List<NoteSummary>> = flow {
+    override fun getNotes(folderUri: String, extraFileUris: List<String>): Flow<List<NoteSummary>> = flow {
         val startedAt = System.currentTimeMillis()
         val treeUri = Uri.parse(folderUri)
 
@@ -58,8 +58,36 @@ class FileRepositoryImpl(
 
         AppLog.d("Files", "Loaded ${notes.size} notes in ${System.currentTimeMillis() - startedAt}ms from $folderUri")
         AppLog.d("Files", notes.joinToString { "${it.fileName}@${it.lastModified}" })
-        emit(notes)
+
+        // An extra note that went missing is skipped, not an error: the folder is what the
+        // widget is about, and one moved file must not blank the whole thing.
+        val extraNotes = extraFileUris.mapNotNull { getExtraNote(it).getOrNull() }
+        if (extraFileUris.isNotEmpty()) {
+            AppLog.d("Files", "Loaded ${extraNotes.size} of ${extraFileUris.size} extra notes")
+        }
+        emit(mergeFolderAndExtraNotes(notes, extraNotes))
     }.flowOn(Dispatchers.IO)
+
+    override suspend fun getExtraNote(fileUri: String): Result<NoteSummary> = withContext(Dispatchers.IO) {
+        runCatching {
+            val uri = Uri.parse(fileUri)
+            // Same check the folder gets: without a persisted grant the reads below would only
+            // work until the process dies, and then fail somewhere less obvious.
+            val hasPermission = contentResolver.persistedUriPermissions.any { perm ->
+                perm.uri == uri && perm.isReadPermission
+            }
+            if (!hasPermission) {
+                throw SecurityException("Access to an extra note was revoked")
+            }
+            val docFile = DocumentFile.fromSingleUri(context, uri)
+                ?: throw IllegalStateException("Extra note could not be resolved")
+            if (!docFile.exists()) {
+                throw java.io.FileNotFoundException("Extra note no longer exists")
+            }
+            fileToNoteSummary(docFile)?.copy(isExtra = true)
+                ?: throw IllegalStateException("Extra note could not be read")
+        }
+    }
 
     override suspend fun createNote(
         folderUri: String,
@@ -128,7 +156,12 @@ class FileRepositoryImpl(
 
     override suspend fun deleteNote(fileUri: String): Result<Boolean> = withContext(Dispatchers.IO) {
         runCatching {
-            val deleted = DocumentsContract.deleteDocument(contentResolver, Uri.parse(fileUri))
+            val uri = Uri.parse(fileUri)
+            // Folder notes are always listed through the granted tree, so their uris are tree
+            // uris. A plain document uri can only be an extra note, and those are never deleted —
+            // DeleteNoteUseCase already refuses them, this is the last line behind it.
+            require(DocumentsContract.isTreeUri(uri)) { "Refusing to delete a note from outside the notes folder" }
+            val deleted = DocumentsContract.deleteDocument(contentResolver, uri)
             Log.d(TAG, "Delete of $fileUri returned $deleted")
             deleted
         }.recoverCatching { error ->

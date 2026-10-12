@@ -5,6 +5,7 @@ import com.marfolog.noteswidgetformarkdown.domain.repository.FileRepository
 import com.marfolog.noteswidgetformarkdown.domain.usecase.AppendFastNoteUseCase
 import com.marfolog.noteswidgetformarkdown.domain.usecase.CreateNoteUseCase
 import com.marfolog.noteswidgetformarkdown.domain.usecase.DeleteNoteUseCase
+import com.marfolog.noteswidgetformarkdown.domain.usecase.GetExtraNotesUseCase
 import com.marfolog.noteswidgetformarkdown.domain.usecase.GetNotesUseCase
 import com.marfolog.noteswidgetformarkdown.presentation.viewmodel.NotesViewModel
 import org.koin.core.module.dsl.viewModel
@@ -16,5 +17,6 @@ val appModule = module {
     factory { CreateNoteUseCase(fileRepository = get()) }
     factory { AppendFastNoteUseCase(fileRepository = get()) }
     factory { DeleteNoteUseCase(fileRepository = get()) }
+    factory { GetExtraNotesUseCase(fileRepository = get()) }
     viewModel { NotesViewModel(getNotesUseCase = get()) }
 }

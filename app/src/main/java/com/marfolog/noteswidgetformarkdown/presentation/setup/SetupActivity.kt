@@ -47,6 +47,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.RemoveCircleOutline
 import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material.icons.filled.DragHandle
 import androidx.compose.material3.AlertDialog
@@ -97,8 +98,12 @@ import androidx.compose.ui.unit.dp
 import androidx.documentfile.provider.DocumentFile
 import com.marfolog.noteswidgetformarkdown.BuildConfig
 import com.marfolog.noteswidgetformarkdown.R
+import com.marfolog.noteswidgetformarkdown.data.preferences.ExtraNotesStore
 import com.marfolog.noteswidgetformarkdown.data.preferences.NoteCardSettingsStore
 import com.marfolog.noteswidgetformarkdown.data.repository.GitSyncStatusReader
+import com.marfolog.noteswidgetformarkdown.data.repository.fileNameFromDocumentUri
+import com.marfolog.noteswidgetformarkdown.data.repository.isAlreadyAFolderNote
+import com.marfolog.noteswidgetformarkdown.data.repository.isMarkdownFileName
 import com.marfolog.noteswidgetformarkdown.data.repository.ObsidianVaultLocator
 import java.text.DateFormat
 import java.util.Date
@@ -109,6 +114,7 @@ import com.marfolog.noteswidgetformarkdown.domain.model.NoteCardSize
 import com.marfolog.noteswidgetformarkdown.domain.model.NoteCardTextSize
 import com.marfolog.noteswidgetformarkdown.domain.model.NoteSummary
 import com.marfolog.noteswidgetformarkdown.domain.usecase.DeleteNoteUseCase
+import com.marfolog.noteswidgetformarkdown.domain.usecase.GetExtraNotesUseCase
 import com.marfolog.noteswidgetformarkdown.domain.usecase.GetNotesUseCase
 import com.marfolog.noteswidgetformarkdown.presentation.widget.GitSyncLabel
 import com.marfolog.noteswidgetformarkdown.presentation.widget.NotesWidget
@@ -200,8 +206,25 @@ private fun SetupScreen(modifier: Modifier = Modifier) {
     var notesForSettings by remember { mutableStateOf<List<NoteSummary>>(emptyList()) }
     var cardSettings by remember { mutableStateOf(cardSettingsStore.getAll()) }
     var notesLoadError by rememberSaveable { mutableStateOf<String?>(null) }
+    val extraNotesStore = remember { ExtraNotesStore(context.applicationContext) }
+    var extraNoteUris by remember { mutableStateOf(extraNotesStore.getAll()) }
+    var extraNoteEntries by remember { mutableStateOf<List<ExtraNoteEntry>>(emptyList()) }
+    var extraNoteToRemove by remember { mutableStateOf<ExtraNoteEntry?>(null) }
 
-    LaunchedEffect(notesUri) {
+    LaunchedEffect(extraNoteUris) {
+        val getExtraNotesUseCase = get<GetExtraNotesUseCase>(GetExtraNotesUseCase::class.java)
+        extraNoteEntries = getExtraNotesUseCase(extraNoteUris).map { extra ->
+            ExtraNoteEntry(
+                fileUri = extra.fileUri,
+                // A file that cannot be opened any more has no name to ask for, so it comes
+                // from the uri — still enough to recognise which one to remove.
+                name = extra.note?.fileName ?: fileNameFromDocumentUri(extra.fileUri),
+                isAvailable = extra.isAvailable
+            )
+        }
+    }
+
+    LaunchedEffect(notesUri, extraNoteUris) {
         val currentNotesUri = notesUri
         if (currentNotesUri.isNullOrEmpty()) {
             notesForSettings = emptyList()
@@ -211,7 +234,9 @@ private fun SetupScreen(modifier: Modifier = Modifier) {
 
         runCatching {
             val getNotesUseCase = get<GetNotesUseCase>(GetNotesUseCase::class.java)
-            cardSettingsStore.applyOrder(getNotesUseCase(currentNotesUri).firstOrNull().orEmpty())
+            cardSettingsStore.applyOrder(
+                getNotesUseCase(currentNotesUri, extraNoteUris).firstOrNull().orEmpty()
+            )
         }.onSuccess { notes ->
             notesForSettings = notes
             cardSettings = cardSettingsStore.getAll()
@@ -377,6 +402,38 @@ private fun SetupScreen(modifier: Modifier = Modifier) {
         }
     }
 
+    // One file per pick. The type list is wide on purpose — providers disagree on what a .md file
+    // is — and the extension check below is what actually decides.
+    val extraNotePicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        val name = runCatching { DocumentFile.fromSingleUri(context, uri)?.name }.getOrNull()
+        if (!isMarkdownFileName(name)) {
+            Toast.makeText(context, R.string.extra_notes_not_markdown, Toast.LENGTH_SHORT).show()
+            return@rememberLauncherForActivityResult
+        }
+        // Checked before any access is kept: a refused file must not leave a grant behind.
+        val folderNoteUris = notesForSettings.filterNot { it.isExtra }.map { it.fileUri }
+        if (isAlreadyAFolderNote(uri.toString(), folderNoteUris)) {
+            Toast.makeText(context, R.string.extra_notes_in_folder, Toast.LENGTH_SHORT).show()
+            return@rememberLauncherForActivityResult
+        }
+        extraNotesStore.add(uri.toString())
+            .onSuccess { added ->
+                if (added) {
+                    extraNoteUris = extraNotesStore.getAll()
+                    scope.launch { NotesWidget.updateAll(context) }
+                } else {
+                    Toast.makeText(context, R.string.extra_notes_already_added, Toast.LENGTH_SHORT).show()
+                }
+            }
+            .onFailure { error ->
+                AppLog.w(SetupActivity.AREA, "Could not keep access to an extra note", error)
+                Toast.makeText(context, R.string.extra_notes_add_failed, Toast.LENGTH_SHORT).show()
+            }
+    }
+
     val vaultDisplayName = vaultName
     // Nazev musi byt neprazdny vzdy, kdyz je slozka vybrana — zbytek nastaveni se podle nej
     // zobrazuje. Kdyz na ni prijdeme o opravneni, DocumentFile.name vrati null, tak vezmeme
@@ -436,6 +493,9 @@ private fun SetupScreen(modifier: Modifier = Modifier) {
         notesFolderName = notesDisplayName,
         notesFolderPath = notesUri?.let { humanFolderPath(it) },
         onSelectNotesFolder = { notesPicker.launch(null) },
+        extraNotes = extraNoteEntries,
+        onAddExtraNote = { extraNotePicker.launch(EXTRA_NOTE_MIME_TYPES) },
+        onRemoveExtraNote = { entry -> extraNoteToRemove = entry },
         derivedPath = derivedPath,
         notes = notesForSettings,
         cardSettings = cardSettings,
@@ -487,7 +547,15 @@ private fun SetupScreen(modifier: Modifier = Modifier) {
         onToggleExpanded = { note ->
             expandedNoteUri = if (expandedNoteUri == note.fileUri) null else note.fileUri
         },
-        onDeleteRequested = { note -> noteToDelete = note },
+        onDeleteRequested = { note ->
+            // A swipe on an extra note only takes it off the widget, so it gets that dialog —
+            // never the delete one.
+            if (note.isExtra) {
+                extraNoteToRemove = ExtraNoteEntry(note.fileUri, note.fileName, isAvailable = true)
+            } else {
+                noteToDelete = note
+            }
+        },
         openWith = openWith,
         onOpenWithChanged = { mode ->
             openWith = mode
@@ -543,7 +611,7 @@ private fun SetupScreen(modifier: Modifier = Modifier) {
                         scope.launch {
                             val deleteNoteUseCase = get<DeleteNoteUseCase>(DeleteNoteUseCase::class.java)
                             AppLog.i(SetupActivity.AREA, "Deleting a note file on user request")
-                            deleteNoteUseCase(note.fileUri)
+                            deleteNoteUseCase(note)
                                 .onSuccess { deleted ->
                                     if (deleted) {
                                         cardSettingsStore.forget(note.fileUri)
@@ -586,7 +654,35 @@ private fun SetupScreen(modifier: Modifier = Modifier) {
             }
         )
     }
+
+    // Removing an extra note forgets it and gives its access back. The file is not touched.
+    extraNoteToRemove?.let { entry ->
+        RemoveExtraNoteDialog(
+            name = entry.name,
+            onDismiss = { extraNoteToRemove = null },
+            onConfirm = {
+                extraNoteToRemove = null
+                extraNotesStore.remove(entry.fileUri)
+                cardSettingsStore.forget(entry.fileUri)
+                extraNoteUris = extraNotesStore.getAll()
+                notesForSettings = notesForSettings.filterNot { it.isExtra && it.fileUri == entry.fileUri }
+                cardSettings = cardSettingsStore.getAll()
+                if (expandedNoteUri == entry.fileUri) {
+                    expandedNoteUri = null
+                }
+                scope.launch { NotesWidget.updateAll(context) }
+            }
+        )
+    }
 }
+
+/** What the single-file picker offers. See the picker for why the list is this wide. */
+private val EXTRA_NOTE_MIME_TYPES = arrayOf(
+    "text/markdown",
+    "text/x-markdown",
+    "text/plain",
+    "application/octet-stream"
+)
 
 /**
  * Ctelna cesta ke slozce ze SAF tree URI. Z "primary:Documents/vault/Quick" udela
@@ -670,6 +766,9 @@ internal fun SetupScreenContent(
     notesFolderName: String?,
     notesFolderPath: String? = null,
     onSelectNotesFolder: () -> Unit,
+    extraNotes: List<ExtraNoteEntry> = emptyList(),
+    onAddExtraNote: () -> Unit = {},
+    onRemoveExtraNote: (ExtraNoteEntry) -> Unit = {},
     derivedPath: String,
     notes: List<NoteSummary> = emptyList(),
     cardSettings: Map<String, NoteCardAppearance> = emptyMap(),
@@ -773,6 +872,16 @@ internal fun SetupScreenContent(
         HorizontalDivider()
         Spacer(modifier = Modifier.height(24.dp))
 
+        ExtraNotesSection(
+            entries = extraNotes,
+            onAddFile = onAddExtraNote,
+            onRemove = onRemoveExtraNote
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+        HorizontalDivider()
+        Spacer(modifier = Modifier.height(24.dp))
+
         Text(
             text = stringResource(R.string.open_with_title),
             style = MaterialTheme.typography.titleMedium,
@@ -828,7 +937,8 @@ internal fun SetupScreenContent(
         Spacer(modifier = Modifier.height(12.dp))
 
         FastNoteTargetSection(
-            notes = notes,
+            // Fast notes go into the folder; an extra note is not a target.
+            notes = notes.filterNot { it.isExtra },
             notesLoadError = notesLoadError,
             selectedNoteUri = fastNoteTargetUri,
             onTargetSelected = onFastNoteTargetSelected,
@@ -1227,7 +1337,8 @@ private fun CardSettingsSection(
                 ReorderableItem {
                 SwipeToDelete(
                     onDelete = { onDeleteRequested(note) },
-                    hintOffset = if (index == 0) hintOffset.value else 0f
+                    hintOffset = if (index == 0) hintOffset.value else 0f,
+                    removesFromWidgetOnly = note.isExtra
                 ) {
                 NoteCardSettingsRow(
                     note = note,
@@ -1392,11 +1503,15 @@ private const val KEY_SWIPE_HINT_SHOWN = "card_swipe_hint_shown"
  * takze se karta vzdy vrati zpatky — nic nemizi pod rukou.
  *
  * [hintOffset] je jen posun pro uvodni napovedu; gesto samo bezi pres stav dismiss boxu.
+ *
+ * [removesFromWidgetOnly] is for extra notes: the swipe then shows a "remove" icon instead of
+ * the trash can, because nothing gets deleted.
  */
 @Composable
-private fun SwipeToDelete(
+internal fun SwipeToDelete(
     onDelete: () -> Unit,
     hintOffset: Float,
+    removesFromWidgetOnly: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val state = rememberSwipeToDismissBoxState(
@@ -1408,14 +1523,14 @@ private fun SwipeToDelete(
     Box(modifier = Modifier.offset { IntOffset(hintOffset.toInt(), 0) }) {
         SwipeToDismissBox(
             state = state,
-            backgroundContent = { DeleteSwipeBackground(state.dismissDirection) },
+            backgroundContent = { DeleteSwipeBackground(state.dismissDirection, removesFromWidgetOnly) },
             content = { content() }
         )
     }
 }
 
 @Composable
-private fun DeleteSwipeBackground(direction: SwipeToDismissBoxValue) {
+private fun DeleteSwipeBackground(direction: SwipeToDismissBoxValue, removesFromWidgetOnly: Boolean) {
     val alignment = if (direction == SwipeToDismissBoxValue.EndToStart) {
         Alignment.CenterEnd
     } else {
@@ -1425,15 +1540,25 @@ private fun DeleteSwipeBackground(direction: SwipeToDismissBoxValue) {
         modifier = Modifier
             .fillMaxSize()
             .clip(RoundedCornerShape(12.dp))
+            // Red either way, so the swipe reads as "this goes away". The icon and the dialog
+            // are what tell removing from the widget apart from deleting the file.
             .background(MaterialTheme.colorScheme.errorContainer)
             .padding(horizontal = 20.dp),
         contentAlignment = alignment
     ) {
-        Icon(
-            imageVector = Icons.Default.Delete,
-            contentDescription = stringResource(R.string.card_delete_file),
-            tint = MaterialTheme.colorScheme.onErrorContainer
-        )
+        if (removesFromWidgetOnly) {
+            Icon(
+                imageVector = Icons.Default.RemoveCircleOutline,
+                contentDescription = stringResource(R.string.card_remove_from_widget),
+                tint = MaterialTheme.colorScheme.onErrorContainer
+            )
+        } else {
+            Icon(
+                imageVector = Icons.Default.Delete,
+                contentDescription = stringResource(R.string.card_delete_file),
+                tint = MaterialTheme.colorScheme.onErrorContainer
+            )
+        }
     }
 }
 

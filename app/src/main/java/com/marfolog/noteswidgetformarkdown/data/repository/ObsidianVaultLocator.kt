@@ -18,11 +18,13 @@ import kotlinx.coroutines.withContext
  */
 class ObsidianVaultLocator(private val context: Context) {
 
-    data class Vault(val name: String, val documentId: String)
+    data class Vault(val name: String, val documentId: String, val authority: String? = null)
 
     suspend fun locate(): Vault? = withContext(Dispatchers.IO) {
         context.contentResolver.persistedUriPermissions
-            .filter { it.isReadPermission }
+            // Extra notes are single-file grants. They cannot hold a vault, and fromTreeUri
+            // throws on them.
+            .filter { it.isReadPermission && DocumentsContract.isTreeUri(it.uri) }
             .firstNotNullOfOrNull { permission ->
                 runCatching {
                     val tree = DocumentFile.fromTreeUri(context, permission.uri)
@@ -32,7 +34,8 @@ class ObsidianVaultLocator(private val context: Context) {
                     if (holdsVault && !name.isNullOrEmpty()) {
                         Vault(
                             name = name,
-                            documentId = DocumentsContract.getTreeDocumentId(permission.uri)
+                            documentId = DocumentsContract.getTreeDocumentId(permission.uri),
+                            authority = permission.uri.authority
                         )
                     } else {
                         null
@@ -59,6 +62,26 @@ class ObsidianVaultLocator(private val context: Context) {
 
             return relativeDocumentPath(vaultDocumentId, notesDocId)
         }
+
+        /**
+         * Folder of a single note relative to the vault root, for an extra note that was added
+         * on its own. Empty when it sits in the vault root; null when it lives outside the vault
+         * or comes from another provider — then there is no deep link to build, and the note is
+         * opened as a plain file instead.
+         */
+        fun folderOfNote(vault: Vault, noteUri: String): String? {
+            val uri = runCatching { Uri.parse(noteUri) }.getOrNull() ?: return null
+            if (vault.authority != null && uri.authority != vault.authority) return null
+            val noteDocId = runCatching { DocumentsContract.getDocumentId(uri) }.getOrNull()
+                ?: return null
+            return relativeFolderOfDocument(vault.documentId, noteDocId)
+        }
+
+        /** [relativeDocumentPath] for a file, minus the file name. Split out for unit tests. */
+        internal fun relativeFolderOfDocument(vaultDocumentId: String, fileDocumentId: String): String? =
+            relativeDocumentPath(vaultDocumentId, fileDocumentId)
+                ?.takeIf { it.isNotEmpty() }
+                ?.substringBeforeLast('/', missingDelimiterValue = "")
 
         /**
          * The comparison itself, with no Android types in sight.

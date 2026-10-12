@@ -53,6 +53,24 @@ class ObsidianVaultLocatorTest {
         assertEquals("", relative("$vault/").orEmpty())
     }
 
+    @Test
+    fun `an extra note in a vault subfolder gets that folder`() {
+        assertEquals("Lists", ObsidianVaultLocator.relativeFolderOfDocument(vault, "$vault/Lists/Gifts.md"))
+        assertEquals("Lists/2026", ObsidianVaultLocator.relativeFolderOfDocument(vault, "$vault/Lists/2026/Gifts.md"))
+    }
+
+    @Test
+    fun `an extra note in the vault root gets an empty folder`() {
+        assertEquals("", ObsidianVaultLocator.relativeFolderOfDocument(vault, "$vault/Gifts.md"))
+    }
+
+    @Test
+    fun `an extra note outside the vault has no folder, so it opens as a plain file`() {
+        assertNull(ObsidianVaultLocator.relativeFolderOfDocument(vault, "primary:Download/Gifts.md"))
+        assertNull(ObsidianVaultLocator.relativeFolderOfDocument(vault, "primary:Documents/my-vault-backup/Gifts.md"))
+        assertNull(ObsidianVaultLocator.relativeFolderOfDocument(vault, vault))
+    }
+
     private fun relative(notesDocumentId: String): String? =
         ObsidianVaultLocator.relativeDocumentPath(vault, notesDocumentId)
 }

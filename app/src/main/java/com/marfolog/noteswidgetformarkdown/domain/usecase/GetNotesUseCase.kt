@@ -7,8 +7,8 @@ import kotlinx.coroutines.flow.map
 
 class GetNotesUseCase(private val fileRepository: FileRepository) {
 
-    operator fun invoke(folderUri: String): Flow<List<NoteSummary>> {
-        return fileRepository.getNotes(folderUri).map { notes ->
+    operator fun invoke(folderUri: String, extraFileUris: List<String> = emptyList()): Flow<List<NoteSummary>> {
+        return fileRepository.getNotes(folderUri, extraFileUris).map { notes ->
             notes.sortedByDescending { it.lastModified }
         }
     }

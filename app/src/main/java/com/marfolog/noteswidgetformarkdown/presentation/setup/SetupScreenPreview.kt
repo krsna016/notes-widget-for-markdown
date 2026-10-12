@@ -37,6 +37,9 @@ private fun SetupScreenConfiguredPreview() {
                 onSelectVault = {},
                 notesFolderName = "hanges",
                 onSelectNotesFolder = {},
+                extraNotes = listOf(
+                    ExtraNoteEntry("content://preview/document/Gifts.md", "Gifts.md", isAvailable = true)
+                ),
                 derivedPath = "hanges",
                 canSave = true,
                 onSave = {},
