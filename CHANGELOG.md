@@ -2,6 +2,10 @@
 
 All notable public changes will be documented in this file.
 
+## v1.2.1 - 2026-10-12
+
+- Fixed: after picking a different notes folder, the widget kept showing the old folder until a manual refresh or the next periodic update. It now redraws right away. Reported on Reddit.
+
 ## v1.2.0 - 2026-10-12
 
 - Extra notes: single Markdown files from anywhere on the device can be added to the widget one at a time, next to the notes from the folder. Removing one, by swiping either way or with its remove button, only takes it off the widget and never deletes the file. A file that is already in the notes folder, or is not a `.md` file, is refused with a message.

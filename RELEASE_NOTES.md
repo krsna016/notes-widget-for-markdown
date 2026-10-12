@@ -1,12 +1,8 @@
-# v1.2.0
+# v1.2.1
 
-- Extra notes: add single Markdown files from anywhere on your device, one at a time, and they
-  show on the widget next to the notes from your folder. Settings → Extra Notes → Add File
-- Removing an extra note, by swiping either way or with its remove button, only takes it off the
-  widget. The file stays where it is
-- A file that is already in your notes folder, or is not a `.md` file, is refused with a message
-- Play build only: after five days the app may ask Google Play to show its rating dialog, at most
-  every 90 days, and settings have a "Rate on Google Play" link. The foss build has neither
+- Fixed: after picking a different notes folder, the widget kept showing the old folder until you
+  refreshed it by hand or the next periodic update came. It now redraws right away. Thanks to the
+  Reddit user who reported it
 
 Two builds: `foss` has no `INTERNET` permission, `play` adds analytics and crash reporting that can
 be switched off. Take `foss` unless you want to send crash reports.
