@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import com.marfolog.noteswidgetformarkdown.R
 import com.marfolog.noteswidgetformarkdown.util.AppLog
+import com.marfolog.noteswidgetformarkdown.util.RatingPrompt
 import androidx.activity.compose.setContent
 import androidx.compose.ui.res.stringResource
 import androidx.compose.material3.AlertDialog
@@ -37,6 +38,9 @@ import org.koin.java.KoinJavaComponent.get
 
 class FastNoteActivity : ComponentActivity() {
 
+    /** Off once the line is saved, so a rating dialog from Play is not drawn over a stale form. */
+    private var dialogVisible by mutableStateOf(true)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -49,7 +53,7 @@ class FastNoteActivity : ComponentActivity() {
 
         setContent {
             NotesWidgetForMarkdownTheme {
-                FastNoteDialog(
+                if (dialogVisible) FastNoteDialog(
                     hasTarget = !targetUri.isNullOrBlank(),
                     targetName = targetName,
                     onCancel = { finish() },
@@ -80,6 +84,11 @@ class FastNoteActivity : ComponentActivity() {
                                             // render is async and outlives this
                                             // Activity, which finish() destroys.
                                             NotesWidget.updateAll(applicationContext)
+                                            // A note just saved is a fair moment to ask. Not
+                                            // time yet returns at once, so this closes as fast
+                                            // as it always did; otherwise finish waits for Play.
+                                            dialogVisible = false
+                                            RatingPrompt.maybeAsk(this@FastNoteActivity)
                                             finish()
                                         } else {
                                             onError(getString(R.string.fast_note_write_failed))

@@ -9,6 +9,7 @@ import androidx.core.content.ContextCompat
 import com.marfolog.noteswidgetformarkdown.di.appModule
 import com.marfolog.noteswidgetformarkdown.presentation.widget.NotesWidget
 import com.marfolog.noteswidgetformarkdown.util.AppLog
+import com.marfolog.noteswidgetformarkdown.util.RatingPrompt
 import com.marfolog.noteswidgetformarkdown.util.Telemetry
 import com.marfolog.noteswidgetformarkdown.worker.NotesFolderObserverJob
 import kotlinx.coroutines.CoroutineScope
@@ -47,6 +48,9 @@ class NotesWidgetApp : Application() {
     override fun onCreate() {
         super.onCreate()
         Telemetry.init(this)
+        // Here rather than in an activity: widget updates start the process too, and most people
+        // only ever use the widget.
+        RatingPrompt.recordFirstSeen(this)
         AppLog.i("App", "Started, telemetry=${Telemetry.ENABLED}")
         AppLog.d("App", "Process created at ${System.currentTimeMillis()}")
         startKoin {

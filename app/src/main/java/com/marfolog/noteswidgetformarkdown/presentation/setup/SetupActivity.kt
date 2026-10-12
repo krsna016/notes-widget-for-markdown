@@ -120,6 +120,7 @@ import com.marfolog.noteswidgetformarkdown.presentation.widget.GitSyncLabel
 import com.marfolog.noteswidgetformarkdown.presentation.widget.NotesWidget
 import com.marfolog.noteswidgetformarkdown.presentation.widget.OpenWith
 import com.marfolog.noteswidgetformarkdown.util.AppLog
+import com.marfolog.noteswidgetformarkdown.util.RatingPrompt
 import com.marfolog.noteswidgetformarkdown.util.Telemetry
 import com.marfolog.noteswidgetformarkdown.worker.NotesFolderObserverJob
 import com.marfolog.noteswidgetformarkdown.ui.theme.NoteCardPalette
@@ -476,6 +477,19 @@ private fun SetupScreen(modifier: Modifier = Modifier) {
         }
     }
 
+    // Only a returning user with a working setup, and never over a dialog of our own. The delay
+    // lets the screen settle first, and opening a dialog in the meantime cancels it.
+    val canAskForRating = guideStep == null &&
+        notesUri != null &&
+        !(askAboutReporting && Telemetry.ENABLED) &&
+        noteToDelete == null &&
+        extraNoteToRemove == null
+    LaunchedEffect(canAskForRating) {
+        if (!canAskForRating) return@LaunchedEffect
+        delay(RATING_PROMPT_DELAY_MILLIS)
+        (context as? Activity)?.let { RatingPrompt.maybeAsk(it) }
+    }
+
     if (askAboutReporting && Telemetry.ENABLED) {
         ReportingConsentDialog { agreed ->
             Telemetry.setEnabled(context, agreed)
@@ -675,6 +689,8 @@ private fun SetupScreen(modifier: Modifier = Modifier) {
         )
     }
 }
+
+private const val RATING_PROMPT_DELAY_MILLIS = 1_500L
 
 /** What the single-file picker offers. See the picker for why the list is this wide. */
 private val EXTRA_NOTE_MIME_TYPES = arrayOf(
@@ -1692,6 +1708,12 @@ private fun AboutSection() {
 
     OutlinedButton(onClick = { open(ISSUES_URL) }, modifier = Modifier.fillMaxWidth()) {
         Text(stringResource(R.string.about_report))
+    }
+    // Only the Play build has a store page; the foss build shows nothing here.
+    if (RatingPrompt.HAS_STORE_PAGE) {
+        TextButton(onClick = { RatingPrompt.openStorePage(context) }, modifier = Modifier.fillMaxWidth()) {
+            Text(stringResource(R.string.about_rate))
+        }
     }
     Spacer(modifier = Modifier.height(8.dp))
     OutlinedButton(onClick = { open(DISCUSSIONS_URL) }, modifier = Modifier.fillMaxWidth()) {

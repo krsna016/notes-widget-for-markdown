@@ -12,6 +12,7 @@ reorderable = "3.1.0"
 firebaseBom = "34.1.0"
 googleServices = "4.4.4"
 crashlyticsPlugin = "3.0.8"
+playReview = "2.0.2"
 glance = "1.2.0"
 koin = "4.1.1"
 coroutines = "1.10.2"
@@ -65,6 +66,7 @@ reorderable = { group = "sh.calvin.reorderable", name = "reorderable", version.r
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
 firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics" }
 firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics" }
+play-review-ktx = { group = "com.google.android.play", name = "review-ktx", version.ref = "playReview" }
 
 # Markdown
 commonmark = { group = "org.commonmark", name = "commonmark", version.ref = "commonmark" }

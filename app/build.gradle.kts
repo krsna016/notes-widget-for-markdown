@@ -150,6 +150,9 @@ dependencies {
     "playImplementation"(libs.firebase.analytics)
     "playImplementation"(libs.firebase.crashlytics)
 
+    // Google Play's in-app rating dialog, Play flavour only
+    "playImplementation"(libs.play.review.ktx)
+
     // Markdown preview
     implementation(libs.commonmark)
     implementation(libs.commonmark.ext.task.list.items)

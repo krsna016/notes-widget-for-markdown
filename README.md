@@ -101,6 +101,7 @@ phone.
 | Analytics | none | Firebase, app usage only |
 | Crash reports | none | Firebase Crashlytics |
 | Can be switched off | nothing to switch off | yes, in settings |
+| Rating prompt | none | Google Play's own dialog, at most every 90 days, and a store link in settings |
 
 **The foss build declares no `INTERNET` permission.** Without it, Android does not grant the app a
 network connection of its own. That is a property of the file you download rather than an assurance
@@ -121,6 +122,14 @@ The Play build reports app and crash events. It can be switched off in settings.
 to send note contents, file names or folder paths: storage locations are stripped from crash
 breadcrumbs before they are handed to Firebase. No advertising ID is collected, and the ad-related
 permissions Firebase would otherwise add are removed from the manifest.
+
+Five days after the Play build first runs on your phone (for an update, the first run of the
+version that added this), it may ask Google Play to show its rating dialog:
+right after you save a quick note from the widget, or when you open settings. It asks no more
+than once every 90 days. That request goes to the Play Store app on your phone, and Google decides
+whether the dialog appears. The app is never told whether you rated it or what you gave, and it
+sends nothing about your notes. Settings in the Play build also have a "Rate on Google Play" link
+that opens the store page. The foss build has neither.
 
 Neither build has an account, a server or a database. Files are read only in folders you picked.
 
