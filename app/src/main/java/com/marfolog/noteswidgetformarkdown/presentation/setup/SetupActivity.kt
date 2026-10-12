@@ -392,6 +392,9 @@ private fun SetupScreen(modifier: Modifier = Modifier) {
             AppLog.i(SetupActivity.AREA, "Notes folder granted: $uriStr")
             // Re-arm the folder watcher: it is bound to one specific tree URI.
             NotesFolderObserverJob.schedule(context)
+            // And redraw now. The watcher only wakes when a file changes, so after a plain
+            // folder switch the widget kept showing the old folder until something else did.
+            scope.launch { NotesWidget.updateAll(context) }
 
             // Compute relative path if vault is already selected
             val currentVaultUri = vaultUri
