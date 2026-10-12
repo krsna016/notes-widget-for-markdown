@@ -20,3 +20,7 @@
 # s0 and c they say nothing, and a bug report is all the visibility the foss build has.
 -keepnames class com.marfolog.noteswidgetformarkdown.domain.model.** { *; }
 -keepnames class com.marfolog.noteswidgetformarkdown.presentation.widget.WidgetState** { *; }
+
+# review-ktx references an annotation from a newer play-services-basement than the one Firebase
+# pulls in. It is compile-time only, so its absence at runtime changes nothing.
+-dontwarn com.google.android.gms.common.annotation.NoNullnessRewrite
