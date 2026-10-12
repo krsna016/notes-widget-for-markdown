@@ -99,6 +99,15 @@ android {
     }
 }
 
+// A foss debug build installs next to the copy from Google Play instead of over it: same id would
+// mean a signature clash, and uninstalling the store copy loses the widget setup. Only foss, since
+// the Play flavour's google-services.json is registered for the real id alone.
+androidComponents {
+    onVariants(selector().withBuildType("debug").withFlavor("distribution" to "foss")) { variant ->
+        variant.applicationId.set("com.marfolog.noteswidgetformarkdown.debug")
+    }
+}
+
 // When both flavours are built in one invocation the Firebase plugins are applied for the Play
 // variant and then also demand a google-services.json for foss, which deliberately has none.
 // Switch their foss counterparts off instead.
