@@ -1,0 +1,1 @@
+Fixed: after picking a different notes folder, the widget kept showing the old folder until a manual refresh. It now updates right away.

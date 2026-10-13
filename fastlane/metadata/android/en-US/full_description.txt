@@ -1,0 +1,24 @@
+A home screen widget for your Markdown notes. Pick a folder of plain .md files, an Obsidian vault or any other folder, and your notes show up as cards or a compact list without opening an app. The folder is read through Android's own file picker, so your notes stay in a format any app can open.
+
+<b>Works with Obsidian, or without it</b>
+Built with Obsidian users in mind, but Obsidian doesn't have to be installed. Any app that writes plain Markdown files to a folder works the same way. Tap a note to open it in Obsidian or your default Markdown app, or let Android ask every time.
+
+<b>Two widget styles</b>
+Cards show a Markdown preview with headings, links, lists, checkboxes and strikethrough. The compact list shows only note titles, so more of them fit.
+
+<b>Make it yours</b>
+Set the height, text size and colour of each note, and drag notes to reorder them. Swipe a card aside to delete the file. The delete is real and there is no trash, so the app asks first.
+
+<b>Extra notes</b>
+Add single Markdown files from other folders, one at a time, and they show up next to the folder notes. Removing one only takes it off the widget, the file stays where it is.
+
+<b>Git sync status on your home screen</b>
+If your notes folder is a git repository, a small label shows the last commit, a stuck merge or unpushed work. It reads the .git folder only, so it works the same with Obsidian Git, Git Sync or command-line git. Without a git repo, the label shows when a note last changed.
+
+<b>Quick capture</b>
+A second button adds a line to one file you choose, for when you need to write something down before you forget it.
+
+<b>Your notes stay yours</b>
+The app doesn't copy, convert or upload your notes. It reads the files you already have, where they are. This build has no INTERNET permission, so Android gives it no network connection of its own. There's no account, and no analytics or crash reporting either.
+
+Open source, GPL-3.0. Requires Android 11 or newer.

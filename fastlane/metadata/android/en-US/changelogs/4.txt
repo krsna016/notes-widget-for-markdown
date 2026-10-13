@@ -1,0 +1,1 @@
+Add single Markdown files from anywhere to the widget (Settings, Extra Notes, Add File). Removing one only takes it off the widget, the file stays on your device.

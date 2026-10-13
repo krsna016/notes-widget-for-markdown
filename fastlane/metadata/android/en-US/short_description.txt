@@ -1,0 +1,1 @@
+Markdown notes from any folder on your home screen, with git sync status.
