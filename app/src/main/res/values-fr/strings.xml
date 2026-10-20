@@ -1,14 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">Notes Widget for Markdown</string>
     <string name="widget_description">Affiche vos notes Markdown dans un widget défilant</string>
     <string name="list_widget_description">Liste compacte des noms de notes avec leur dernière modification</string>
-
     <string name="action_refresh">Recharger les notes</string>
     <string name="action_open_settings">Ouvrir les réglages du widget</string>
     <string name="action_add_note">Ajouter une note</string>
     <string name="action_add_fast_note">Ajouter une note rapide</string>
     <string name="action_setup">Configurer</string>
     <string name="action_error">Erreur</string>
-
     <string name="widget_setup_required">Configuration requise</string>
     <string name="widget_setup_hint">Touchez pour choisir votre dossier de notes</string>
     <string name="widget_permission_lost">Autorisation perdue</string>
@@ -17,7 +17,6 @@
     <string name="widget_pick_folder_hint">Touchez le crayon pour choisir votre dossier de notes</string>
     <string name="widget_permission_lost_short">Autorisation du dossier perdue — ouvrez les réglages</string>
     <string name="widget_new_note_name">Nouvelle note</string>
-
     <string name="sync_no_info">aucune info</string>
     <string name="sync_unknown">état inconnu</string>
     <string name="sync_stuck">sync bloquée</string>
@@ -27,7 +26,6 @@
     <string name="sync_days_one">1 j</string>
     <string name="sync_days">%1$d j</string>
     <string name="sync_days_many">99+ j</string>
-
     <string name="fast_note_title">Note rapide</string>
     <string name="fast_note_saving">Enregistrement…</string>
     <string name="fast_note_saved">Note rapide enregistrée sur l\'appareil</string>
@@ -36,11 +34,9 @@
     <string name="fast_note_pick_target_first">Choisissez d\'abord une destination pour les notes rapides dans les réglages.</string>
     <string name="fast_note_write_failed">Impossible d\'écrire dans la note choisie.</string>
     <string name="fast_note_failed">Impossible d\'enregistrer la note rapide.</string>
-
     <string name="action_cancel">Annuler</string>
     <string name="action_open_settings_button">Ouvrir les réglages</string>
     <string name="no_app_opens_notes">Aucune application ne peut ouvrir cette note. Obsidian est-il installé ?</string>
-
     <string name="settings_title">Réglages du widget</string>
     <string name="notes_folder_title">Dossier de notes</string>
     <string name="notes_folder_title_first">Commencez ici — dossier de notes</string>
@@ -69,6 +65,7 @@
     <string name="cards_empty">Rien à régler pour l\'instant : ce dossier ne contient aucun fichier .md.</string>
     <string name="appearance_title">Apparence</string>
     <string name="appearance_desc">S\'applique à cet écran et à la boîte de dialogue de note rapide. Les couleurs des cartes du widget se règlent à part.</string>
+    <string name="language_setting">Langue</string>
     <string name="action_done">Terminé</string>
     <string name="action_delete">Supprimer</string>
     <string name="action_skip">Ignorer</string>
@@ -87,6 +84,7 @@
     <string name="guide_step_widget">Ajoutez le widget à votre écran d\'accueil</string>
     <string name="about_title">Un souci, ou vous l\'utilisez tout simplement ?</string>
     <string name="about_report">Signaler un bug</string>
+    <string name="about_rate">Noter sur Google Play</string>
     <string name="about_say_hi">Dites bonjour — dites-moi que vous l\'utilisez</string>
     <string name="about_source">Code source sur GitHub</string>
     <string name="about_privacy">Politique de confidentialité</string>
@@ -128,6 +126,10 @@
     <string name="theme_light">Clair</string>
     <string name="theme_dark">Sombre</string>
     <string name="about_sponsor">Contribuer — une fois, totalement facultatif</string>
+    <string name="consent_prompt_title">Voulez-vous aider à améliorer l\'application ?</string>
+    <string name="consent_prompt_body">Des statistiques anonymes me montrent ce que vous utilisez. Rien de vos notes.</string>
+    <string name="consent_prompt_yes">Bien sûr</string>
+    <string name="consent_prompt_no">Non merci</string>
     <string name="open_with_title">Ouvrir les notes avec</string>
     <string name="open_with_desc">Toucher une note dans le widget l\'ouvre ici.</string>
     <string name="open_with_obsidian">Obsidian</string>
@@ -138,4 +140,68 @@
     <string name="open_with_hint_ask">Android demande à chaque fois avec quoi l\'ouvrir.</string>
     <string name="open_note_with">Ouvrir la note avec</string>
     <string name="new_note_failed">Impossible de créer la note</string>
+    <string name="extra_notes_title">Notes supplémentaires</string>
+    <string name="extra_notes_desc">Facultatif. Fichiers Markdown isolés, où qu\'ils se trouvent sur l\'appareil, affichés dans le widget avec les notes de votre dossier. Ajoutez-les un par un.</string>
+    <string name="extra_notes_add">Ajouter un fichier</string>
+    <string name="extra_notes_unavailable">Indisponible. Le fichier a été déplacé ou supprimé, ou l\'accès y a été perdu.</string>
+    <string name="extra_notes_unknown_name">Fichier inconnu</string>
+    <string name="extra_notes_already_added">Ce fichier est déjà dans le widget</string>
+    <string name="extra_notes_in_folder">Ce fichier se trouve déjà dans votre dossier de notes.</string>
+    <string name="extra_notes_not_markdown">Seuls les fichiers Markdown (.md) peuvent être ajoutés</string>
+    <string name="extra_notes_add_failed">Impossible de conserver l\'accès à ce fichier</string>
+    <string name="action_remove_from_widget">Retirer du widget</string>
+    <string name="remove_extra_note_title">Retirer %1$s du widget ?</string>
+    <string name="remove_extra_note_body">Le fichier reste sur votre appareil. Seul le widget cesse de l\'afficher.</string>
+    <string name="card_remove_from_widget">Retirer du widget, le fichier reste</string>
+    <string name="rate_chip">★ Noter</string>
+    <string name="rate_chip_label">Noter</string>
+    <string name="rate_chip_hint">Prend 10 s</string>
+    <string name="rate_dialog_title">Notes Widget est développé par une seule personne.</string>
+    <string name="rate_dialog_body_play">Une note sur Google Play aide d\'autres personnes à le trouver.</string>
+    <string name="rate_dialog_body_foss">Une étoile sur GitHub aide d\'autres personnes à le trouver.</string>
+    <string name="rate_dialog_rate_play">★ Noter sur Google Play</string>
+    <string name="rate_dialog_rate_foss">★ Mettre une étoile sur GitHub</string>
+    <string name="rate_dialog_idea">Proposer une idée</string>
+    <string name="rate_dialog_later">Pas maintenant</string>
+    <string name="rate_dialog_never">Ne plus demander</string>
+    <string name="rate_chip_setting">Rappel de notation sur le widget</string>
+    <string name="rate_chip_setting_desc">Un petit bouton ★ Noter affiché deux jours à la fois, trois fois au maximum. Jamais tant que la synchronisation demande une attention.</string>
+    <string name="fast_note_pick_title">Dans quel fichier enregistrer les notes rapides ?</string>
+    <string name="fast_note_pick_hint">Vous pourrez le modifier plus tard dans les réglages.</string>
+    <string name="fast_note_no_folder">Choisissez d\'abord votre dossier de notes dans les réglages. Les notes rapides sont ajoutées à l\'un de ses fichiers.</string>
+    <string name="fast_note_folder_empty">Votre dossier de notes ne contient pas encore de fichier .md. Créez d\'abord une note avec le bouton + du widget.</string>
+    <string name="fast_note_style_title">Ajouter comme</string>
+    <string name="fast_note_style_bullet">Puce</string>
+    <string name="fast_note_style_checkbox">Case à cocher</string>
+    <string name="widget_background_title">Arrière-plan du widget</string>
+    <string name="widget_background_desc">Baissez-le pour laisser transparaître le fond d\'écran. Les cartes de notes gardent leurs couleurs.</string>
+    <string name="widget_background_value">%1$d%%</string>
+    <string name="widget_color_desc">La couleur Système suit le thème du téléphone. Les autres couleurs restent identiques en mode clair et sombre.</string>
+    <string name="widget_color_system">Système</string>
+    <string name="widget_color_custom">Personnalisée</string>
+    <string name="feedback_title">Bonjour ! Désolé de vous déranger, cela ne prend que dix secondes.</string>
+    <string name="feedback_body">Notes Widget est développé par une seule personne pendant son temps libre, et votre réponse décide de ce qui sera créé ensuite.</string>
+    <string name="feedback_how">Comment cela fonctionne-t-il pour vous ?</string>
+    <string name="feedback_thumbs_up">Fonctionne bien</string>
+    <string name="feedback_thumbs_down">Ne fonctionne pas bien</string>
+    <string name="feedback_text">Qu\'est-ce qui l\'améliorerait ?</string>
+    <string name="feedback_send">Envoyer</string>
+    <string name="feedback_later">Pas maintenant</string>
+    <string name="feedback_never">Ne plus demander</string>
+    <string name="feedback_footer_play">Envoyé anonymement : votre réponse et la version de l\'application, rien de vos notes.</string>
+    <string name="feedback_footer_foss">Ouvre une nouvelle discussion GitHub dans votre navigateur, pour que vous puissiez la lire avant de la publier.</string>
+    <string name="feedback_failed_play">Échec de l\'envoi. Vérifiez la connexion et réessayez.</string>
+    <string name="feedback_too_soon">Un avis a déjà été envoyé aujourd\'hui. Merci, réessayez demain.</string>
+    <string name="feedback_pending">La dernière réponse est peut-être encore en route. Patientez une minute avant de renvoyer.</string>
+    <string name="feedback_thanks">Merci !</string>
+    <string name="about_feedback">Envoyer un avis</string>
+    <string name="about_star">Mettre une étoile sur GitHub</string>
+    <string name="whats_new_title">Nouveautés dans %1$s</string>
+    <string name="whats_new_130_background">Choisissez la couleur et la transparence de l\'arrière-plan du widget</string>
+    <string name="whats_new_130_fast_note">Les notes rapides peuvent être des cases à cocher, et vous choisissez le fichier directement dans la boîte de dialogue</string>
+    <string name="whats_new_130_feedback">Dites-moi ce qu\'il faut améliorer, directement depuis les réglages</string>
+    <string name="whats_new_130_languages">Désormais aussi en russe, portugais, italien et ukrainien</string>
+    <string name="whats_new_footer_play">Vous aimez la mise à jour ? Une note aide d\'autres personnes à trouver le widget.</string>
+    <string name="whats_new_footer_foss">Vous aimez la mise à jour ? Une étoile sur GitHub aide d\'autres personnes à trouver le widget.</string>
+    <string name="whats_new_later">Peut-être plus tard</string>
 </resources>

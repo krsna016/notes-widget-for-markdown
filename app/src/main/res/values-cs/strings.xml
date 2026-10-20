@@ -1,14 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">Notes Widget for Markdown</string>
     <string name="widget_description">Zobrazí vaše Markdown poznámky v posuvném widgetu</string>
     <string name="list_widget_description">Úsporný seznam názvů poznámek s časem poslední změny</string>
-
     <string name="action_refresh">Načíst poznámky znovu</string>
     <string name="action_open_settings">Otevřít nastavení widgetu</string>
     <string name="action_add_note">Přidat poznámku</string>
     <string name="action_add_fast_note">Přidat rychlou poznámku</string>
     <string name="action_setup">Nastavit</string>
     <string name="action_error">Chyba</string>
-
     <string name="widget_setup_required">Chybí nastavení</string>
     <string name="widget_setup_hint">Klepnutím vyberte složku s poznámkami</string>
     <string name="widget_permission_lost">Ztracené oprávnění</string>
@@ -17,7 +17,6 @@
     <string name="widget_pick_folder_hint">Složku s poznámkami vyberete klepnutím na tužku</string>
     <string name="widget_permission_lost_short">Ztracené oprávnění ke složce — otevřete nastavení</string>
     <string name="widget_new_note_name">Nová poznámka</string>
-
     <string name="sync_no_info">bez údajů</string>
     <string name="sync_unknown">stav neznámý</string>
     <string name="sync_stuck">sync vázne</string>
@@ -27,7 +26,6 @@
     <string name="sync_days_one">1 d</string>
     <string name="sync_days">%1$d d</string>
     <string name="sync_days_many">99+ d</string>
-
     <string name="fast_note_title">Rychlá poznámka</string>
     <string name="fast_note_saving">Ukládám…</string>
     <string name="fast_note_saved">Rychlá poznámka uložena do zařízení</string>
@@ -36,11 +34,9 @@
     <string name="fast_note_pick_target_first">Nejdřív v nastavení vyberte cíl pro rychlé poznámky.</string>
     <string name="fast_note_write_failed">Do vybrané poznámky se nepodařilo zapsat.</string>
     <string name="fast_note_failed">Rychlou poznámku se nepodařilo uložit.</string>
-
     <string name="action_cancel">Zrušit</string>
     <string name="action_open_settings_button">Otevřít nastavení</string>
     <string name="no_app_opens_notes">Poznámku nemá co otevřít. Je nainstalovaný Obsidian?</string>
-
     <string name="settings_title">Nastavení widgetu</string>
     <string name="notes_folder_title">Složka s poznámkami</string>
     <string name="notes_folder_title_first">Začněte tady — složka s poznámkami</string>
@@ -88,6 +84,7 @@
     <string name="guide_step_widget">Přidejte widget na plochu</string>
     <string name="about_title">Něco nefunguje? Nebo to jen používáte?</string>
     <string name="about_report">Nahlásit chybu</string>
+    <string name="about_rate">Ohodnotit na Google Play</string>
     <string name="about_say_hi">Pozdravit — dejte vědět, že to používáte</string>
     <string name="about_source">Zdrojový kód na GitHubu</string>
     <string name="about_privacy">Zásady ochrany údajů</string>
@@ -105,7 +102,7 @@
     <string name="sync_desc_other">Žádný synchronizační nástroj svůj stav do složky neukládá, takže štítek ukáže čas poslední změny poznámky. To stačí k tomu, abyste poznali mrtvou synchronizaci.</string>
     <string name="sync_warn_git_hint">Štítek zežloutne. Nastavte podle toho, jak často váš git klient běží — při patnáctiminutovém intervalu je celý den ticha už podezřelý.</string>
     <string name="fast_note_target_folder_empty">V této složce zatím nejsou žádné soubory .md. Vytvořte poznámku tlačítkem + na widgetu a pak se sem vraťte.</string>
-    <string name="about_desc">Tuhle aplikaci dělá jeden člověk ve volném čase. Hlášení chyb si čte a vědomí, že to někde někdo používá, je to, co ho drží.</string>
+    <string name="about_desc">Tuto aplikaci dělá jeden člověk ve volném čase. Hlášení chyb si čte a vědomí, že to někde někdo používá, je to, co ho drží.</string>
     <string name="vault_detected">Rozpoznán Obsidian vault \"%1$s\", takže klepnutí na poznámku ve widgetu otevře správný soubor. Tady není co nastavovat.</string>
     <string name="guide_step_counter">Nastavení — krok %1$d ze 2</string>
     <string name="delete_note_title">Smazat %1$s?</string>
@@ -129,8 +126,8 @@
     <string name="theme_light">Světlé</string>
     <string name="theme_dark">Tmavé</string>
     <string name="about_sponsor">Přispět — jednorázově, zcela dobrovolně</string>
-    <string name="consent_prompt_title">Pomůžeš mi appku zlepšit?</string>
-    <string name="consent_prompt_body">Anonymní statistiky mi ukážou, co používáš. Nic z poznámek.</string>
+    <string name="consent_prompt_title">Pomůžete mi aplikaci zlepšit?</string>
+    <string name="consent_prompt_body">Anonymní statistiky mi ukážou, co používáte. Nic z poznámek.</string>
     <string name="consent_prompt_yes">Ano</string>
     <string name="consent_prompt_no">Ne, díky</string>
     <string name="open_with_title">Otevírat poznámky v</string>
@@ -143,7 +140,19 @@
     <string name="open_with_hint_ask">Android se pokaždé zeptá, čím to otevřít.</string>
     <string name="open_note_with">Otevřít poznámku v</string>
     <string name="new_note_failed">Poznámku se nepodařilo vytvořit</string>
-
+    <string name="extra_notes_title">Další poznámky</string>
+    <string name="extra_notes_desc">Nepovinné. Jednotlivé soubory Markdown z libovolného místa v telefonu se ve widgetu zobrazí spolu s poznámkami ze vaší složky. Přidávejte je jeden po druhém.</string>
+    <string name="extra_notes_add">Přidat soubor</string>
+    <string name="extra_notes_unavailable">Nedostupné. Soubor byl přesunut nebo smazán, nebo jste ztratili přístup k němu.</string>
+    <string name="extra_notes_unknown_name">Neznámý soubor</string>
+    <string name="extra_notes_already_added">Tento soubor už ve widgetu je</string>
+    <string name="extra_notes_in_folder">Tento soubor už je ve vaší složce s poznámkami.</string>
+    <string name="extra_notes_not_markdown">Přidat lze jen soubory Markdown (.md)</string>
+    <string name="extra_notes_add_failed">Nepodařilo se udržet přístup k tomuto souboru</string>
+    <string name="action_remove_from_widget">Odebrat z widgetu</string>
+    <string name="remove_extra_note_title">Odebrat %1$s z widgetu?</string>
+    <string name="remove_extra_note_body">Soubor zůstane v telefonu. Widget ho jen přestane zobrazovat.</string>
+    <string name="card_remove_from_widget">Odebrat z widgetu, soubor zůstane</string>
     <string name="rate_chip">★ Ohodnotit</string>
     <string name="rate_chip_label">Ohodnotit</string>
     <string name="rate_chip_hint">Zabere 10 s</string>
@@ -157,7 +166,6 @@
     <string name="rate_dialog_never">Už se neptat</string>
     <string name="rate_chip_setting">Připomínka hodnocení na widgetu</string>
     <string name="rate_chip_setting_desc">Malý čip ★ Ohodnotit vždy na dva dny, nejvýš třikrát. Nikdy, když synchronizace potřebuje pozornost.</string>
-
     <string name="fast_note_pick_title">Do kterého souboru ukládat rychlé poznámky?</string>
     <string name="fast_note_pick_hint">Později to můžete změnit v nastavení.</string>
     <string name="fast_note_no_folder">Nejdřív v nastavení vyberte složku s poznámkami. Rychlé poznámky se přidávají do jednoho z jejích souborů.</string>
@@ -165,17 +173,13 @@
     <string name="fast_note_style_title">Přidat jako</string>
     <string name="fast_note_style_bullet">Odrážku</string>
     <string name="fast_note_style_checkbox">Zaškrtávací políčko</string>
-
-    <!-- Widget background opacity -->
     <string name="widget_background_title">Pozadí widgetu</string>
     <string name="widget_background_desc">Snižte ho a widgetem prosvitne tapeta. Karty poznámek si barvy ponechají.</string>
     <string name="widget_background_value">%1$d %%</string>
     <string name="widget_color_desc">Systémová se řídí motivem telefonu. Ostatní barvy zůstávají stejné ve světlém i tmavém režimu.</string>
     <string name="widget_color_system">Systémová</string>
     <string name="widget_color_custom">Vlastní</string>
-
-    <!-- Feedback dialog in settings -->
-    <string name="feedback_title">Ahoj! Promiňte, že ruším, zabere to deset vteřin.</string>
+    <string name="feedback_title">Dobrý den! Promiňte, že ruším, zabere to deset vteřin.</string>
     <string name="feedback_body">Notes Widget dělá jeden člověk ve volném čase a vaše odpověď rozhodne, co vznikne příště.</string>
     <string name="feedback_how">Jak vám to funguje?</string>
     <string name="feedback_thumbs_up">Funguje dobře</string>
@@ -191,10 +195,7 @@
     <string name="feedback_pending">Předchozí odpověď možná ještě odchází. Počkejte prosím minutu, než ji pošlete znovu.</string>
     <string name="feedback_thanks">Děkuji!</string>
     <string name="about_feedback">Poslat zpětnou vazbu</string>
-    <string name="about_rate">Ohodnotit na Google Play</string>
     <string name="about_star">Hvězdička na GitHubu</string>
-
-    <!-- One-time "What's new" dialog after an update -->
     <string name="whats_new_title">Co je nového ve verzi %1$s</string>
     <string name="whats_new_130_background">Vyberte si barvu a průhlednost pozadí widgetu</string>
     <string name="whats_new_130_fast_note">Rychlé poznámky můžou být zaškrtávací políčka a soubor vyberete přímo v dialogu</string>

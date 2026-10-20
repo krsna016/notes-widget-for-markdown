@@ -1,14 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">Notes Widget for Markdown</string>
     <string name="widget_description">Zeigt deine Markdown-Notizen in einem scrollbaren Widget</string>
     <string name="list_widget_description">Kompakte Liste der Notiznamen mit der letzten Änderung</string>
-
     <string name="action_refresh">Notizen neu laden</string>
     <string name="action_open_settings">Widget-Einstellungen öffnen</string>
     <string name="action_add_note">Notiz hinzufügen</string>
     <string name="action_add_fast_note">Schnellnotiz hinzufügen</string>
     <string name="action_setup">Einrichten</string>
     <string name="action_error">Fehler</string>
-
     <string name="widget_setup_required">Einrichtung nötig</string>
     <string name="widget_setup_hint">Tippen, um den Notizordner zu wählen</string>
     <string name="widget_permission_lost">Berechtigung verloren</string>
@@ -17,7 +17,6 @@
     <string name="widget_pick_folder_hint">Auf den Stift tippen, um den Notizordner zu wählen</string>
     <string name="widget_permission_lost_short">Ordnerberechtigung verloren — Einstellungen öffnen</string>
     <string name="widget_new_note_name">Neue Notiz</string>
-
     <string name="sync_no_info">keine Infos</string>
     <string name="sync_unknown">Status unklar</string>
     <string name="sync_stuck">Sync hängt</string>
@@ -27,7 +26,6 @@
     <string name="sync_days_one">1 T</string>
     <string name="sync_days">%1$d T</string>
     <string name="sync_days_many">99+ T</string>
-
     <string name="fast_note_title">Schnellnotiz</string>
     <string name="fast_note_saving">Speichern…</string>
     <string name="fast_note_saved">Schnellnotiz lokal gespeichert</string>
@@ -36,11 +34,9 @@
     <string name="fast_note_pick_target_first">Wähle zuerst in den Einstellungen ein Ziel für Schnellnotizen.</string>
     <string name="fast_note_write_failed">In die gewählte Notiz konnte nicht geschrieben werden.</string>
     <string name="fast_note_failed">Schnellnotiz konnte nicht gespeichert werden.</string>
-
     <string name="action_cancel">Abbrechen</string>
     <string name="action_open_settings_button">Einstellungen öffnen</string>
     <string name="no_app_opens_notes">Keine App kann diese Notiz öffnen. Ist Obsidian installiert?</string>
-
     <string name="settings_title">Widget-Einstellungen</string>
     <string name="notes_folder_title">Notizordner</string>
     <string name="notes_folder_title_first">Hier starten — Notizordner</string>
@@ -69,6 +65,7 @@
     <string name="cards_empty">Noch nichts einzustellen — dieser Ordner enthält keine .md-Dateien.</string>
     <string name="appearance_title">Darstellung</string>
     <string name="appearance_desc">Gilt für diesen Bildschirm und den Schnellnotiz-Dialog. Kartenfarben im Widget werden separat eingestellt.</string>
+    <string name="language_setting">Sprache</string>
     <string name="action_done">Fertig</string>
     <string name="action_delete">Löschen</string>
     <string name="action_skip">Überspringen</string>
@@ -87,6 +84,7 @@
     <string name="guide_step_widget">Lege das Widget auf den Startbildschirm</string>
     <string name="about_title">Etwas kaputt, oder benutzt du es einfach?</string>
     <string name="about_report">Fehler melden</string>
+    <string name="about_rate">Bei Google Play bewerten</string>
     <string name="about_say_hi">Hallo sagen — schreib mir, dass du es nutzt</string>
     <string name="about_source">Quellcode auf GitHub</string>
     <string name="about_privacy">Datenschutzerklärung</string>
@@ -128,6 +126,10 @@
     <string name="theme_light">Hell</string>
     <string name="theme_dark">Dunkel</string>
     <string name="about_sponsor">Etwas beitragen — einmalig, völlig freiwillig</string>
+    <string name="consent_prompt_title">Hilfst du mir, die App zu verbessern?</string>
+    <string name="consent_prompt_body">Anonyme Statistiken zeigen mir, was du nutzt. Nichts aus deinen Notizen.</string>
+    <string name="consent_prompt_yes">Klar</string>
+    <string name="consent_prompt_no">Nein, danke</string>
     <string name="open_with_title">Notizen öffnen mit</string>
     <string name="open_with_desc">Ein Tippen auf eine Notiz im Widget öffnet sie hier.</string>
     <string name="open_with_obsidian">Obsidian</string>
@@ -138,4 +140,68 @@
     <string name="open_with_hint_ask">Android fragt jedes Mal, womit geöffnet werden soll.</string>
     <string name="open_note_with">Notiz öffnen mit</string>
     <string name="new_note_failed">Notiz konnte nicht erstellt werden</string>
+    <string name="extra_notes_title">Zusätzliche Notizen</string>
+    <string name="extra_notes_desc">Optional. Einzelne Markdown-Dateien von überall auf deinem Gerät, die zusammen mit den Notizen aus deinem Ordner im Widget angezeigt werden. Füge sie nacheinander hinzu.</string>
+    <string name="extra_notes_add">Datei hinzufügen</string>
+    <string name="extra_notes_unavailable">Nicht verfügbar. Die Datei wurde verschoben oder gelöscht, oder der Zugriff darauf ging verloren.</string>
+    <string name="extra_notes_unknown_name">Unbekannte Datei</string>
+    <string name="extra_notes_already_added">Diese Datei ist bereits im Widget</string>
+    <string name="extra_notes_in_folder">Diese Datei liegt bereits in deinem Notizordner.</string>
+    <string name="extra_notes_not_markdown">Nur Markdown-Dateien (.md) können hinzugefügt werden</string>
+    <string name="extra_notes_add_failed">Der Zugriff auf diese Datei konnte nicht beibehalten werden</string>
+    <string name="action_remove_from_widget">Aus dem Widget entfernen</string>
+    <string name="remove_extra_note_title">%1$s aus dem Widget entfernen?</string>
+    <string name="remove_extra_note_body">Die Datei bleibt auf deinem Gerät. Nur das Widget zeigt sie nicht mehr an.</string>
+    <string name="card_remove_from_widget">Aus dem Widget entfernen, die Datei bleibt erhalten</string>
+    <string name="rate_chip">★ Bewerten</string>
+    <string name="rate_chip_label">Bewerten</string>
+    <string name="rate_chip_hint">Dauert 10 s</string>
+    <string name="rate_dialog_title">Notes Widget entsteht von einer einzigen Person.</string>
+    <string name="rate_dialog_body_play">Eine Bewertung bei Google Play hilft anderen, die App zu finden.</string>
+    <string name="rate_dialog_body_foss">Ein Stern auf GitHub hilft anderen, die App zu finden.</string>
+    <string name="rate_dialog_rate_play">★ Bei Google Play bewerten</string>
+    <string name="rate_dialog_rate_foss">★ Auf GitHub mit Stern markieren</string>
+    <string name="rate_dialog_idea">Idee vorschlagen</string>
+    <string name="rate_dialog_later">Nicht jetzt</string>
+    <string name="rate_dialog_never">Nicht mehr fragen</string>
+    <string name="rate_chip_setting">Bewertungserinnerung im Widget</string>
+    <string name="rate_chip_setting_desc">Ein kleiner Chip ★ Bewerten, jeweils für zwei Tage, höchstens dreimal. Nie, solange die Synchronisation Aufmerksamkeit braucht.</string>
+    <string name="fast_note_pick_title">In welche Datei sollen Schnellnotizen gespeichert werden?</string>
+    <string name="fast_note_pick_hint">Das kannst du später in den Einstellungen ändern.</string>
+    <string name="fast_note_no_folder">Wähle zuerst in den Einstellungen deinen Notizordner. Schnellnotizen werden an eine seiner Dateien angehängt.</string>
+    <string name="fast_note_folder_empty">Dein Notizordner enthält noch keine .md-Dateien. Erstelle zuerst eine Notiz mit dem +-Button im Widget.</string>
+    <string name="fast_note_style_title">Hinzufügen als</string>
+    <string name="fast_note_style_bullet">Aufzählungspunkt</string>
+    <string name="fast_note_style_checkbox">Kontrollkästchen</string>
+    <string name="widget_background_title">Widget-Hintergrund</string>
+    <string name="widget_background_desc">Senke den Wert, damit das Hintergrundbild durchscheint. Notizkarten behalten ihre Farben.</string>
+    <string name="widget_background_value">%1$d%%</string>
+    <string name="widget_color_desc">Systemfarbe folgt dem Design des Telefons. Jede andere Farbe bleibt im hellen und dunklen Modus gleich.</string>
+    <string name="widget_color_system">System</string>
+    <string name="widget_color_custom">Benutzerdefiniert</string>
+    <string name="feedback_title">Hallo! Entschuldige die Unterbrechung, das dauert zehn Sekunden.</string>
+    <string name="feedback_body">Notes Widget entsteht von einer einzigen Person in ihrer Freizeit, und deine Antwort bestimmt, was als Nächstes entsteht.</string>
+    <string name="feedback_how">Wie gefällt dir die App bisher?</string>
+    <string name="feedback_thumbs_up">Läuft gut</string>
+    <string name="feedback_thumbs_down">Läuft nicht gut</string>
+    <string name="feedback_text">Was würde sie verbessern?</string>
+    <string name="feedback_send">Senden</string>
+    <string name="feedback_later">Nicht jetzt</string>
+    <string name="feedback_never">Nicht mehr fragen</string>
+    <string name="feedback_footer_play">Anonym gesendet: deine Antwort und die App-Version, nichts aus deinen Notizen.</string>
+    <string name="feedback_footer_foss">Öffnet im Browser eine neue Diskussion auf GitHub, damit du sie vor dem Absenden lesen kannst.</string>
+    <string name="feedback_failed_play">Senden fehlgeschlagen. Prüfe die Verbindung und versuche es erneut.</string>
+    <string name="feedback_too_soon">Heute wurde bereits Feedback gesendet. Danke, versuch es morgen noch einmal.</string>
+    <string name="feedback_pending">Die letzte Antwort ist vielleicht noch unterwegs. Warte bitte eine Minute, bevor du erneut sendest.</string>
+    <string name="feedback_thanks">Danke!</string>
+    <string name="about_feedback">Feedback senden</string>
+    <string name="about_star">Auf GitHub mit Stern markieren</string>
+    <string name="whats_new_title">Neu in %1$s</string>
+    <string name="whats_new_130_background">Wähle Farbe und Transparenz für den Widget-Hintergrund</string>
+    <string name="whats_new_130_fast_note">Schnellnotizen können Kontrollkästchen sein, und die Datei wählst du direkt im Dialog</string>
+    <string name="whats_new_130_feedback">Sag mir, was verbessert werden soll, direkt aus den Einstellungen</string>
+    <string name="whats_new_130_languages">Jetzt auch auf Russisch, Portugiesisch, Italienisch und Ukrainisch</string>
+    <string name="whats_new_footer_play">Gefällt dir das Update? Eine Bewertung hilft anderen, das Widget zu finden.</string>
+    <string name="whats_new_footer_foss">Gefällt dir das Update? Ein Stern auf GitHub hilft anderen, das Widget zu finden.</string>
+    <string name="whats_new_later">Vielleicht später</string>
 </resources>

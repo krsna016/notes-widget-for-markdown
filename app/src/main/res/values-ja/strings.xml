@@ -1,14 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">Notes Widget for Markdown</string>
     <string name="widget_description">Markdown のノートをスクロールできるウィジェットに表示します</string>
     <string name="list_widget_description">ノート名と最終更新をコンパクトに一覧表示</string>
-
     <string name="action_refresh">ノートを読み込み直す</string>
     <string name="action_open_settings">ウィジェットの設定を開く</string>
     <string name="action_add_note">ノートを追加</string>
     <string name="action_add_fast_note">クイックノートを追加</string>
     <string name="action_setup">設定する</string>
     <string name="action_error">エラー</string>
-
     <string name="widget_setup_required">設定が必要です</string>
     <string name="widget_setup_hint">タップしてノートのフォルダを選んでください</string>
     <string name="widget_permission_lost">権限が失われました</string>
@@ -17,7 +17,6 @@
     <string name="widget_pick_folder_hint">鉛筆をタップしてノートのフォルダを選んでください</string>
     <string name="widget_permission_lost_short">フォルダの権限が失われました — 設定を開いてください</string>
     <string name="widget_new_note_name">新規ノート</string>
-
     <string name="sync_no_info">情報なし</string>
     <string name="sync_unknown">状態不明</string>
     <string name="sync_stuck">同期が停止</string>
@@ -27,7 +26,6 @@
     <string name="sync_days_one">1 日</string>
     <string name="sync_days">%1$d 日</string>
     <string name="sync_days_many">99+ 日</string>
-
     <string name="fast_note_title">クイックノート</string>
     <string name="fast_note_saving">保存中…</string>
     <string name="fast_note_saved">クイックノートを端末に保存しました</string>
@@ -36,11 +34,9 @@
     <string name="fast_note_pick_target_first">先に設定でクイックノートの保存先を選んでください。</string>
     <string name="fast_note_write_failed">選択したノートに書き込めませんでした。</string>
     <string name="fast_note_failed">クイックノートを保存できませんでした。</string>
-
     <string name="action_cancel">キャンセル</string>
     <string name="action_open_settings_button">設定を開く</string>
     <string name="no_app_opens_notes">このノートを開けるアプリがありません。Obsidian はインストールされていますか？</string>
-
     <string name="settings_title">ウィジェットの設定</string>
     <string name="notes_folder_title">ノートのフォルダ</string>
     <string name="notes_folder_title_first">ここから始めます — ノートのフォルダ</string>
@@ -69,6 +65,7 @@
     <string name="cards_empty">まだ設定するものがありません — このフォルダに .md ファイルはありません。</string>
     <string name="appearance_title">外観</string>
     <string name="appearance_desc">この画面とクイックノートのダイアログに適用されます。ウィジェットのカードの色は別に設定します。</string>
+    <string name="language_setting">言語</string>
     <string name="action_done">完了</string>
     <string name="action_delete">削除</string>
     <string name="action_skip">スキップ</string>
@@ -87,6 +84,7 @@
     <string name="guide_step_widget">ウィジェットをホーム画面に置く</string>
     <string name="about_title">不具合ですか、それとも使ってくださっていますか？</string>
     <string name="about_report">不具合を報告</string>
+    <string name="about_rate">Google Play で評価する</string>
     <string name="about_say_hi">ひとこと — 使っていると伝える</string>
     <string name="about_source">GitHub のソースコード</string>
     <string name="about_privacy">プライバシーポリシー</string>
@@ -128,6 +126,10 @@
     <string name="theme_light">ライト</string>
     <string name="theme_dark">ダーク</string>
     <string name="about_sponsor">支援する — 一度きり、まったくの任意です</string>
+    <string name="consent_prompt_title">アプリの改善にご協力いただけますか？</string>
+    <string name="consent_prompt_body">匿名の利用統計から、どの機能が使われているかが分かります。ノートの内容は送信されません。</string>
+    <string name="consent_prompt_yes">はい</string>
+    <string name="consent_prompt_no">いいえ</string>
     <string name="open_with_title">ノートを開くアプリ</string>
     <string name="open_with_desc">ウィジェットでノートをタップすると、ここで開きます。</string>
     <string name="open_with_obsidian">Obsidian</string>
@@ -138,4 +140,68 @@
     <string name="open_with_hint_ask">開くアプリを毎回 Android がたずねます。</string>
     <string name="open_note_with">ノートを開く</string>
     <string name="new_note_failed">ノートを作成できませんでした</string>
+    <string name="extra_notes_title">追加のノート</string>
+    <string name="extra_notes_desc">任意です。端末内のどこにあっても構わない Markdown ファイルを 1 つずつ追加でき、フォルダ内のノートと一緒にウィジェットに表示されます。</string>
+    <string name="extra_notes_add">ファイルを追加</string>
+    <string name="extra_notes_unavailable">利用できません。ファイルが移動または削除されたか、アクセス権を失いました。</string>
+    <string name="extra_notes_unknown_name">不明なファイル</string>
+    <string name="extra_notes_already_added">このファイルはすでにウィジェットに表示されています</string>
+    <string name="extra_notes_in_folder">このファイルはすでにノートのフォルダにあります。</string>
+    <string name="extra_notes_not_markdown">Markdown ファイル（.md）のみ追加できます</string>
+    <string name="extra_notes_add_failed">このファイルへのアクセスを維持できませんでした</string>
+    <string name="action_remove_from_widget">ウィジェットから削除</string>
+    <string name="remove_extra_note_title">ウィジェットから %1$s を削除しますか？</string>
+    <string name="remove_extra_note_body">ファイルは端末に残ります。ウィジェットに表示されなくなるだけです。</string>
+    <string name="card_remove_from_widget">ウィジェットから削除（ファイルは残ります）</string>
+    <string name="rate_chip">★ 評価</string>
+    <string name="rate_chip_label">評価</string>
+    <string name="rate_chip_hint">10 秒で完了</string>
+    <string name="rate_dialog_title">Notes Widget は一人で開発しています。</string>
+    <string name="rate_dialog_body_play">Google Play での評価は、ほかの人がこのアプリを見つける助けになります。</string>
+    <string name="rate_dialog_body_foss">GitHub のスターは、ほかの人がこのアプリを見つける助けになります。</string>
+    <string name="rate_dialog_rate_play">★ Google Play で評価する</string>
+    <string name="rate_dialog_rate_foss">★ GitHub でスターを付ける</string>
+    <string name="rate_dialog_idea">アイデアを提案する</string>
+    <string name="rate_dialog_later">今はしない</string>
+    <string name="rate_dialog_never">今後表示しない</string>
+    <string name="rate_chip_setting">ウィジェットの評価リマインダー</string>
+    <string name="rate_chip_setting_desc">小さな ★ 評価 チップを 2 日間ずつ、最大 3 回表示します。同期に注意が必要な間は表示しません。</string>
+    <string name="fast_note_pick_title">クイックノートを保存するファイルはどれですか？</string>
+    <string name="fast_note_pick_hint">後から設定で変更できます。</string>
+    <string name="fast_note_no_folder">まず設定でノートのフォルダを選択してください。クイックノートはそのフォルダー内のファイルに追加されます。</string>
+    <string name="fast_note_folder_empty">ノートのフォルダにまだ .md ファイルがありません。先にウィジェットの + ボタンでノートを作成してください。</string>
+    <string name="fast_note_style_title">追加の形式</string>
+    <string name="fast_note_style_bullet">箇条書き</string>
+    <string name="fast_note_style_checkbox">チェックボックス</string>
+    <string name="widget_background_title">ウィジェットの背景</string>
+    <string name="widget_background_desc">下げると壁紙が透けて見えます。ノートのカードは色を保ちます。</string>
+    <string name="widget_background_value">%1$d%%</string>
+    <string name="widget_color_desc">「システム」は端末のテーマに従います。それ以外の色はライトモードとダークモードで同じままです。</string>
+    <string name="widget_color_system">システム</string>
+    <string name="widget_color_custom">カスタム</string>
+    <string name="feedback_title">こんにちは！お手数ですが、10 秒ほどお付き合いください。</string>
+    <string name="feedback_body">Notes Widget は一人が余暇に開発しています。いただいたご意見が次に作る機能を決めます。</string>
+    <string name="feedback_how">このアプリの使い心地はいかがですか？</string>
+    <string name="feedback_thumbs_up">快適に使えている</string>
+    <string name="feedback_thumbs_down">うまく使えていない</string>
+    <string name="feedback_text">どうすれば良くなりますか？</string>
+    <string name="feedback_send">送信</string>
+    <string name="feedback_later">今はしない</string>
+    <string name="feedback_never">今後表示しない</string>
+    <string name="feedback_footer_play">匿名で送信されます。回答とアプリのバージョンのみで、ノートの内容は含まれません。</string>
+    <string name="feedback_footer_foss">ブラウザで新しい GitHub ディスカッションを開きます。投稿前に内容を確認できます。</string>
+    <string name="feedback_failed_play">送信できませんでした。接続を確認して、もう一度お試しください。</string>
+    <string name="feedback_too_soon">今日はすでにフィードバックを送信済みです。ありがとうございます。明日もう一度お試しください。</string>
+    <string name="feedback_pending">直前の回答がまだ送信中かもしれません。1 分ほど待ってから、もう一度送信してください。</string>
+    <string name="feedback_thanks">ありがとうございます！</string>
+    <string name="about_feedback">フィードバックを送信</string>
+    <string name="about_star">GitHub でスターを付ける</string>
+    <string name="whats_new_title">%1$s の新機能</string>
+    <string name="whats_new_130_background">ウィジェットの背景の色と透明度を選べます</string>
+    <string name="whats_new_130_fast_note">クイックノートをチェックボックスにでき、ダイアログでファイルを直接選べます</string>
+    <string name="whats_new_130_feedback">改善点を設定画面から直接お知らせいただけます</string>
+    <string name="whats_new_130_languages">ロシア語、ポルトガル語、イタリア語、ウクライナ語にも対応しました</string>
+    <string name="whats_new_footer_play">アップデートはいかがですか？評価は、ほかの人がウィジェットを見つける助けになります。</string>
+    <string name="whats_new_footer_foss">アップデートはいかがですか？GitHub のスターは、ほかの人がウィジェットを見つける助けになります。</string>
+    <string name="whats_new_later">また今度</string>
 </resources>
