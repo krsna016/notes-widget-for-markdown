@@ -169,6 +169,21 @@
     <string name="widget_background_title">Pozadí widgetu</string>
     <string name="widget_background_desc">Snižte ho a widgetem prosvitne tapeta. Karty poznámek si barvy ponechají.</string>
     <string name="widget_background_value">%1$d %%</string>
+    <string name="widget_color_desc">Systémová se řídí motivem telefonu. Ostatní barvy zůstávají stejné ve světlém i tmavém režimu.</string>
+    <string name="widget_color_system">Systémová</string>
+    <string name="widget_color_rose">Růžová</string>
+    <string name="widget_color_red">Červená</string>
+    <string name="widget_color_amber">Jantarová</string>
+    <string name="widget_color_orange">Oranžová</string>
+    <string name="widget_color_mint">Mátová</string>
+    <string name="widget_color_green">Zelená</string>
+    <string name="widget_color_sky">Nebeská</string>
+    <string name="widget_color_blue">Modrá</string>
+    <string name="widget_color_lavender">Levandulová</string>
+    <string name="widget_color_graphite">Grafitová</string>
+    <string name="widget_color_midnight">Půlnoční</string>
+    <string name="widget_color_forest">Lesní</string>
+    <string name="widget_color_custom">Vlastní</string>
 
     <!-- Feedback dialog in settings -->
     <string name="feedback_title">Ahoj! Promiňte, že ruším, zabere to deset vteřin.</string>

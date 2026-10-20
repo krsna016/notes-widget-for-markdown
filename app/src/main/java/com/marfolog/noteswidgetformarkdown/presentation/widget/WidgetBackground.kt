@@ -1,14 +1,16 @@
 package com.marfolog.noteswidgetformarkdown.presentation.widget
 
 import android.content.Context
+import com.marfolog.noteswidgetformarkdown.domain.model.WidgetColor
+import com.marfolog.noteswidgetformarkdown.domain.model.WidgetColorChoice
 import com.marfolog.noteswidgetformarkdown.presentation.setup.SetupActivity
 import com.marfolog.noteswidgetformarkdown.util.KeyValueStore
 import com.marfolog.noteswidgetformarkdown.util.SharedPreferencesStore
 import kotlin.math.roundToInt
 
 /**
- * How opaque the widget's own background is, in percent. Only the root behind the notes fades;
- * note cards, buttons and the bottom bar keep their colours.
+ * The widget's own background: its colour, and how opaque it is in percent. Only the root behind
+ * the notes fades; note cards, buttons and the bottom bar keep their colours.
  */
 internal object WidgetBackground {
 
@@ -40,6 +42,20 @@ internal object WidgetBackground {
 
     /** Text sitting on the root needs its own backdrop only once the wallpaper shows through. */
     fun needsBacking(percent: Int): Boolean = !isOpaque(percent)
+
+    fun color(context: Context): WidgetColorChoice = color(store(context))
+
+    internal fun color(store: KeyValueStore): WidgetColorChoice = WidgetColorChoice(
+        color = WidgetColor.fromStorage(store.getString(SetupActivity.KEY_WIDGET_COLOR)),
+        customHex = store.getString(SetupActivity.KEY_WIDGET_COLOR_HEX)?.takeIf { it.isNotBlank() }
+    )
+
+    fun saveColor(context: Context, choice: WidgetColorChoice) = saveColor(store(context), choice)
+
+    internal fun saveColor(store: KeyValueStore, choice: WidgetColorChoice) {
+        store.putString(SetupActivity.KEY_WIDGET_COLOR, choice.color.storageValue)
+        store.putString(SetupActivity.KEY_WIDGET_COLOR_HEX, choice.customHex.orEmpty())
+    }
 
     private fun store(context: Context): KeyValueStore = SharedPreferencesStore(
         context.getSharedPreferences(SetupActivity.PREFS_NAME, Context.MODE_PRIVATE)

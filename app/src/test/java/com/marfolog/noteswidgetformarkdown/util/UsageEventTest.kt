@@ -1,6 +1,7 @@
 package com.marfolog.noteswidgetformarkdown.util
 
 import com.marfolog.noteswidgetformarkdown.domain.model.FastNoteStyle
+import com.marfolog.noteswidgetformarkdown.domain.model.WidgetColor
 import com.marfolog.noteswidgetformarkdown.presentation.widget.OpenWith
 import com.marfolog.noteswidgetformarkdown.presentation.widget.WidgetBackground
 import org.junit.Assert.assertEquals
@@ -51,7 +52,8 @@ class UsageEventTest {
                 "open_with" to "default",
                 "has_extra_notes" to "yes",
                 "fast_note_style" to "checkbox",
-                "widget_alpha" to "30-70"
+                "widget_alpha" to "30-70",
+                "widget_color" to "graphite"
             ),
             UsageProperties.of(
                 cardWidgets = 1,
@@ -60,18 +62,20 @@ class UsageEventTest {
                 openWith = OpenWith.DefaultApp,
                 hasExtraNotes = true,
                 fastNoteStyle = FastNoteStyle.Checkbox,
-                widgetBackgroundPercent = 40
+                widgetBackgroundPercent = 40,
+                widgetColor = WidgetColor.Graphite
             )
         )
     }
 
     @Test
     fun `an unknown sync mode in prefs is reported as none`() {
-        val properties = UsageProperties.of(0, 0, "syncthing", OpenWith.Obsidian, false, FastNoteStyle.Bullet, 100).toMap()
+        val properties = UsageProperties.of(0, 0, "syncthing", OpenWith.Obsidian, false, FastNoteStyle.Bullet, 100, WidgetColor.System).toMap()
         assertEquals("none", properties["sync_mode"])
         assertEquals("none", properties["widget_type"])
         assertEquals("no", properties["has_extra_notes"])
         assertEquals("100", properties["widget_alpha"])
+        assertEquals("system", properties["widget_color"])
     }
 
     @Test
@@ -79,9 +83,11 @@ class UsageEventTest {
         OpenWith.entries.forEach { openWith ->
             FastNoteStyle.entries.forEach { style ->
                 (0..100).forEach { percent ->
-                    UsageProperties.of(1, 1, "other", openWith, true, style, percent).forEach { (name, value) ->
-                        assertTrue(name, name.length <= 24)
-                        assertTrue(value, value.length <= 36)
+                    WidgetColor.entries.forEach { color ->
+                        UsageProperties.of(1, 1, "other", openWith, true, style, percent, color).forEach { (name, value) ->
+                            assertTrue(name, name.length <= 24)
+                            assertTrue(value, value.length <= 36)
+                        }
                     }
                 }
             }

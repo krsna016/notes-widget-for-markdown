@@ -1,5 +1,7 @@
 package com.marfolog.noteswidgetformarkdown.presentation.widget
 
+import com.marfolog.noteswidgetformarkdown.domain.model.WidgetColor
+import com.marfolog.noteswidgetformarkdown.domain.model.WidgetColorChoice
 import com.marfolog.noteswidgetformarkdown.util.KeyValueStore
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -15,6 +17,8 @@ class WidgetBackgroundTest {
         override fun putLong(key: String, value: Long) { values[key] = value }
         override fun getInt(key: String) = values[key] as Int?
         override fun putInt(key: String, value: Int) { values[key] = value }
+        override fun getString(key: String) = values[key] as String?
+        override fun putString(key: String, value: String) { values[key] = value }
         override fun getBoolean(key: String, default: Boolean) = values[key] as Boolean? ?: default
         override fun putBoolean(key: String, value: Boolean) { values[key] = value }
         override fun remove(key: String) { values.remove(key) }
@@ -123,5 +127,41 @@ class WidgetBackgroundTest {
         assertTrue(WidgetBackground.needsBacking(40))
         assertTrue(WidgetBackground.needsBacking(0))
         assertTrue(WidgetBackground.needsBacking(-20))
+    }
+
+    @Test
+    fun `a user who never picked a colour keeps the system one`() {
+        assertEquals(WidgetColorChoice(), WidgetBackground.color(store))
+    }
+
+    @Test
+    fun `a picked colour is read back as picked`() {
+        WidgetBackground.saveColor(store, WidgetColorChoice(WidgetColor.Graphite))
+
+        assertEquals("graphite", store.values["widget_color"])
+        assertEquals(WidgetColorChoice(WidgetColor.Graphite), WidgetBackground.color(store))
+    }
+
+    @Test
+    fun `a custom colour keeps its hex across a switch to a preset and back`() {
+        WidgetBackground.saveColor(store, WidgetColorChoice(WidgetColor.Custom, "#8E24AA"))
+        WidgetBackground.saveColor(store, WidgetColorChoice(WidgetColor.Amber, "#8E24AA"))
+
+        assertEquals(WidgetColorChoice(WidgetColor.Amber, "#8E24AA"), WidgetBackground.color(store))
+    }
+
+    @Test
+    fun `an unknown stored colour from a newer or older version reads as system`() {
+        store.putString("widget_color", "neon")
+
+        assertEquals(WidgetColor.System, WidgetBackground.color(store).color)
+    }
+
+    @Test
+    fun `an empty stored hex reads as no custom colour at all`() {
+        WidgetBackground.saveColor(store, WidgetColorChoice(WidgetColor.Custom, null))
+
+        assertEquals("", store.values["widget_color_hex"])
+        assertEquals(WidgetColorChoice(WidgetColor.Custom, null), WidgetBackground.color(store))
     }
 }

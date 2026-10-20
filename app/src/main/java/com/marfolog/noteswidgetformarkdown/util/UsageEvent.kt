@@ -73,6 +73,7 @@ object UsageEvent {
     const val SETTING_RATE_CHIP = "rate_chip"
     const val SETTING_FAST_NOTE_STYLE = "fast_note_style"
     const val SETTING_WIDGET_BACKGROUND = "widget_background"
+    const val SETTING_WIDGET_COLOR = "widget_color"
 
     const val BUTTON_REPORT_BUG = "report_bug"
     const val BUTTON_RATE = "rate"
@@ -93,6 +94,7 @@ object UsageEvent {
     const val PROPERTY_HAS_EXTRA_NOTES = "has_extra_notes"
     const val PROPERTY_FAST_NOTE_STYLE = "fast_note_style"
     const val PROPERTY_WIDGET_ALPHA = "widget_alpha"
+    const val PROPERTY_WIDGET_COLOR = "widget_color"
 
     private val KNOWN_OPENED_FROM = setOf(FROM_WIDGET, FROM_SYNC_CHIP, FROM_FAST_NOTE_ERROR)
 

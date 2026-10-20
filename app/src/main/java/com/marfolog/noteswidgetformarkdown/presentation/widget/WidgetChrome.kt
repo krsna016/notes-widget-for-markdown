@@ -9,7 +9,9 @@ import android.os.Build
 import android.view.View
 import android.widget.RemoteViews
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.Dp
@@ -49,6 +51,8 @@ import com.marfolog.noteswidgetformarkdown.domain.model.NoteCardAppearance
 import com.marfolog.noteswidgetformarkdown.domain.model.NoteCardColor
 import com.marfolog.noteswidgetformarkdown.presentation.setup.SetupActivity
 import com.marfolog.noteswidgetformarkdown.ui.theme.NoteCardPalette
+import com.marfolog.noteswidgetformarkdown.ui.theme.WidgetColors
+import com.marfolog.noteswidgetformarkdown.ui.theme.WidgetTheme
 import com.marfolog.noteswidgetformarkdown.util.UsageEvent
 
 /**
@@ -76,7 +80,7 @@ internal fun WidgetActionButtons(isLoading: Boolean = false) {
                 ) {
                     CircularProgressIndicator(
                         modifier = GlanceModifier.size(20.dp),
-                        color = GlanceTheme.colors.onSurface
+                        color = ChromeColors.onButton
                     )
                 }
             } else {
@@ -106,7 +110,7 @@ internal fun RoundIconButton(
         modifier = GlanceModifier
             .size(40.dp)
             .cornerRadius(20.dp)
-            .background(GlanceTheme.colors.widgetBackground)
+            .background(ChromeColors.button)
             .then(onClickModifier),
         contentAlignment = Alignment.Center
     ) {
@@ -114,7 +118,7 @@ internal fun RoundIconButton(
             provider = ImageProvider(icon),
             contentDescription = contentDescription,
             modifier = GlanceModifier.size(20.dp),
-            colorFilter = ColorFilter.tint(GlanceTheme.colors.onSurface)
+            colorFilter = ColorFilter.tint(ChromeColors.onButton)
         )
     }
 }
@@ -143,7 +147,7 @@ internal fun BottomBar(
             Row(
                 modifier = GlanceModifier
                     .cornerRadius(16.dp)
-                    .background(BAR_TINT)
+                    .background(ChromeColors.bar)
                     .padding(horizontal = 8.dp, vertical = 6.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -165,7 +169,7 @@ private fun severityColor(severity: GitSyncLabel.Severity): ColorProvider = when
     GitSyncLabel.Severity.Ok -> ColorProvider(Color(0xFF4CAF50))
     GitSyncLabel.Severity.Stale -> ColorProvider(Color(0xFFFFB300))
     GitSyncLabel.Severity.Problem -> ColorProvider(Color(0xFFE53935))
-    GitSyncLabel.Severity.Off -> GlanceTheme.colors.onSurfaceVariant
+    GitSyncLabel.Severity.Off -> ChromeColors.onBar
 }
 
 @Composable
@@ -247,7 +251,7 @@ private fun BarChip(onClick: Action, dotColor: ColorProvider, text: String, back
         Row(
             modifier = GlanceModifier
                 .cornerRadius(16.dp)
-                .background(BAR_TINT)
+                .background(ChromeColors.bar)
                 .padding(horizontal = 10.dp, vertical = 6.dp)
                 .clickable(onClick),
             verticalAlignment = Alignment.CenterVertically
@@ -263,7 +267,7 @@ private fun BarChip(onClick: Action, dotColor: ColorProvider, text: String, back
                 text = text,
                 style = TextStyle(
                     fontSize = 12.sp,
-                    color = GlanceTheme.colors.onSurfaceVariant
+                    color = ChromeColors.onBar
                 ),
                 maxLines = 1
             )
@@ -349,13 +353,55 @@ internal fun vaultRelativePath(noteFolderPath: String?, fileName: String): Strin
 
 // region Widget background
 
+/** The user's widget colour; null while they keep the system one. */
+private val LocalWidgetColors = staticCompositionLocalOf<WidgetColors?> { null }
+
+/** The app's widget theme, plus the user's widget colour for everything in [ChromeColors]. */
+@Composable
+internal fun WidgetColorTheme(colors: WidgetColors?, content: @Composable () -> Unit) {
+    WidgetTheme {
+        CompositionLocalProvider(LocalWidgetColors provides colors, content = content)
+    }
+}
+
 /**
- * The root's colour at the user's opacity. Fully opaque stays the theme's own provider, so the
- * default widget is untouched. Otherwise the day and night colours are resolved separately before
- * fading, so a dark home screen keeps a dark, see-through widget rather than a light one.
+ * Colours of what the widget draws on its own background. With the system colour they are the
+ * theme's, exactly as before there was a choice; with a chosen one they come from [WidgetColors].
+ */
+internal object ChromeColors {
+    val background: ColorProvider
+        @Composable get() = fixed { it.background } ?: GlanceTheme.colors.widgetBackground
+    val content: ColorProvider
+        @Composable get() = fixed { it.content } ?: GlanceTheme.colors.onSurface
+    val error: ColorProvider
+        @Composable get() = fixed { it.error } ?: GlanceTheme.colors.error
+    val progress: ColorProvider
+        @Composable get() = fixed { it.content } ?: GlanceTheme.colors.primary
+    val bar: ColorProvider
+        @Composable get() = fixed { it.bar } ?: BAR_TINT
+    val onBar: ColorProvider
+        @Composable get() = fixed { it.onBar } ?: GlanceTheme.colors.onSurfaceVariant
+    val button: ColorProvider
+        @Composable get() = fixed { it.bar } ?: GlanceTheme.colors.widgetBackground
+    val onButton: ColorProvider
+        @Composable get() = fixed { it.onBar } ?: GlanceTheme.colors.onSurface
+
+    @Composable
+    private fun fixed(pick: (WidgetColors) -> Color): ColorProvider? =
+        LocalWidgetColors.current?.let { ColorProvider(pick(it)) }
+}
+
+/**
+ * The root's colour at the user's opacity. A chosen colour is one colour in both modes. The system
+ * one, fully opaque, stays the theme's own provider, so the default widget is untouched. Otherwise
+ * its day and night colours are resolved separately before fading, so a dark home screen keeps a
+ * dark, see-through widget rather than a light one.
  */
 @Composable
 internal fun widgetBackground(percent: Int): ColorProvider {
+    LocalWidgetColors.current?.let { chosen ->
+        return ColorProvider(chosen.background.copy(alpha = WidgetBackground.alpha(percent)))
+    }
     val base = GlanceTheme.colors.widgetBackground
     if (WidgetBackground.isOpaque(percent)) return base
     val context = LocalContext.current
@@ -392,7 +438,7 @@ internal fun WidgetSurface(
         Box(
             modifier = GlanceModifier
                 .cornerRadius(cornerRadius)
-                .background(GlanceTheme.colors.widgetBackground)
+                .background(ChromeColors.background)
                 .padding(horizontal = horizontalPadding, vertical = verticalPadding)
         ) {
             content()

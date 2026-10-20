@@ -15,7 +15,6 @@ import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.LocalContext
-import androidx.glance.GlanceTheme
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.CircularProgressIndicator
 import androidx.glance.appwidget.GlanceAppWidget
@@ -40,7 +39,7 @@ import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import com.marfolog.noteswidgetformarkdown.R
 import com.marfolog.noteswidgetformarkdown.domain.model.NoteCardAppearance
-import com.marfolog.noteswidgetformarkdown.ui.theme.WidgetTheme
+import com.marfolog.noteswidgetformarkdown.ui.theme.WidgetPalette
 import com.marfolog.noteswidgetformarkdown.domain.model.NoteSummary
 
 /**
@@ -52,6 +51,7 @@ class NotesListWidget : GlanceAppWidget() {
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         val startedAt = System.currentTimeMillis()
         val backgroundPercent = WidgetBackground.percent(context)
+        val widgetColors = WidgetPalette.colors(WidgetBackground.color(context))
 
         // Same cache both flavours share — see WidgetDataCache. Seeding from it means a refresh
         // shows what was already there while it reloads, instead of going blank every time.
@@ -64,7 +64,7 @@ class NotesListWidget : GlanceAppWidget() {
                 data = fresh
                 isLoading = false
             }
-            WidgetTheme {
+            WidgetColorTheme(widgetColors) {
                 val current = data
                 if (current == null) {
                     Box(
@@ -74,7 +74,7 @@ class NotesListWidget : GlanceAppWidget() {
                             .padding(12.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        CircularProgressIndicator(color = GlanceTheme.colors.primary)
+                        CircularProgressIndicator(color = ChromeColors.progress)
                     }
                 } else {
                     Box(
@@ -191,7 +191,7 @@ private fun StatusMessage(state: WidgetState, backgroundPercent: Int) {
         WidgetSurface(backgroundPercent, cornerRadius = 12.dp, horizontalPadding = 12.dp, verticalPadding = 8.dp) {
             Text(
                 text = message,
-                style = TextStyle(fontSize = 13.sp, color = GlanceTheme.colors.onSurface)
+                style = TextStyle(fontSize = 13.sp, color = ChromeColors.content)
             )
         }
     }

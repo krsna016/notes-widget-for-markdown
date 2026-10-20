@@ -195,6 +195,21 @@
     <string name="widget_background_title">Widget background</string>
     <string name="widget_background_desc">Lower it to let the wallpaper show through. Note cards keep their colours.</string>
     <string name="widget_background_value">%1$d%%</string>
+    <string name="widget_color_desc">System follows the phone\'s theme. Any other colour stays the same in light and dark mode.</string>
+    <string name="widget_color_system">System</string>
+    <string name="widget_color_rose">Rose</string>
+    <string name="widget_color_red">Red</string>
+    <string name="widget_color_amber">Amber</string>
+    <string name="widget_color_orange">Orange</string>
+    <string name="widget_color_mint">Mint</string>
+    <string name="widget_color_green">Green</string>
+    <string name="widget_color_sky">Sky</string>
+    <string name="widget_color_blue">Blue</string>
+    <string name="widget_color_lavender">Lavender</string>
+    <string name="widget_color_graphite">Graphite</string>
+    <string name="widget_color_midnight">Midnight</string>
+    <string name="widget_color_forest">Forest</string>
+    <string name="widget_color_custom">Custom</string>
 
     <!-- Feedback dialog in settings -->
     <string name="feedback_title">Hi! Sorry for the interruption, this takes ten seconds.</string>

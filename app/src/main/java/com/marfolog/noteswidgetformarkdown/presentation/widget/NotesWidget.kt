@@ -56,7 +56,7 @@ import com.marfolog.noteswidgetformarkdown.domain.model.NoteCardColor
 import com.marfolog.noteswidgetformarkdown.domain.model.NoteSummary
 import com.marfolog.noteswidgetformarkdown.domain.usecase.GetNotesUseCase
 import com.marfolog.noteswidgetformarkdown.presentation.setup.SetupActivity
-import com.marfolog.noteswidgetformarkdown.ui.theme.WidgetTheme
+import com.marfolog.noteswidgetformarkdown.ui.theme.WidgetPalette
 import com.marfolog.noteswidgetformarkdown.util.UsageEvent
 import kotlinx.coroutines.flow.firstOrNull
 import org.koin.java.KoinJavaComponent.get
@@ -67,6 +67,7 @@ class NotesWidget : GlanceAppWidget() {
         val startedAt = System.currentTimeMillis()
         AppLog.d("Render", "provideGlance entered at $startedAt")
         val backgroundPercent = WidgetBackground.percent(context)
+        val widgetColors = WidgetPalette.colors(WidgetBackground.color(context))
 
         // loadWidgetData used to run before provideContent, so the first frame anyone saw was
         // already the finished one — on a slow SAF folder that is a multi-second blank widget
@@ -85,7 +86,7 @@ class NotesWidget : GlanceAppWidget() {
                 isLoading = false
                 AppLog.d("Render", "loadWidgetData done in ${System.currentTimeMillis() - startedAt}ms")
             }
-            WidgetTheme {
+            WidgetColorTheme(widgetColors) {
                 val current = data
                 if (current == null) {
                     LoadingRoot(backgroundPercent)
@@ -179,7 +180,7 @@ private fun LoadingRoot(backgroundPercent: Int) {
             .padding(16.dp),
         contentAlignment = Alignment.Center
     ) {
-        CircularProgressIndicator(color = GlanceTheme.colors.primary)
+        CircularProgressIndicator(color = ChromeColors.progress)
     }
 }
 
@@ -407,7 +408,7 @@ private fun EmptyContent(backgroundPercent: Int, modifier: GlanceModifier = Glan
                 text = LocalContext.current.getString(R.string.widget_no_notes),
                 style = TextStyle(
                     fontSize = 14.sp,
-                    color = GlanceTheme.colors.onSurface
+                    color = ChromeColors.content
                 )
             )
         }
@@ -426,14 +427,14 @@ private fun ErrorContent(message: String, backgroundPercent: Int, modifier: Glan
                     provider = ImageProvider(R.drawable.ic_error),
                     contentDescription = LocalContext.current.getString(R.string.action_error),
                     modifier = GlanceModifier.size(32.dp),
-                    colorFilter = ColorFilter.tint(GlanceTheme.colors.error)
+                    colorFilter = ColorFilter.tint(ChromeColors.error)
                 )
                 Spacer(modifier = GlanceModifier.height(8.dp))
                 Text(
                     text = message,
                     style = TextStyle(
                         fontSize = 14.sp,
-                        color = GlanceTheme.colors.error
+                        color = ChromeColors.error
                     )
                 )
             }

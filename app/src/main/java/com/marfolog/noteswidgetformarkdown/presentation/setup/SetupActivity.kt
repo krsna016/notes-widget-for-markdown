@@ -122,6 +122,8 @@ import com.marfolog.noteswidgetformarkdown.domain.model.GitSyncStatus
 import com.marfolog.noteswidgetformarkdown.domain.model.FastNoteStyle
 import com.marfolog.noteswidgetformarkdown.domain.model.NoteCardAppearance
 import com.marfolog.noteswidgetformarkdown.domain.model.NoteCardColor
+import com.marfolog.noteswidgetformarkdown.domain.model.WidgetColor
+import com.marfolog.noteswidgetformarkdown.domain.model.WidgetColorChoice
 import com.marfolog.noteswidgetformarkdown.domain.model.NoteCardSize
 import com.marfolog.noteswidgetformarkdown.domain.model.NoteCardTextSize
 import com.marfolog.noteswidgetformarkdown.domain.model.NoteSummary
@@ -142,6 +144,7 @@ import com.marfolog.noteswidgetformarkdown.util.UsageEvent
 import com.marfolog.noteswidgetformarkdown.util.UsageProperties
 import com.marfolog.noteswidgetformarkdown.worker.NotesFolderObserverJob
 import com.marfolog.noteswidgetformarkdown.ui.theme.NoteCardPalette
+import com.marfolog.noteswidgetformarkdown.ui.theme.WidgetPalette
 import com.marfolog.noteswidgetformarkdown.ui.theme.NotesWidgetForMarkdownTheme
 import com.marfolog.noteswidgetformarkdown.ui.theme.ThemePreference
 import sh.calvin.reorderable.ReorderableColumn
@@ -217,6 +220,8 @@ class SetupActivity : ComponentActivity() {
         const val KEY_GIT_ROOT_URI = "git_root_uri"
         const val KEY_FAST_NOTE_STYLE = "fast_note_style"
         const val KEY_WIDGET_BACKGROUND = "widget_background_percent"
+        const val KEY_WIDGET_COLOR = "widget_color"
+        const val KEY_WIDGET_COLOR_HEX = "widget_color_hex"
 
         /** One of the `UsageEvent.FROM_*` values; none means the launcher. */
         const val EXTRA_OPENED_FROM = "opened_from"
@@ -331,6 +336,19 @@ private fun SetupScreen(modifier: Modifier = Modifier) {
     }
 
     var widgetBackgroundPercent by rememberSaveable { mutableIntStateOf(WidgetBackground.percent(context)) }
+    val savedWidgetColor = remember { WidgetBackground.color(context) }
+    var widgetColor by rememberSaveable { mutableStateOf(savedWidgetColor.color) }
+    var widgetColorHex by rememberSaveable { mutableStateOf(savedWidgetColor.customHex) }
+
+    fun changeWidgetColor(choice: WidgetColorChoice) {
+        val before = WidgetColorChoice(widgetColor, widgetColorHex)
+        widgetColor = choice.color
+        widgetColorHex = choice.customHex
+        WidgetBackground.saveColor(context, choice)
+        if (WidgetPalette.changesWidget(before, choice)) {
+            scope.launch { NotesWidget.updateAll(context) }
+        }
+    }
 
     LaunchedEffect(vaultUri, notesUri, gitReloadTrigger) {
         gitStatus = GitSyncStatusReader(context.applicationContext).read(vaultUri)
@@ -613,6 +631,14 @@ private fun SetupScreen(modifier: Modifier = Modifier) {
                 scope.launch { NotesWidget.updateAll(context) }
             }
         },
+        widgetColor = WidgetColorChoice(widgetColor, widgetColorHex),
+        onWidgetColorSelected = { color ->
+            if (color != widgetColor) {
+                changeWidgetColor(WidgetColorChoice(color, widgetColorHex))
+                logSettingChanged(UsageEvent.SETTING_WIDGET_COLOR, color.storageValue)
+            }
+        },
+        onWidgetCustomColorChanged = { hex -> changeWidgetColor(WidgetColorChoice(WidgetColor.Custom, hex)) },
         onCardSizeSelected = { note, size ->
             val updated = (cardSettings[note.fileUri] ?: NoteCardAppearance()).copy(size = size)
             cardSettingsStore.save(note.fileUri, updated)
@@ -909,6 +935,9 @@ internal fun SetupScreenContent(
     onFastNoteStyleChanged: (FastNoteStyle) -> Unit = {},
     widgetBackgroundPercent: Int = WidgetBackground.DEFAULT_PERCENT,
     onWidgetBackgroundChanged: (Int) -> Unit = {},
+    widgetColor: WidgetColorChoice = WidgetColorChoice(),
+    onWidgetColorSelected: (WidgetColor) -> Unit = {},
+    onWidgetCustomColorChanged: (String) -> Unit = {},
     onCardSizeSelected: (NoteSummary, NoteCardSize) -> Unit = { _, _ -> },
     onCardColorSelected: (NoteSummary, NoteCardColor) -> Unit = { _, _ -> },
     onCardTextSizeSelected: (NoteSummary, NoteCardTextSize) -> Unit = { _, _ -> },
@@ -1275,7 +1304,13 @@ internal fun SetupScreenContent(
         HorizontalDivider()
         Spacer(modifier = Modifier.height(24.dp))
 
-        WidgetBackgroundSetting(percent = widgetBackgroundPercent, onChanged = onWidgetBackgroundChanged)
+        WidgetBackgroundSetting(
+            percent = widgetBackgroundPercent,
+            onChanged = onWidgetBackgroundChanged,
+            color = widgetColor,
+            onColorSelected = onWidgetColorSelected,
+            onCustomColorChanged = onWidgetCustomColorChanged
+        )
 
         Spacer(modifier = Modifier.height(24.dp))
         HorizontalDivider()
@@ -1448,14 +1483,50 @@ private fun FastNoteStyleChooser(selected: FastNoteStyle, onSelected: (FastNoteS
 
 /** Reports only where the slider was let go, so one drag is one change rather than dozens. */
 @Composable
-private fun WidgetBackgroundSetting(percent: Int, onChanged: (Int) -> Unit) {
+private fun WidgetBackgroundSetting(
+    percent: Int,
+    onChanged: (Int) -> Unit,
+    color: WidgetColorChoice,
+    onColorSelected: (WidgetColor) -> Unit,
+    onCustomColorChanged: (String) -> Unit
+) {
     var position by remember(percent) { mutableFloatStateOf(percent.toFloat()) }
     Text(
         text = stringResource(R.string.widget_background_title),
         style = MaterialTheme.typography.titleMedium,
         color = MaterialTheme.colorScheme.primary
     )
+    Spacer(modifier = Modifier.height(8.dp))
+    Text(
+        text = stringResource(R.string.card_color),
+        style = MaterialTheme.typography.labelMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant
+    )
     Spacer(modifier = Modifier.height(4.dp))
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier.horizontalScroll(rememberScrollState())
+    ) {
+        WidgetColor.entries.forEach { option ->
+            ColorChip(
+                selected = color.color == option,
+                label = stringResource(widgetColorLabel(option)),
+                swatch = widgetColorPreview(color.copy(color = option)),
+                onClick = { onColorSelected(option) }
+            )
+        }
+    }
+    if (color.color == WidgetColor.Custom) {
+        Spacer(modifier = Modifier.height(8.dp))
+        CustomColorField(value = color.customHex.orEmpty(), onValueChange = onCustomColorChanged)
+    }
+    Spacer(modifier = Modifier.height(4.dp))
+    Text(
+        text = stringResource(R.string.widget_color_desc),
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant
+    )
+    Spacer(modifier = Modifier.height(12.dp))
     Text(
         text = stringResource(R.string.widget_background_desc),
         style = MaterialTheme.typography.bodySmall,
@@ -1693,41 +1764,84 @@ private fun NoteCardSettingsRow(
                 modifier = Modifier.horizontalScroll(rememberScrollState())
             ) {
                 NoteCardColor.entries.forEach { color ->
-                    FilterChip(
+                    ColorChip(
                         selected = appearance.color == color,
-                        onClick = { onColorSelected(color) },
-                        label = {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(12.dp)
-                                        .background(cardColorPreview(color), RoundedCornerShape(3.dp))
-                                )
-                                Spacer(modifier = Modifier.size(6.dp))
-                                Text(color.label)
-                            }
-                        }
+                        label = color.label,
+                        swatch = cardColorPreview(color),
+                        onClick = { onColorSelected(color) }
                     )
                 }
             }
             if (appearance.color == NoteCardColor.Custom) {
                 Spacer(modifier = Modifier.height(8.dp))
-                OutlinedTextField(
-                    value = appearance.customColorHex.orEmpty(),
-                    onValueChange = onCustomColorChanged,
-                    modifier = Modifier.fillMaxWidth(),
-                    label = { Text(stringResource(R.string.card_custom_color)) },
-                    placeholder = { Text("#D9E8C8") },
-                    singleLine = true
-                )
+                CustomColorField(value = appearance.customColorHex.orEmpty(), onValueChange = onCustomColorChanged)
             }
             }
         }
     }
 }
 
+@Composable
+private fun ColorChip(selected: Boolean, label: String, swatch: Color, onClick: () -> Unit) {
+    FilterChip(
+        selected = selected,
+        onClick = onClick,
+        label = {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier
+                        .size(12.dp)
+                        .background(swatch, RoundedCornerShape(3.dp))
+                        .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(3.dp))
+                )
+                Spacer(modifier = Modifier.size(6.dp))
+                Text(label)
+            }
+        }
+    )
+}
+
+@Composable
+private fun CustomColorField(value: String, onValueChange: (String) -> Unit) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        modifier = Modifier.fillMaxWidth(),
+        label = { Text(stringResource(R.string.card_custom_color)) },
+        placeholder = { Text("#D9E8C8") },
+        singleLine = true
+    )
+}
+
+private val PREVIEW_FALLBACK = Color(0xFFE7E0EC)
+
 private fun cardColorPreview(color: NoteCardColor): Color =
-    NoteCardPalette.background(color) ?: Color(0xFFE7E0EC)
+    NoteCardPalette.background(color) ?: PREVIEW_FALLBACK
+
+/** System has no one colour to show, so its swatch is the app's own surface. */
+@Composable
+private fun widgetColorPreview(choice: WidgetColorChoice): Color = when (choice.color) {
+    WidgetColor.System -> MaterialTheme.colorScheme.surface
+    else -> WidgetPalette.background(choice) ?: PREVIEW_FALLBACK
+}
+
+@StringRes
+private fun widgetColorLabel(color: WidgetColor): Int = when (color) {
+    WidgetColor.System -> R.string.widget_color_system
+    WidgetColor.Rose -> R.string.widget_color_rose
+    WidgetColor.Red -> R.string.widget_color_red
+    WidgetColor.Amber -> R.string.widget_color_amber
+    WidgetColor.Orange -> R.string.widget_color_orange
+    WidgetColor.Mint -> R.string.widget_color_mint
+    WidgetColor.Green -> R.string.widget_color_green
+    WidgetColor.Sky -> R.string.widget_color_sky
+    WidgetColor.Blue -> R.string.widget_color_blue
+    WidgetColor.Lavender -> R.string.widget_color_lavender
+    WidgetColor.Graphite -> R.string.widget_color_graphite
+    WidgetColor.Midnight -> R.string.widget_color_midnight
+    WidgetColor.Forest -> R.string.widget_color_forest
+    WidgetColor.Custom -> R.string.widget_color_custom
+}
 
 private const val KEY_SWIPE_HINT_SHOWN = "card_swipe_hint_shown"
 
