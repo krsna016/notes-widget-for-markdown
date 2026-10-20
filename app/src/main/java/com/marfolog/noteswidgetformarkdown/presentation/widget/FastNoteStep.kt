@@ -13,15 +13,21 @@ internal sealed interface FastNoteStep {
 }
 
 /**
- * Without a target the dialog asks for one right there, from the same notes the settings offer,
- * instead of sending the user off to settings first. [folderNotes] is null while still loading.
+ * Without a usable target the dialog asks for one right there, from the same notes the settings
+ * offer, instead of sending the user off to settings first. A saved target that no longer exists
+ * or cannot be written counts as no target. [targetExists] and [folderNotes] are null while still
+ * loading.
  */
 internal fun fastNoteStep(
     targetUri: String?,
+    targetExists: Boolean?,
     notesFolderUri: String?,
     folderNotes: Result<List<NoteSummary>>?
 ): FastNoteStep {
-    if (!targetUri.isNullOrBlank()) return FastNoteStep.Write
+    if (!targetUri.isNullOrBlank()) {
+        if (targetExists == null) return FastNoteStep.Loading
+        if (targetExists) return FastNoteStep.Write
+    }
     if (notesFolderUri.isNullOrBlank()) return FastNoteStep.NoNotesFolder
     if (folderNotes == null) return FastNoteStep.Loading
     val notes = folderNotes.getOrNull() ?: return FastNoteStep.NotesUnreadable

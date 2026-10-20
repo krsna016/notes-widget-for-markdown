@@ -6,34 +6,41 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Description
-import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -58,8 +65,10 @@ import com.marfolog.noteswidgetformarkdown.util.AppLog
 import com.marfolog.noteswidgetformarkdown.util.RatingPrompt
 import com.marfolog.noteswidgetformarkdown.util.Telemetry
 import com.marfolog.noteswidgetformarkdown.util.UsageEvent
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.java.KoinJavaComponent.get
 
 class FastNoteActivity : ComponentActivity() {
@@ -68,7 +77,9 @@ class FastNoteActivity : ComponentActivity() {
     private var dialogVisible by mutableStateOf(true)
     private var targetUri by mutableStateOf<String?>(null)
     private var targetName by mutableStateOf<String?>(null)
+    private var targetExists by mutableStateOf<Boolean?>(null)
     private var folderNotes by mutableStateOf<Result<List<NoteSummary>>?>(null)
+    private var saving by mutableStateOf(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,50 +87,61 @@ class FastNoteActivity : ComponentActivity() {
         val prefs = getSharedPreferences(SetupActivity.PREFS_NAME, MODE_PRIVATE)
         val notesFolderUri = prefs.getString(SetupActivity.KEY_NOTES_URI, null)
         targetUri = prefs.getString(SetupActivity.KEY_FAST_NOTE_TARGET_URI, null)
-        // Show where the line will land. The target is set once and then forgotten, so without
-        // this the dialog asks you to type into an unknown file.
-        targetName = targetUri
-            ?.let { runCatching { DocumentFile.fromSingleUri(this, Uri.parse(it))?.name }.getOrNull() }
-
-        if (targetUri.isNullOrBlank() && !notesFolderUri.isNullOrBlank()) {
-            lifecycleScope.launch { folderNotes = loadFolderNotes(notesFolderUri) }
+        lifecycleScope.launch {
+            val target = targetUri
+            if (!target.isNullOrBlank()) {
+                val file = withContext(Dispatchers.IO) { usableTarget(target) }
+                targetName = file?.name
+                targetExists = file != null
+            }
+            if (target.isNullOrBlank() || targetExists == false) {
+                if (!notesFolderUri.isNullOrBlank()) folderNotes = loadFolderNotes(notesFolderUri)
+            }
         }
 
         setContent {
             NotesWidgetForMarkdownTheme {
                 if (dialogVisible) {
-                    when (val step = fastNoteStep(targetUri, notesFolderUri, folderNotes)) {
-                        FastNoteStep.Write -> FastNoteDialog(
-                            targetName = targetName,
-                            onCancel = { finish() },
-                            onSave = ::save
-                        )
-                        FastNoteStep.Loading -> LoadingDialog(onCancel = { finish() })
-                        is FastNoteStep.PickTarget -> PickTargetDialog(
-                            notes = step.notes,
-                            onPick = ::pickTarget,
-                            onCancel = { finish() }
-                        )
-                        FastNoteStep.NoNotesFolder -> NoTargetDialog(
-                            messageRes = R.string.fast_note_no_folder,
-                            onOpenSettings = ::openSettings,
-                            onCancel = { finish() }
-                        )
-                        FastNoteStep.NoNotesInFolder -> NoTargetDialog(
-                            messageRes = R.string.fast_note_folder_empty,
-                            onOpenSettings = ::openSettings,
-                            onCancel = { finish() }
-                        )
-                        FastNoteStep.NotesUnreadable -> NoTargetDialog(
-                            messageRes = R.string.notes_load_failed,
-                            onOpenSettings = ::openSettings,
-                            onCancel = { finish() }
-                        )
+                    FastNoteWindow(onDismissRequest = { if (!saving) finish() }) {
+                        when (val step = fastNoteStep(targetUri, targetExists, notesFolderUri, folderNotes)) {
+                            FastNoteStep.Write -> WriteContent(
+                                targetName = targetName,
+                                isSaving = saving,
+                                onCancel = { finish() },
+                                onSave = ::save
+                            )
+                            FastNoteStep.Loading -> LoadingContent(onCancel = { finish() })
+                            is FastNoteStep.PickTarget -> PickTargetContent(
+                                notes = step.notes,
+                                onPick = ::pickTarget,
+                                onCancel = { finish() }
+                            )
+                            FastNoteStep.NoNotesFolder -> NoTargetContent(
+                                messageRes = R.string.fast_note_no_folder,
+                                onOpenSettings = ::openSettings,
+                                onCancel = { finish() }
+                            )
+                            FastNoteStep.NoNotesInFolder -> NoTargetContent(
+                                messageRes = R.string.fast_note_folder_empty,
+                                onOpenSettings = ::openSettings,
+                                onCancel = { finish() }
+                            )
+                            FastNoteStep.NotesUnreadable -> NoTargetContent(
+                                messageRes = R.string.notes_load_failed,
+                                onOpenSettings = ::openSettings,
+                                onCancel = { finish() }
+                            )
+                        }
                     }
                 }
             }
         }
     }
+
+    private fun usableTarget(target: String): DocumentFile? = runCatching {
+        DocumentFile.fromSingleUri(this, Uri.parse(target))
+            ?.takeIf { it.exists() && it.canRead() && it.canWrite() }
+    }.getOrNull()
 
     /** Same notes, in the same order, as the target chips in settings. */
     private suspend fun loadFolderNotes(notesFolderUri: String): Result<List<NoteSummary>> = runCatching {
@@ -136,6 +158,7 @@ class FastNoteActivity : ComponentActivity() {
         Telemetry.event(UsageEvent.FAST_TARGET_SET)
         targetName = note.fileName
         targetUri = note.fileUri
+        targetExists = true
     }
 
     private fun openSettings() {
@@ -149,6 +172,7 @@ class FastNoteActivity : ComponentActivity() {
             onError(getString(R.string.fast_note_pick_target_first))
             return
         }
+        saving = true
         val style = FastNoteStyle.from(
             getSharedPreferences(SetupActivity.PREFS_NAME, MODE_PRIVATE)
                 .getString(SetupActivity.KEY_FAST_NOTE_STYLE, null)
@@ -173,10 +197,12 @@ class FastNoteActivity : ComponentActivity() {
                         RatingPrompt.maybeAsk(this@FastNoteActivity)
                         finish()
                     } else {
+                        saving = false
                         onError(getString(R.string.fast_note_write_failed))
                     }
                 }
                 .onFailure { error ->
+                    saving = false
                     onError(error.message ?: getString(R.string.fast_note_failed))
                 }
         }
@@ -187,66 +213,102 @@ class FastNoteActivity : ComponentActivity() {
     }
 }
 
+/**
+ * One dialog window for every step. Swapping separate dialogs moved window focus between windows
+ * right as the keyboard came up, and on a busy device the focus change was not handled in time.
+ */
 @Composable
-private fun LoadingDialog(onCancel: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = onCancel,
+private fun FastNoteWindow(onDismissRequest: () -> Unit, content: @Composable () -> Unit) {
+    Dialog(onDismissRequest = onDismissRequest) {
+        Surface(
+            shape = AlertDialogDefaults.shape,
+            color = AlertDialogDefaults.containerColor,
+            tonalElevation = AlertDialogDefaults.TonalElevation,
+            modifier = Modifier.sizeIn(minWidth = 280.dp, maxWidth = 560.dp)
+        ) {
+            content()
+        }
+    }
+}
+
+@Composable
+private fun StepLayout(
+    title: @Composable () -> Unit,
+    body: @Composable () -> Unit,
+    buttons: @Composable RowScope.() -> Unit
+) {
+    Column(modifier = Modifier.padding(24.dp)) {
+        ProvideTextStyle(MaterialTheme.typography.headlineSmall) {
+            CompositionLocalProvider(LocalContentColor provides AlertDialogDefaults.titleContentColor) {
+                title()
+            }
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        ProvideTextStyle(MaterialTheme.typography.bodyMedium) {
+            CompositionLocalProvider(LocalContentColor provides AlertDialogDefaults.textContentColor) {
+                body()
+            }
+        }
+        Spacer(modifier = Modifier.height(24.dp))
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End),
+            modifier = Modifier.fillMaxWidth(),
+            content = buttons
+        )
+    }
+}
+
+@Composable
+private fun LoadingContent(onCancel: () -> Unit) {
+    StepLayout(
         title = { Text(stringResource(R.string.fast_note_pick_title)) },
-        text = {
+        body = {
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
             }
         },
-        confirmButton = {
+        buttons = {
             TextButton(onClick = onCancel) { Text(stringResource(R.string.action_cancel)) }
         }
     )
 }
 
 @Composable
-private fun PickTargetDialog(
+private fun PickTargetContent(
     notes: List<NoteSummary>,
     onPick: (NoteSummary) -> Unit,
     onCancel: () -> Unit
 ) {
-    Dialog(onDismissRequest = onCancel) {
-        Surface(
-            shape = MaterialTheme.shapes.extraLarge,
-            color = MaterialTheme.colorScheme.surfaceContainerHigh,
-            tonalElevation = 6.dp
+    Column(modifier = Modifier.padding(vertical = 24.dp)) {
+        Text(
+            text = stringResource(R.string.fast_note_pick_title),
+            style = MaterialTheme.typography.headlineSmall,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.padding(horizontal = 24.dp)
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = stringResource(R.string.fast_note_pick_hint),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(horizontal = 24.dp)
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Column(
+            modifier = Modifier
+                .heightIn(max = 360.dp)
+                .verticalScroll(rememberScrollState())
         ) {
-            Column(modifier = Modifier.padding(vertical = 24.dp)) {
-                Text(
-                    text = stringResource(R.string.fast_note_pick_title),
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.padding(horizontal = 24.dp)
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = stringResource(R.string.fast_note_pick_hint),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(horizontal = 24.dp)
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Column(
-                    modifier = Modifier
-                        .heightIn(max = 360.dp)
-                        .verticalScroll(rememberScrollState())
-                ) {
-                    notes.forEach { note -> TargetRow(note.fileName, onClick = { onPick(note) }) }
-                }
-                Spacer(modifier = Modifier.height(16.dp))
-                TextButton(
-                    onClick = onCancel,
-                    modifier = Modifier
-                        .align(Alignment.End)
-                        .padding(horizontal = 12.dp)
-                ) {
-                    Text(stringResource(R.string.action_cancel))
-                }
-            }
+            notes.forEach { note -> TargetRow(note.fileName, onClick = { onPick(note) }) }
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        TextButton(
+            onClick = onCancel,
+            modifier = Modifier
+                .align(Alignment.End)
+                .padding(horizontal = 12.dp)
+        ) {
+            Text(stringResource(R.string.action_cancel))
         }
     }
 }
@@ -278,40 +340,42 @@ private fun TargetRow(fileName: String, onClick: () -> Unit) {
 }
 
 @Composable
-private fun NoTargetDialog(messageRes: Int, onOpenSettings: () -> Unit, onCancel: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = onCancel,
+private fun NoTargetContent(messageRes: Int, onOpenSettings: () -> Unit, onCancel: () -> Unit) {
+    StepLayout(
         title = { Text(stringResource(R.string.fast_note_target_missing)) },
-        text = { Text(stringResource(messageRes)) },
-        confirmButton = {
-            TextButton(onClick = onOpenSettings) {
-                Text(stringResource(R.string.action_open_settings_button))
-            }
-        },
-        dismissButton = {
+        body = { Text(stringResource(messageRes)) },
+        buttons = {
             TextButton(onClick = onCancel) {
                 Text(stringResource(R.string.action_cancel))
+            }
+            TextButton(onClick = onOpenSettings) {
+                Text(stringResource(R.string.action_open_settings_button))
             }
         }
     )
 }
 
 @Composable
-private fun FastNoteDialog(
+private fun WriteContent(
     targetName: String?,
+    isSaving: Boolean,
     onCancel: () -> Unit,
     onSave: (String, (String) -> Unit) -> Unit
 ) {
     var noteText by rememberSaveable { mutableStateOf("") }
-    var isSaving by rememberSaveable { mutableStateOf(false) }
     var errorMessage by rememberSaveable { mutableStateOf<String?>(null) }
+    val focusRequester = remember { FocusRequester() }
+    val keyboard = LocalSoftwareKeyboardController.current
 
-    AlertDialog(
-        onDismissRequest = {
-            if (!isSaving) {
-                onCancel()
-            }
-        },
+    // The whole point of a fast note is typing straight away — opening the dialog and then
+    // tapping the field first defeats it. Waiting a frame lets the field be laid out first.
+    LaunchedEffect(focusRequester) {
+        withFrameNanos { }
+        focusRequester.requestFocus()
+        keyboard?.show()
+    }
+
+    StepLayout(
         title = {
             Column {
                 Text(stringResource(R.string.fast_note_title))
@@ -324,17 +388,7 @@ private fun FastNoteDialog(
                 }
             }
         },
-        text = {
-            val focusRequester = remember { FocusRequester() }
-            val keyboard = LocalSoftwareKeyboardController.current
-
-            // The whole point of a fast note is typing straight away — opening the dialog and then
-            // tapping the field first defeats it.
-            LaunchedEffect(Unit) {
-                focusRequester.requestFocus()
-                keyboard?.show()
-            }
-
+        body = {
             OutlinedTextField(
                 value = noteText,
                 onValueChange = {
@@ -352,26 +406,18 @@ private fun FastNoteDialog(
                     .focusRequester(focusRequester)
             )
         },
-        confirmButton = {
-            TextButton(
-                enabled = noteText.isNotBlank() && !isSaving,
-                onClick = {
-                    isSaving = true
-                    onSave(noteText) { message ->
-                        errorMessage = message
-                        isSaving = false
-                    }
-                }
-            ) {
-                Text(stringResource(if (isSaving) R.string.fast_note_saving else R.string.fast_note_add))
-            }
-        },
-        dismissButton = {
+        buttons = {
             TextButton(
                 enabled = !isSaving,
                 onClick = onCancel
             ) {
                 Text(stringResource(R.string.action_cancel))
+            }
+            TextButton(
+                enabled = noteText.isNotBlank() && !isSaving,
+                onClick = { onSave(noteText) { message -> errorMessage = message } }
+            ) {
+                Text(stringResource(if (isSaving) R.string.fast_note_saving else R.string.fast_note_add))
             }
         }
     )
