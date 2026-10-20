@@ -19,11 +19,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -34,7 +29,6 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -96,6 +90,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import kotlin.random.Random
+import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.luminance
@@ -1027,8 +1023,8 @@ internal fun SetupScreenContent(
     onSkipGuide: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    BoxWithConstraints(modifier = modifier.fillMaxSize()) {
-        DriftingLogo(containerWidth = maxWidth, containerHeight = maxHeight)
+    Box(modifier = modifier.fillMaxSize()) {
+        WatermarkLogo()
 
         Column(
             modifier = Modifier
@@ -2063,42 +2059,20 @@ private fun GuideLine(text: String, done: Boolean) {
     }
 }
 
-/**
- * Logo appky jako vodoznak. Lita krizem po obrazovce a odrazi se od okraju — vodorovne a svisle
- * ma jinou periodu, takze drahy se nikdy neopakuji uplne stejne.
- */
 @Composable
-private fun BoxScope.DriftingLogo(containerWidth: Dp, containerHeight: Dp) {
-    val logoSize = 260.dp
-    val travelX = (containerWidth - logoSize).coerceAtLeast(0.dp)
-    val travelY = (containerHeight - logoSize).coerceAtLeast(0.dp)
-    val transition = rememberInfiniteTransition(label = "logoDrift")
-    val progressX by transition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(tween(9_000, easing = LinearEasing), RepeatMode.Reverse),
-        label = "logoDriftX"
-    )
-    val progressY by transition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(tween(13_000, easing = LinearEasing), RepeatMode.Reverse),
-        label = "logoDriftY"
-    )
+private fun BoxScope.WatermarkLogo() {
     // Logo je svetle, takze na svetlem pozadi by bylo bila na bile — tam se prebarvi na tmavou
-    // navy z ikony. Na tmavem pozadi se necha, jak je.
-    //
-    // Tma se pozna z pouziteho schematu, ne ze systemoveho nastaveni: uzivatel si v appce muze
-    // vybrat opak toho, co ma v telefonu, a logo by pak splynulo s pozadim.
+    // navy z ikony. Tma se pozna z pouziteho schematu, ne ze systemoveho nastaveni.
     val dark = MaterialTheme.colorScheme.surface.luminance() < 0.5f
+    val horizontalBias = rememberSaveable { Random.nextFloat() * 2f - 1f }
+    val verticalBias = rememberSaveable { Random.nextFloat() * 2f - 1f }
     Image(
         painter = painterResource(R.drawable.ic_launcher_foreground),
         contentDescription = null,
         colorFilter = if (dark) null else ColorFilter.tint(androidx.compose.ui.graphics.Color(0xFF061B2A)),
         modifier = Modifier
-            .align(Alignment.TopStart)
-            .offset(x = travelX * progressX, y = travelY * progressY)
-            .size(logoSize)
+            .align(BiasAlignment(horizontalBias, verticalBias))
+            .size(260.dp)
             .alpha(if (dark) 0.14f else 0.10f)
     )
 }
