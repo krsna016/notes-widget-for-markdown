@@ -2,6 +2,20 @@
 
 All notable public changes will be documented in this file.
 
+## v1.3.0 - 2026-10-20
+
+- Widget background: pick a colour (System, card pastels, Graphite, Forest or a custom hex) and its transparency. The default is now 85 % opacity; buttons and chips switch to readable colours automatically.
+- Fast notes can be added as checkboxes as well as bullets. Without a target file the fast note dialog asks which file to use instead of showing an error, also when the saved file was moved or deleted.
+- A small rating chip appears on the widget for two days at a time, at most three times, and never while sync needs attention. It opens a short dialog with links to rate the app or suggest an idea, and can be turned off in settings.
+- Play build: the Google Play rating dialog now only appears after a quick note is saved, never when settings open.
+- Settings can ask once what would make the app better: thumbs up or down and a short text. The Play build stores the answer anonymously in Firebase Firestore (EU); the foss build opens a GitHub discussion instead.
+- After an update, a one-time "What's new" dialog lists the changes. All automatic dialogs share one rule: at most one per visit, at least three days apart.
+- Play build: the reporting question now comes after setup instead of on first launch, with shorter text. Nothing is collected before the answer, and crash reports have file paths removed before they are stored.
+- The app is now also in Russian, Brazilian Portuguese, Italian and Ukrainian, and on Android 13+ settings link to the per-app language setting.
+- Usage events for features and settings (action names and chosen options only), sent only with consent.
+- Fixed: the settings screen kept redrawing because of the moving logo, which wasted battery; the logo now stays still.
+- Fixed: the fast note dialog could freeze while the keyboard opened.
+
 ## v1.2.1 - 2026-10-12
 
 - Fixed: after picking a different notes folder, the widget kept showing the old folder until a manual refresh or the next periodic update. It now redraws right away. Reported on Reddit.

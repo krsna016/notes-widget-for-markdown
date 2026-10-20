@@ -1,0 +1,5 @@
+- Widget background colour and transparency
+- Fast notes as checkboxes; pick the target file in the dialog
+- Tell me what to improve from settings
+- Now also in Russian, Portuguese, Italian and Ukrainian
+- Settings no longer drain battery
