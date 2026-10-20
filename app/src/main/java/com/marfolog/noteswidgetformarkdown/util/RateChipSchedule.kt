@@ -46,6 +46,11 @@ internal object RateChipSchedule {
             featureSeenAtMillis + FEATURE_SEEN_DELAY_MILLIS
         )
 
+    /** The settings switch appears with the first window and stays for good. */
+    fun isSettingAvailable(nowMillis: Long, firstSeenAtMillis: Long?, featureSeenAtMillis: Long?): Boolean =
+        firstSeenAtMillis != null && featureSeenAtMillis != null &&
+            nowMillis >= firstShowAt(firstSeenAtMillis, featureSeenAtMillis)
+
     /** "Shown" is counted once per window, not once per widget redraw. */
     fun isFirstShowOfWindow(window: Int?, lastReportedWindow: Int?): Boolean =
         window != null && (lastReportedWindow == null || window > lastReportedWindow)

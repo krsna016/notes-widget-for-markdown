@@ -322,6 +322,9 @@ private fun SetupScreen(modifier: Modifier = Modifier) {
         )
     }
     var gitReloadTrigger by remember { mutableIntStateOf(0) }
+    val rateChipSettingAvailable = remember {
+        RateReminder.isSettingAvailable(context, System.currentTimeMillis())
+    }
     var rateChipEnabled by rememberSaveable { mutableStateOf(RateReminder.isEnabled(context)) }
     var fastNoteStyle by rememberSaveable {
         mutableStateOf(FastNoteStyle.from(prefs.getString(SetupActivity.KEY_FAST_NOTE_STYLE, null)))
@@ -706,6 +709,7 @@ private fun SetupScreen(modifier: Modifier = Modifier) {
             scope.launch { NotesWidget.updateAll(context) }
         },
         onSendFeedback = openFeedback,
+        rateChipSettingAvailable = rateChipSettingAvailable,
         rateChipEnabled = rateChipEnabled,
         onRateChipChanged = { enabled ->
             rateChipEnabled = enabled
@@ -931,6 +935,7 @@ internal fun SetupScreenContent(
     telemetryAvailable: Boolean = false,
     telemetryEnabled: Boolean = false,
     onTelemetryChanged: (Boolean) -> Unit = {},
+    rateChipSettingAvailable: Boolean = true,
     rateChipEnabled: Boolean = true,
     onRateChipChanged: (Boolean) -> Unit = {},
     onSendFeedback: () -> Unit = {},
@@ -1343,9 +1348,11 @@ internal fun SetupScreenContent(
         HorizontalDivider()
         Spacer(modifier = Modifier.height(24.dp))
 
-        RateChipSetting(enabled = rateChipEnabled, onChanged = onRateChipChanged)
+        if (rateChipSettingAvailable) {
+            RateChipSetting(enabled = rateChipEnabled, onChanged = onRateChipChanged)
 
-        Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(24.dp))
+        }
 
         AboutSection(onSendFeedback = onSendFeedback)
 

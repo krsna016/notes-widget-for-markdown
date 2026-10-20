@@ -47,6 +47,16 @@ object RateReminder {
         disabledInSettings = !store.getBoolean(KEY_ENABLED, true)
     )
 
+    fun isSettingAvailable(context: Context, nowMillis: Long): Boolean =
+        isSettingAvailable(store(context), nowMillis)
+
+    internal fun isSettingAvailable(store: KeyValueStore, nowMillis: Long): Boolean =
+        RateChipSchedule.isSettingAvailable(
+            nowMillis = nowMillis,
+            firstSeenAtMillis = store.timestamp(KEY_FIRST_SEEN_AT),
+            featureSeenAtMillis = store.timestamp(KEY_FEATURE_SEEN_AT)
+        )
+
     /** Both widgets load their data on every refresh; the window is reported by whichever is first. */
     fun reportShownOnce(context: Context, window: Int?) {
         if (claimShownWindow(store(context), window)) {

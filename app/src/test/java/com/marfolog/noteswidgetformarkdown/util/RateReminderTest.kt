@@ -98,4 +98,21 @@ class RateReminderTest {
         assertFalse(RateReminder.claimShownWindow(store, null))
         assertTrue(RateReminder.claimShownWindow(store, 0))
     }
+
+    @Test
+    fun `setting is hidden on a fresh install and appears a week later, whatever the chip state`() {
+        RateReminder.recordStart(store, installedAt)
+        assertFalse(RateReminder.isSettingAvailable(store, installedAt + 7 * day - 1))
+        assertTrue(RateReminder.isSettingAvailable(store, installedAt + 7 * day))
+
+        RateReminder.markRateTapped(store)
+        RateReminder.markNeverAgain(store)
+        RateReminder.setEnabled(store, false)
+        assertTrue(RateReminder.isSettingAvailable(store, installedAt + 200 * day))
+    }
+
+    @Test
+    fun `setting is hidden when nothing has been recorded yet`() {
+        assertFalse(RateReminder.isSettingAvailable(store, installedAt + 200 * day))
+    }
 }

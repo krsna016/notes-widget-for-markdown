@@ -139,4 +139,44 @@ class RateChipScheduleTest {
         assertFalse(RateChipSchedule.isFirstShowOfWindow(window = null, lastReportedWindow = null))
         assertFalse(RateChipSchedule.isFirstShowOfWindow(window = null, lastReportedWindow = 0))
     }
+
+    private fun available(now: Long, firstSeen: Long? = installedAt, featureSeen: Long? = installedAt) =
+        RateChipSchedule.isSettingAvailable(now, firstSeen, featureSeen)
+
+    @Test
+    fun `setting stays hidden for a new install until day seven`() {
+        assertFalse(available(now = installedAt))
+        assertFalse(available(now = installedAt + 7 * day - 1))
+    }
+
+    @Test
+    fun `setting appears exactly when the first window opens`() {
+        assertTrue(available(now = installedAt + 7 * day))
+    }
+
+    @Test
+    fun `existing user gets the setting two days after the update`() {
+        val updatedAt = installedAt + 90 * day
+        assertFalse(available(now = updatedAt + 2 * day - 1, featureSeen = updatedAt))
+        assertTrue(available(now = updatedAt + 2 * day, featureSeen = updatedAt))
+    }
+
+    @Test
+    fun `setting stays hidden when a timestamp is missing`() {
+        val later = installedAt + 400 * day
+        assertFalse(available(now = later, firstSeen = null))
+        assertFalse(available(now = later, featureSeen = null))
+        assertFalse(available(now = later, firstSeen = null, featureSeen = null))
+    }
+
+    @Test
+    fun `setting stays hidden when the clock is set before the first start`() {
+        assertFalse(available(now = installedAt - 30 * day))
+    }
+
+    @Test
+    fun `setting stays visible after every window has closed`() {
+        assertTrue(available(now = installedAt + 7 * day + 100 * day))
+        assertTrue(available(now = installedAt + 1000 * day))
+    }
 }
