@@ -131,4 +131,23 @@ class FeedbackScheduleTest {
     fun `a clock set before the last send does not lock feedback out`() {
         assertTrue(FeedbackSchedule.canSend(nowMillis = aWeekLater - 30 * day, lastSentAtMillis = aWeekLater))
     }
+
+    @Test
+    fun `nothing on its way means nothing is pending`() {
+        assertFalse(FeedbackSchedule.isPending(nowMillis = aWeekLater, pendingSinceMillis = null))
+    }
+
+    @Test
+    fun `a send that timed out blocks a retry for exactly a minute`() {
+        val startedAt = aWeekLater
+        val minute = TimeUnit.MINUTES.toMillis(1)
+        assertTrue(FeedbackSchedule.isPending(nowMillis = startedAt, pendingSinceMillis = startedAt))
+        assertTrue(FeedbackSchedule.isPending(nowMillis = startedAt + minute - 1, pendingSinceMillis = startedAt))
+        assertFalse(FeedbackSchedule.isPending(nowMillis = startedAt + minute, pendingSinceMillis = startedAt))
+    }
+
+    @Test
+    fun `a clock set before the timed out send does not block a retry`() {
+        assertFalse(FeedbackSchedule.isPending(nowMillis = aWeekLater - hour, pendingSinceMillis = aWeekLater))
+    }
 }

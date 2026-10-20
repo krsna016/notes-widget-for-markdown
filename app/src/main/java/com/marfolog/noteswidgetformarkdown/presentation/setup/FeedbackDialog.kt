@@ -22,8 +22,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -34,6 +33,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.marfolog.noteswidgetformarkdown.R
 import com.marfolog.noteswidgetformarkdown.util.FeedbackForm
 import com.marfolog.noteswidgetformarkdown.util.FeedbackIdeas
@@ -43,7 +43,6 @@ import com.marfolog.noteswidgetformarkdown.util.FeedbackSender
 import com.marfolog.noteswidgetformarkdown.util.FeedbackThumbs
 import com.marfolog.noteswidgetformarkdown.util.Telemetry
 import com.marfolog.noteswidgetformarkdown.util.UsageEvent
-import kotlinx.coroutines.launch
 
 private val FeedbackFormSaver = listSaver<FeedbackForm, Any?>(
     save = { listOf(it.thumbs?.value, ArrayList(it.ideas), it.text) },
@@ -61,14 +60,28 @@ private val FeedbackFormSaver = listSaver<FeedbackForm, Any?>(
 @Composable
 internal fun FeedbackDialogHost(onClose: () -> Unit) {
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
+    val sender: FeedbackSendViewModel = viewModel()
     var form by rememberSaveable(stateSaver = FeedbackFormSaver) { mutableStateOf(FeedbackForm()) }
     var errorRes by rememberSaveable { mutableStateOf<Int?>(null) }
-    var sending by remember { mutableStateOf(false) }
 
     fun close(choice: String) {
         Telemetry.event(UsageEvent.FEEDBACK_DIALOG_CHOICE, UsageEvent.PARAM_CHOICE to choice)
         onClose()
+    }
+
+    LaunchedEffect(sender.outcome) {
+        val outcome = sender.outcome ?: return@LaunchedEffect
+        sender.outcomeHandled()
+        when (outcome.result) {
+            FeedbackSendResult.Sent -> {
+                UsageEvent.feedbackSent(outcome.form).forEach { (name, param) -> Telemetry.event(name, param) }
+                Toast.makeText(context, R.string.feedback_thanks, Toast.LENGTH_SHORT).show()
+                onClose()
+            }
+            FeedbackSendResult.Failed -> errorRes = FeedbackSender.FAILED_RES
+            FeedbackSendResult.TooSoon -> errorRes = R.string.feedback_too_soon
+            FeedbackSendResult.Pending -> errorRes = R.string.feedback_pending
+        }
     }
 
     FeedbackDialog(
@@ -77,24 +90,12 @@ internal fun FeedbackDialogHost(onClose: () -> Unit) {
             form = it
             errorRes = null
         },
-        sending = sending,
+        sending = sender.sending,
         errorRes = errorRes,
         footerRes = FeedbackSender.FOOTER_RES,
         onSend = {
-            sending = true
             errorRes = null
-            scope.launch {
-                when (FeedbackSender.send(context, form)) {
-                    FeedbackSendResult.Sent -> {
-                        UsageEvent.feedbackSent(form).forEach { (name, param) -> Telemetry.event(name, param) }
-                        Toast.makeText(context, R.string.feedback_thanks, Toast.LENGTH_SHORT).show()
-                        onClose()
-                    }
-                    FeedbackSendResult.Failed -> errorRes = FeedbackSender.FAILED_RES
-                    FeedbackSendResult.TooSoon -> errorRes = R.string.feedback_too_soon
-                }
-                sending = false
-            }
+            sender.send(form)
         },
         onLater = {
             FeedbackReminder.markSnoozed(context, System.currentTimeMillis())

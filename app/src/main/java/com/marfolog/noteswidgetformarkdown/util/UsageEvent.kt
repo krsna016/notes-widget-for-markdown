@@ -81,6 +81,7 @@ object UsageEvent {
     const val BUTTON_SAY_HI = "say_hi"
     const val BUTTON_SOURCE = "source"
     const val BUTTON_FEEDBACK = "feedback"
+    const val BUTTON_PRIVACY = "privacy"
 
     const val CHOICE_RATE = "rate"
     const val CHOICE_IDEA = "idea"

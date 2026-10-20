@@ -144,6 +144,8 @@
     <string name="new_note_failed">Poznámku se nepodařilo vytvořit</string>
 
     <string name="rate_chip">★ Ohodnotit</string>
+    <string name="rate_chip_label">Ohodnotit</string>
+    <string name="rate_chip_hint">Zabere 10 s</string>
     <string name="rate_dialog_title">Notes Widget dělá jeden člověk.</string>
     <string name="rate_dialog_body_play">Hodnocení na Google Play pomůže, aby ho našli i další lidé.</string>
     <string name="rate_dialog_body_foss">Hvězdička na GitHubu pomůže, aby ho našli i další lidé.</string>
@@ -189,6 +191,7 @@
     <string name="feedback_footer_foss">Otevře v prohlížeči novou diskusi na GitHubu, takže si ji před odesláním můžete přečíst.</string>
     <string name="feedback_failed_play">Nepodařilo se odeslat. Zkontrolujte připojení a zkuste to znovu.</string>
     <string name="feedback_too_soon">Dnes už zpětná vazba odešla. Děkuji, zkuste to zase zítra.</string>
+    <string name="feedback_pending">Předchozí odpověď možná ještě odchází. Počkejte prosím minutu, než ji pošlete znovu.</string>
     <string name="feedback_thanks">Děkuji!</string>
     <string name="about_feedback">Poslat zpětnou vazbu</string>
     <string name="about_rate">Ohodnotit na Google Play</string>

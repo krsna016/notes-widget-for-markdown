@@ -17,6 +17,7 @@ class FeedbackReminderTest {
         override fun putInt(key: String, value: Int) { values[key] = value }
         override fun getBoolean(key: String, default: Boolean) = values[key] as Boolean? ?: default
         override fun putBoolean(key: String, value: Boolean) { values[key] = value }
+        override fun remove(key: String) { values.remove(key) }
     }
 
     private val day = TimeUnit.DAYS.toMillis(1)
@@ -76,5 +77,33 @@ class FeedbackReminderTest {
     @Test
     fun `nothing sent yet means sending is allowed`() {
         assertTrue(FeedbackReminder.canSend(store, installedAt))
+    }
+
+    @Test
+    fun `a send still on its way holds back a second press of send for a minute`() {
+        val pressedAt = installedAt + 9 * day
+        FeedbackReminder.markPending(store, pressedAt)
+
+        assertTrue(FeedbackReminder.isPending(store, pressedAt + 30_000))
+        assertFalse(FeedbackReminder.isPending(store, pressedAt + 60_000))
+    }
+
+    @Test
+    fun `a send that failed outright can be retried at once`() {
+        val pressedAt = installedAt + 9 * day
+        FeedbackReminder.markPending(store, pressedAt)
+        FeedbackReminder.clearPending(store)
+
+        assertFalse(FeedbackReminder.isPending(store, pressedAt + 1))
+    }
+
+    @Test
+    fun `a send that arrived is no longer pending`() {
+        val pressedAt = installedAt + 9 * day
+        FeedbackReminder.markPending(store, pressedAt)
+        FeedbackReminder.markSent(store, pressedAt + 2_000)
+
+        assertFalse(FeedbackReminder.isPending(store, pressedAt + 3_000))
+        assertFalse(store.contains("feedback_pending_since"))
     }
 }

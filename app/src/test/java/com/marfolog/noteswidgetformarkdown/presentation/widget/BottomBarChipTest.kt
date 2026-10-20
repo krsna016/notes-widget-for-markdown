@@ -3,6 +3,8 @@ package com.marfolog.noteswidgetformarkdown.presentation.widget
 import com.marfolog.noteswidgetformarkdown.R
 import com.marfolog.noteswidgetformarkdown.presentation.widget.GitSyncLabel.Severity
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class BottomBarChipTest {
@@ -23,18 +25,27 @@ class BottomBarChipTest {
     }
 
     @Test
-    fun `healthy sync becomes a rate chip that keeps the green dot`() {
-        assertEquals(BottomBarChip.Rate(okDot = true), bottomBarChip(rateWindowOpen = true, syncLabel = synced))
+    fun `healthy sync becomes a rate chip that takes turns with the synced label`() {
+        assertEquals(
+            BottomBarChip.Rate(RateAlternate.SyncLabel(synced)),
+            bottomBarChip(rateWindowOpen = true, syncLabel = synced)
+        )
     }
 
     @Test
-    fun `sync without information gives way to a plain rate chip`() {
-        assertEquals(BottomBarChip.Rate(okDot = false), bottomBarChip(rateWindowOpen = true, syncLabel = noInfo))
+    fun `sync without information gives way to a rate chip that takes turns with the hint`() {
+        assertEquals(BottomBarChip.Rate(RateAlternate.Hint), bottomBarChip(rateWindowOpen = true, syncLabel = noInfo))
     }
 
     @Test
-    fun `sync chip switched off leaves the corner to a plain rate chip`() {
-        assertEquals(BottomBarChip.Rate(okDot = false), bottomBarChip(rateWindowOpen = true, syncLabel = null))
+    fun `an unreadable sync state never shows its label inside the rate chip`() {
+        val unknown = GitSyncLabel.Label(R.string.sync_unknown, Severity.Off)
+        assertEquals(BottomBarChip.Rate(RateAlternate.Hint), bottomBarChip(rateWindowOpen = true, syncLabel = unknown))
+    }
+
+    @Test
+    fun `sync chip switched off leaves the corner to a rate chip that takes turns with the hint`() {
+        assertEquals(BottomBarChip.Rate(RateAlternate.Hint), bottomBarChip(rateWindowOpen = true, syncLabel = null))
     }
 
     @Test
@@ -47,5 +58,15 @@ class BottomBarChipTest {
     @Test
     fun `outside a rate window with the sync chip off the corner stays empty`() {
         assertEquals(BottomBarChip.None, bottomBarChip(rateWindowOpen = false, syncLabel = null))
+    }
+
+    @Test
+    fun `the synced label shows first and the rate chip fades in after it`() {
+        assertFalse(RateAlternate.SyncLabel(synced).startsWithRate)
+    }
+
+    @Test
+    fun `the rate chip shows first and the hint fades in after it`() {
+        assertTrue(RateAlternate.Hint.startsWithRate)
     }
 }

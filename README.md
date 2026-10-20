@@ -145,9 +145,9 @@ Five days after the Play build first runs on your phone (for an update, the firs
 version that added this), it may ask Google Play to show its rating dialog: right after you save a
 quick note from the widget. It asks no more than once every 90 days. That request goes to the Play
 Store app on your phone, and Google decides whether the dialog appears. The app is never told
-whether you rated it or what you gave, and it sends nothing about your notes. The ★ Rate chip on the widget and the "Rate on Google Play" row
-in settings only open the store page. The foss build has no rating dialog; its chip and settings
-row open the GitHub repository in your browser.
+whether you rated it or what you gave, and it sends nothing about your notes. The ★ Rate chip on
+the widget and the "Rate on Google Play" row in settings only open the store page. The foss build
+has no rating dialog; its chip and settings row open the GitHub repository in your browser.
 
 Settings can ask, at most once a day and not before the app is a week old, what you think and what
 to build next; "Send feedback" in settings opens the same form any time. In the Play build, pressing

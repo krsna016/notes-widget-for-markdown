@@ -15,6 +15,7 @@ internal object FeedbackSchedule {
     val MIN_AGE_MILLIS = TimeUnit.DAYS.toMillis(7)
     val SNOOZE_MILLIS = TimeUnit.HOURS.toMillis(24)
     val SEND_INTERVAL_MILLIS = TimeUnit.HOURS.toMillis(24)
+    val PENDING_MILLIS = TimeUnit.SECONDS.toMillis(60)
 
     fun shouldOffer(
         nowMillis: Long,
@@ -41,5 +42,14 @@ internal object FeedbackSchedule {
         if (lastSentAtMillis == null) return true
         val elapsed = nowMillis - lastSentAtMillis
         return elapsed < 0 || elapsed >= SEND_INTERVAL_MILLIS
+    }
+
+    /**
+     * A send that timed out may still land a moment later, so for a minute another press of Send
+     * would risk a second copy. A clock earlier than the start does not block, as in [canSend].
+     */
+    fun isPending(nowMillis: Long, pendingSinceMillis: Long?): Boolean {
+        if (pendingSinceMillis == null) return false
+        return nowMillis - pendingSinceMillis in 0 until PENDING_MILLIS
     }
 }

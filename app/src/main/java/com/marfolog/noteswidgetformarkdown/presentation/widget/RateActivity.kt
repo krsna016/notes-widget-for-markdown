@@ -3,18 +3,24 @@ package com.marfolog.noteswidgetformarkdown.presentation.widget
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.material3.AlertDialog
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.lifecycleScope
 import com.marfolog.noteswidgetformarkdown.R
 import com.marfolog.noteswidgetformarkdown.ui.theme.NotesWidgetForMarkdownTheme
@@ -83,28 +89,42 @@ internal enum class RateChoice(val eventValue: String, val hidesChip: Boolean) {
 
 @Composable
 private fun RateDialog(bodyRes: Int, rateButtonRes: Int, onChoice: (RateChoice) -> Unit) {
-    AlertDialog(
-        onDismissRequest = { onChoice(RateChoice.Later) },
-        title = { Text(stringResource(R.string.rate_dialog_title)) },
-        text = {
-            Column {
-                Text(stringResource(bodyRes))
+    Dialog(onDismissRequest = { onChoice(RateChoice.Later) }) {
+        Surface(
+            shape = MaterialTheme.shapes.extraLarge,
+            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+            tonalElevation = 6.dp
+        ) {
+            Column(modifier = Modifier.padding(24.dp)) {
+                Text(
+                    text = stringResource(R.string.rate_dialog_title),
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
                 Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = stringResource(bodyRes),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(modifier = Modifier.height(24.dp))
                 Button(onClick = { onChoice(RateChoice.Rate) }, modifier = Modifier.fillMaxWidth()) {
                     Text(stringResource(rateButtonRes))
                 }
-                TextButton(onClick = { onChoice(RateChoice.Idea) }, modifier = Modifier.fillMaxWidth()) {
+                Spacer(modifier = Modifier.height(8.dp))
+                FilledTonalButton(onClick = { onChoice(RateChoice.Idea) }, modifier = Modifier.fillMaxWidth()) {
                     Text(stringResource(R.string.rate_dialog_idea))
                 }
-                TextButton(onClick = { onChoice(RateChoice.Never) }, modifier = Modifier.fillMaxWidth()) {
-                    Text(stringResource(R.string.rate_dialog_never))
+                Spacer(modifier = Modifier.height(16.dp))
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    TextButton(onClick = { onChoice(RateChoice.Never) }) {
+                        Text(stringResource(R.string.rate_dialog_never))
+                    }
+                    TextButton(onClick = { onChoice(RateChoice.Later) }) {
+                        Text(stringResource(R.string.rate_dialog_later))
+                    }
                 }
             }
-        },
-        confirmButton = {
-            TextButton(onClick = { onChoice(RateChoice.Later) }) {
-                Text(stringResource(R.string.rate_dialog_later))
-            }
         }
-    )
+    }
 }

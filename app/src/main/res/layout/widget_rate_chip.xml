@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Embedded in the Glance widget: Glance has no view that cross-fades on its own. -->
+<ViewFlipper xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rate_chip_flipper"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:autoStart="true"
+    android:flipInterval="5000"
+    android:inAnimation="@anim/rate_chip_fade_in"
+    android:measureAllChildren="true"
+    android:outAnimation="@anim/rate_chip_fade_out"
+    android:paddingHorizontal="10dp"
+    android:paddingVertical="6dp">
+
+    <LinearLayout
+        android:id="@+id/rate_chip_alternate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/rate_chip_dot"
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:layout_marginEnd="6dp"
+            android:importantForAccessibility="no"
+            android:src="@drawable/rate_chip_dot"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/rate_chip_alternate_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/rate_chip_rate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/rate_chip_star"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            android:maxLines="1"
+            android:text="@string/rate_chip_star"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/rate_chip_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:text="@string/rate_chip_label"
+            android:textSize="12sp" />
+    </LinearLayout>
+</ViewFlipper>

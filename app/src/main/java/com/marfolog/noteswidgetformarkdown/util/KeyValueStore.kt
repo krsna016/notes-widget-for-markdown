@@ -11,6 +11,7 @@ internal interface KeyValueStore {
     fun putInt(key: String, value: Int)
     fun getBoolean(key: String, default: Boolean): Boolean
     fun putBoolean(key: String, value: Boolean)
+    fun remove(key: String)
 }
 
 internal class SharedPreferencesStore(private val prefs: SharedPreferences) : KeyValueStore {
@@ -21,4 +22,5 @@ internal class SharedPreferencesStore(private val prefs: SharedPreferences) : Ke
     override fun putInt(key: String, value: Int) = prefs.edit().putInt(key, value).apply()
     override fun getBoolean(key: String, default: Boolean) = prefs.getBoolean(key, default)
     override fun putBoolean(key: String, value: Boolean) = prefs.edit().putBoolean(key, value).apply()
+    override fun remove(key: String) = prefs.edit().remove(key).apply()
 }

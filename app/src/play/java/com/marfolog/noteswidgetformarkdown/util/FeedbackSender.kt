@@ -47,21 +47,32 @@ object FeedbackSender {
     suspend fun send(context: Context, form: FeedbackForm): FeedbackSendResult {
         val now = System.currentTimeMillis()
         if (!FeedbackReminder.canSend(context, now)) return FeedbackSendResult.TooSoon
+        if (FeedbackReminder.isPending(context, now)) return FeedbackSendResult.Pending
         // Firestore would queue the write and wait for a network; offline is a plain failure here.
         if (!isOnline(context)) return FeedbackSendResult.Failed
 
         val document = FeedbackPayload.of(form, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE) +
             (FeedbackPayload.FIELD_CREATED_AT to FieldValue.serverTimestamp())
-        val stored = runCatching {
-            withTimeoutOrNull(TIMEOUT_MILLIS) { firestore.collection(COLLECTION).add(document).succeeded() }
-        }.getOrNull() == true
-        if (!stored) {
-            AppLog.d(AREA, "Feedback not sent")
-            return FeedbackSendResult.Failed
+        FeedbackReminder.markPending(context, now)
+        return when (withTimeoutOrNull(TIMEOUT_MILLIS) { store(document) }) {
+            true -> {
+                FeedbackReminder.markSent(context, now)
+                FeedbackSendResult.Sent
+            }
+            false -> {
+                AppLog.d(AREA, "Feedback not sent")
+                FeedbackReminder.clearPending(context)
+                FeedbackSendResult.Failed
+            }
+            null -> {
+                AppLog.d(AREA, "Feedback send timed out")
+                FeedbackSendResult.Pending
+            }
         }
-        FeedbackReminder.markSent(context, now)
-        return FeedbackSendResult.Sent
     }
+
+    private suspend fun store(document: Map<String, Any?>): Boolean =
+        runCatching { firestore.collection(COLLECTION).add(document) }.getOrNull()?.succeeded() == true
 
     private fun isOnline(context: Context): Boolean {
         val connectivity = context.getSystemService(ConnectivityManager::class.java) ?: return false

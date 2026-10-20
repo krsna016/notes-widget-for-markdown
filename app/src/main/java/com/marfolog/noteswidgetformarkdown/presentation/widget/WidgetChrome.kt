@@ -1,12 +1,17 @@
 package com.marfolog.noteswidgetformarkdown.presentation.widget
 
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
+import android.os.Build
+import android.view.View
+import android.widget.RemoteViews
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -18,6 +23,7 @@ import androidx.glance.Image
 import androidx.glance.ImageProvider
 import androidx.glance.action.Action
 import androidx.glance.action.clickable
+import androidx.glance.appwidget.AndroidRemoteViews
 import androidx.glance.appwidget.CircularProgressIndicator
 import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.action.actionStartActivity
@@ -148,7 +154,7 @@ internal fun BottomBar(
         when (chip) {
             BottomBarChip.None -> Unit
             is BottomBarChip.Sync -> SyncStatus(chip.label, backgroundPercent)
-            is BottomBarChip.Rate -> RateChip(okDot = chip.okDot, backgroundPercent = backgroundPercent)
+            is BottomBarChip.Rate -> RateChip(chip.alternate)
         }
     }
 }
@@ -170,26 +176,73 @@ internal fun SyncStatus(label: GitSyncLabel.Label, backgroundPercent: Int) {
     BarChip(
         onClick = actionStartActivity(SetupActivity.intent(context, UsageEvent.FROM_SYNC_CHIP)),
         dotColor = severityColor(label.severity),
-        text = label.arg
-            ?.let { context.getString(label.textRes, it) }
-            ?: context.getString(label.textRes),
+        text = label.text(context),
         backgroundPercent = backgroundPercent
     )
 }
 
+/**
+ * Tertiary rather than the amber of a stale sync, which it must not be mistaken for. The cross-fade
+ * comes from a ViewFlipper, so it keeps running without the widget being redrawn.
+ */
 @Composable
-private fun RateChip(okDot: Boolean, backgroundPercent: Int) {
+private fun RateChip(alternate: RateAlternate) {
     val context = LocalContext.current
-    BarChip(
-        onClick = actionStartActivity(Intent(context, RateActivity::class.java)),
-        dotColor = if (okDot) severityColor(GitSyncLabel.Severity.Ok) else null,
-        text = context.getString(R.string.rate_chip),
-        backgroundPercent = backgroundPercent
-    )
+    val views = RemoteViews(context.packageName, R.layout.widget_rate_chip).apply {
+        setOnClickPendingIntent(R.id.rate_chip_flipper, rateActivityPendingIntent(context))
+        setContentDescription(R.id.rate_chip_flipper, context.getString(R.string.rate_chip))
+        setDayNightTextColor(context, R.id.rate_chip_star, RATE_STAR_GOLD)
+        setDayNightTextColor(context, R.id.rate_chip_label, GlanceTheme.colors.onTertiaryContainer)
+        setDayNightTextColor(context, R.id.rate_chip_alternate_text, GlanceTheme.colors.onTertiaryContainer)
+        when (alternate) {
+            is RateAlternate.SyncLabel -> {
+                setTextViewText(R.id.rate_chip_alternate_text, alternate.label.text(context))
+                setViewVisibility(R.id.rate_chip_dot, View.VISIBLE)
+            }
+            RateAlternate.Hint -> setTextViewText(R.id.rate_chip_alternate_text, context.getString(R.string.rate_chip_hint))
+        }
+        if (alternate.startsWithRate) setDisplayedChild(R.id.rate_chip_flipper, RATE_CHILD_INDEX)
+    }
+    Box(
+        modifier = GlanceModifier
+            .cornerRadius(16.dp)
+            .background(GlanceTheme.colors.tertiaryContainer)
+    ) {
+        AndroidRemoteViews(views)
+    }
 }
 
+private const val RATE_CHILD_INDEX = 1
+private const val RATE_CHIP_REQUEST_CODE = 0x7a7e
+
+private val RATE_STAR_GOLD = dayNightColor(day = Color(0xFFF4B400), night = Color(0xFFFFD54F))
+
+private fun rateActivityPendingIntent(context: Context): PendingIntent = PendingIntent.getActivity(
+    context,
+    RATE_CHIP_REQUEST_CODE,
+    Intent(context, RateActivity::class.java),
+    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+)
+
+/** Night colours apply by themselves from Android 12; before that the current mode is baked in. */
+private fun RemoteViews.setDayNightTextColor(context: Context, viewId: Int, color: ColorProvider) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        setColorInt(
+            viewId,
+            "setTextColor",
+            color.getColor(context.withNightMode(false)).toArgb(),
+            color.getColor(context.withNightMode(true)).toArgb()
+        )
+    } else {
+        setTextColor(viewId, color.getColor(context).toArgb())
+    }
+}
+
+private fun GitSyncLabel.Label.text(context: Context): String =
+    arg?.let { context.getString(textRes, it) } ?: context.getString(textRes)
+
 @Composable
-private fun BarChip(onClick: Action, dotColor: ColorProvider?, text: String, backgroundPercent: Int) {
+private fun BarChip(onClick: Action, dotColor: ColorProvider, text: String, backgroundPercent: Int) {
     WidgetSurface(backgroundPercent, cornerRadius = 16.dp) {
         Row(
             modifier = GlanceModifier
@@ -199,15 +252,13 @@ private fun BarChip(onClick: Action, dotColor: ColorProvider?, text: String, bac
                 .clickable(onClick),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            dotColor?.let { color ->
-                Box(
-                    modifier = GlanceModifier
-                        .size(8.dp)
-                        .cornerRadius(4.dp)
-                        .background(color)
-                ) {}
-                Spacer(modifier = GlanceModifier.width(6.dp))
-            }
+            Box(
+                modifier = GlanceModifier
+                    .size(8.dp)
+                    .cornerRadius(4.dp)
+                    .background(dotColor)
+            ) {}
+            Spacer(modifier = GlanceModifier.width(6.dp))
             Text(
                 text = text,
                 style = TextStyle(

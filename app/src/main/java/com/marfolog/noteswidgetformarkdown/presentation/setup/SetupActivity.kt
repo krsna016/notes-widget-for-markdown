@@ -104,6 +104,7 @@ import androidx.compose.ui.unit.IntOffset
 import kotlinx.coroutines.delay
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.documentfile.provider.DocumentFile
 import com.marfolog.noteswidgetformarkdown.BuildConfig
@@ -1931,6 +1932,7 @@ private fun AboutSection(onSendFeedback: () -> Unit) {
                 ProjectLinks.open(context, ProjectLinks.REPO_URL)
             }
             AboutRow(Icons.Outlined.PrivacyTip, R.string.about_privacy) {
+                clicked(UsageEvent.BUTTON_PRIVACY)
                 ProjectLinks.open(context, ProjectLinks.PRIVACY_URL)
             }
         }
@@ -1943,7 +1945,7 @@ private fun AboutRow(icon: ImageVector, @StringRes labelRes: Int, onClick: () ->
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick)
+            .clickable(role = Role.Button, onClick = onClick)
             .padding(horizontal = 16.dp, vertical = 14.dp)
     ) {
         Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary)

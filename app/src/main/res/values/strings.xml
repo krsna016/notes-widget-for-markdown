@@ -168,6 +168,9 @@
 
     <!-- Rate chip on the widget and the dialog behind it -->
     <string name="rate_chip">★ Rate</string>
+    <string name="rate_chip_label">Rate</string>
+    <string name="rate_chip_hint">Takes 10 s</string>
+    <string name="rate_chip_star" translatable="false">★</string>
     <string name="rate_dialog_title">Notes Widget is made by one person.</string>
     <string name="rate_dialog_body_play">A rating on Google Play helps other people find it.</string>
     <string name="rate_dialog_body_foss">A star on GitHub helps other people find it.</string>
@@ -215,6 +218,7 @@
     <string name="feedback_footer_foss">Opens a new GitHub discussion in your browser, so you can read it before posting.</string>
     <string name="feedback_failed_play">Could not send. Check the connection and try again.</string>
     <string name="feedback_too_soon">Feedback was already sent today. Thank you, try again tomorrow.</string>
+    <string name="feedback_pending">The last answer may still be on its way. Please wait a minute before sending again.</string>
     <string name="feedback_thanks">Thank you!</string>
     <string name="about_feedback">Send feedback</string>
     <string name="about_star">Star on GitHub</string>

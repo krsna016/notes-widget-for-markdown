@@ -18,6 +18,7 @@ class RateReminderTest {
         override fun putInt(key: String, value: Int) { values[key] = value }
         override fun getBoolean(key: String, default: Boolean) = values[key] as Boolean? ?: default
         override fun putBoolean(key: String, value: Boolean) { values[key] = value }
+        override fun remove(key: String) { values.remove(key) }
     }
 
     private val day = TimeUnit.DAYS.toMillis(1)
