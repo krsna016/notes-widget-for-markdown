@@ -13,6 +13,8 @@ import com.marfolog.noteswidgetformarkdown.util.AppLog
 import com.marfolog.noteswidgetformarkdown.util.RateReminder
 import com.marfolog.noteswidgetformarkdown.util.Telemetry
 import com.marfolog.noteswidgetformarkdown.util.UsageProperties
+import com.marfolog.noteswidgetformarkdown.util.WhatsNewReminder
+import com.marfolog.noteswidgetformarkdown.util.WhatsNewSwitch
 import com.marfolog.noteswidgetformarkdown.worker.NotesFolderObserverJob
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -50,6 +52,8 @@ class NotesWidgetApp : Application() {
     override fun onCreate() {
         super.onCreate()
         Telemetry.init(this)
+        WhatsNewSwitch.init(this)
+        WhatsNewReminder.recordStart(this)
         // Here rather than in an activity: widget updates start the process too, and most people
         // only ever use the widget.
         if (RateReminder.recordStart(this, System.currentTimeMillis())) {

@@ -30,9 +30,7 @@ class FeedbackReminderTest {
         store = store,
         nowMillis = nowMillis,
         setupComplete = true,
-        openedFrom = openedFrom,
-        offeredThisVisit = false,
-        anotherDialogOpen = false
+        openedFrom = openedFrom
     )
 
     @Test
@@ -45,7 +43,7 @@ class FeedbackReminderTest {
     fun `a fresh store without a first start never offers`() {
         val empty = InMemoryStore()
         assertFalse(
-            FeedbackReminder.shouldOffer(empty, installedAt + 30 * day, true, null, false, false)
+            FeedbackReminder.shouldOffer(empty, installedAt + 30 * day, true, null)
         )
     }
 

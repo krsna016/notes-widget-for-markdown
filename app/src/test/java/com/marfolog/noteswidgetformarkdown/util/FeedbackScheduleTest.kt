@@ -19,9 +19,7 @@ class FeedbackScheduleTest {
         openedFrom: String? = null,
         answered: Boolean = false,
         neverAgain: Boolean = false,
-        snoozedAtMillis: Long? = null,
-        offeredThisVisit: Boolean = false,
-        anotherDialogOpen: Boolean = false
+        snoozedAtMillis: Long? = null
     ) = FeedbackSchedule.shouldOffer(
         nowMillis = nowMillis,
         setupComplete = setupComplete,
@@ -29,9 +27,7 @@ class FeedbackScheduleTest {
         openedFrom = openedFrom,
         answered = answered,
         neverAgain = neverAgain,
-        snoozedAtMillis = snoozedAtMillis,
-        offeredThisVisit = offeredThisVisit,
-        anotherDialogOpen = anotherDialogOpen
+        snoozedAtMillis = snoozedAtMillis
     )
 
     @Test
@@ -102,16 +98,6 @@ class FeedbackScheduleTest {
     fun `a clock set before the last not now reads as still snoozed`() {
         val snoozedAt = installedAt + 20 * day
         assertFalse(offer(nowMillis = snoozedAt - 3 * day, snoozedAtMillis = snoozedAt))
-    }
-
-    @Test
-    fun `it shows at most once per settings visit, rotation included`() {
-        assertFalse(offer(offeredThisVisit = true))
-    }
-
-    @Test
-    fun `it waits while the reporting question is on screen`() {
-        assertFalse(offer(anotherDialogOpen = true))
     }
 
     @Test

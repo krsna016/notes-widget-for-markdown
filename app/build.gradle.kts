@@ -163,6 +163,9 @@ dependencies {
     // Feedback the user types and sends from settings, Play flavour only
     "playImplementation"(libs.firebase.firestore)
 
+    // Remote off switch for the one-time "What's new" dialog, Play flavour only
+    "playImplementation"(libs.firebase.config)
+
     // Google Play's in-app rating dialog, Play flavour only
     "playImplementation"(libs.play.review.ktx)
 

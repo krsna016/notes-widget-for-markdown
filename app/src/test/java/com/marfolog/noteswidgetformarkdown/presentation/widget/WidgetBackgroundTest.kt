@@ -27,9 +27,23 @@ class WidgetBackgroundTest {
     private val store = InMemoryStore()
 
     @Test
-    fun `a user who never touched the slider keeps the fully opaque widget`() {
+    fun `a user who never touched the slider gets the slightly see-through default`() {
+        assertEquals(85, WidgetBackground.percent(store))
+        assertTrue(WidgetBackground.needsBacking(WidgetBackground.percent(store)))
+    }
+
+    @Test
+    fun `someone who explicitly saved fully opaque keeps it after the default changed`() {
+        WidgetBackground.save(store, 100)
+
         assertEquals(100, WidgetBackground.percent(store))
-        assertTrue(WidgetBackground.isOpaque(WidgetBackground.percent(store)))
+    }
+
+    @Test
+    fun `fully transparent is a real choice, not a missing value`() {
+        WidgetBackground.save(store, 0)
+
+        assertEquals(0, WidgetBackground.percent(store))
     }
 
     @Test
@@ -48,12 +62,15 @@ class WidgetBackgroundTest {
     }
 
     @Test
-    fun `a stored value outside the range is clamped when read`() {
+    fun `a stored value outside the range reads as the default`() {
         store.putInt("widget_background_percent", 250)
-        assertEquals(100, WidgetBackground.percent(store))
+        assertEquals(85, WidgetBackground.percent(store))
 
         store.putInt("widget_background_percent", -30)
-        assertEquals(0, WidgetBackground.percent(store))
+        assertEquals(85, WidgetBackground.percent(store))
+
+        store.putInt("widget_background_percent", 101)
+        assertEquals(85, WidgetBackground.percent(store))
     }
 
     @Test
@@ -89,7 +106,7 @@ class WidgetBackgroundTest {
         assertEquals(100, WidgetBackground.fromSlider(130f))
         assertEquals(100, WidgetBackground.fromSlider(Float.POSITIVE_INFINITY))
         assertEquals(0, WidgetBackground.fromSlider(Float.NEGATIVE_INFINITY))
-        assertEquals(100, WidgetBackground.fromSlider(Float.NaN))
+        assertEquals(85, WidgetBackground.fromSlider(Float.NaN))
     }
 
     @Test

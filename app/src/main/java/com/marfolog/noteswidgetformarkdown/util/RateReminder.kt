@@ -42,6 +42,7 @@ object RateReminder {
         nowMillis = nowMillis,
         firstSeenAtMillis = store.timestamp(KEY_FIRST_SEEN_AT),
         featureSeenAtMillis = store.timestamp(KEY_FEATURE_SEEN_AT),
+        whatsNewShownAtMillis = WhatsNewReminder.shownAt(store),
         rateTapped = store.getBoolean(KEY_RATE_TAPPED, false),
         neverAgain = store.getBoolean(KEY_NEVER_AGAIN, false),
         disabledInSettings = !store.getBoolean(KEY_ENABLED, true)
@@ -54,7 +55,8 @@ object RateReminder {
         RateChipSchedule.isSettingAvailable(
             nowMillis = nowMillis,
             firstSeenAtMillis = store.timestamp(KEY_FIRST_SEEN_AT),
-            featureSeenAtMillis = store.timestamp(KEY_FEATURE_SEEN_AT)
+            featureSeenAtMillis = store.timestamp(KEY_FEATURE_SEEN_AT),
+            whatsNewShownAtMillis = WhatsNewReminder.shownAt(store)
         )
 
     /** Both widgets load their data on every refresh; the window is reported by whichever is first. */

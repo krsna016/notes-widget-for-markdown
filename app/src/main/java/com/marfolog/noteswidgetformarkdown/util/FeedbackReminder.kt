@@ -16,18 +16,14 @@ object FeedbackReminder {
         context: Context,
         nowMillis: Long,
         setupComplete: Boolean,
-        openedFrom: String?,
-        offeredThisVisit: Boolean,
-        anotherDialogOpen: Boolean
-    ): Boolean = shouldOffer(store(context), nowMillis, setupComplete, openedFrom, offeredThisVisit, anotherDialogOpen)
+        openedFrom: String?
+    ): Boolean = shouldOffer(store(context), nowMillis, setupComplete, openedFrom)
 
     internal fun shouldOffer(
         store: KeyValueStore,
         nowMillis: Long,
         setupComplete: Boolean,
-        openedFrom: String?,
-        offeredThisVisit: Boolean,
-        anotherDialogOpen: Boolean
+        openedFrom: String?
     ): Boolean = FeedbackSchedule.shouldOffer(
         nowMillis = nowMillis,
         setupComplete = setupComplete,
@@ -35,9 +31,7 @@ object FeedbackReminder {
         openedFrom = openedFrom,
         answered = store.getBoolean(KEY_ANSWERED, false),
         neverAgain = store.getBoolean(KEY_NEVER_AGAIN, false),
-        snoozedAtMillis = store.getLong(KEY_SNOOZED_AT),
-        offeredThisVisit = offeredThisVisit,
-        anotherDialogOpen = anotherDialogOpen
+        snoozedAtMillis = store.getLong(KEY_SNOOZED_AT)
     )
 
     fun canSend(context: Context, nowMillis: Long): Boolean = canSend(store(context), nowMillis)

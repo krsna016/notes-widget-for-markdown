@@ -41,6 +41,9 @@ object UsageEvent {
     const val FEEDBACK_DIALOG_CHOICE = "feedback_dialog_choice"
     const val FEEDBACK_THUMBS = "feedback_thumbs"
 
+    const val WHATS_NEW_SHOWN = "whats_new_shown"
+    const val WHATS_NEW_CHOICE = "whats_new_choice"
+
     const val PARAM_STEP = "step"
     const val PARAM_TYPE = "type"
     const val PARAM_TARGET = "target"
@@ -51,6 +54,7 @@ object UsageEvent {
     const val PARAM_BUTTON = "button"
     const val PARAM_WINDOW = "window"
     const val PARAM_CHOICE = "choice"
+    const val PARAM_VERSION = "version"
 
     const val STEP_FOLDER = "folder"
     const val STEP_WIDGET = "widget"
@@ -87,6 +91,7 @@ object UsageEvent {
     const val CHOICE_LATER = "later"
     const val CHOICE_NEVER = "never"
     const val CHOICE_SENT = "sent"
+    const val CHOICE_DISMISSED = "dismissed"
 
     const val PROPERTY_WIDGET_TYPE = "widget_type"
     const val PROPERTY_SYNC_MODE = "sync_mode"

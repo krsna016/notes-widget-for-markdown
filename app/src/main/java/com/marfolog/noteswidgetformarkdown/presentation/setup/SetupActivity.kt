@@ -135,13 +135,17 @@ import com.marfolog.noteswidgetformarkdown.presentation.widget.NotesWidget
 import com.marfolog.noteswidgetformarkdown.presentation.widget.OpenWith
 import com.marfolog.noteswidgetformarkdown.presentation.widget.WidgetBackground
 import com.marfolog.noteswidgetformarkdown.util.AppLog
+import com.marfolog.noteswidgetformarkdown.util.AutoPrompt
 import com.marfolog.noteswidgetformarkdown.util.FeedbackReminder
+import com.marfolog.noteswidgetformarkdown.util.PromptBudget
 import com.marfolog.noteswidgetformarkdown.util.ProjectLinks
 import com.marfolog.noteswidgetformarkdown.util.RateReminder
 import com.marfolog.noteswidgetformarkdown.util.RatingPrompt
 import com.marfolog.noteswidgetformarkdown.util.Telemetry
 import com.marfolog.noteswidgetformarkdown.util.UsageEvent
 import com.marfolog.noteswidgetformarkdown.util.UsageProperties
+import com.marfolog.noteswidgetformarkdown.util.WhatsNew
+import com.marfolog.noteswidgetformarkdown.util.WhatsNewReminder
 import com.marfolog.noteswidgetformarkdown.worker.NotesFolderObserverJob
 import com.marfolog.noteswidgetformarkdown.ui.theme.NoteCardPalette
 import com.marfolog.noteswidgetformarkdown.ui.theme.WidgetPalette
@@ -560,31 +564,55 @@ private fun SetupScreen(modifier: Modifier = Modifier) {
         }
     }
 
-    var feedbackOffered by rememberSaveable { mutableStateOf(false) }
     var showFeedback by rememberSaveable { mutableStateOf(false) }
     val openFeedback: () -> Unit = {
         showFeedback = true
         Telemetry.event(UsageEvent.FEEDBACK_DIALOG_SHOWN)
     }
+    var showWhatsNew by rememberSaveable { mutableStateOf(false) }
+    // Saved, so a rotation neither asks again nor brings a second dialog.
+    var autoPromptChecked by rememberSaveable { mutableStateOf(false) }
+    var autoPrompt by rememberSaveable { mutableStateOf<AutoPrompt?>(null) }
     // After the guide effect above, so someone who only just got their guide marked done counts
     // as set up.
     LaunchedEffect(Unit) {
-        val offer = FeedbackReminder.shouldOffer(
-            context = context,
-            nowMillis = System.currentTimeMillis(),
-            setupComplete = notesUri != null && guideDone,
-            openedFrom = (context as? Activity)?.intent?.getStringExtra(SetupActivity.EXTRA_OPENED_FROM),
-            offeredThisVisit = feedbackOffered,
-            anotherDialogOpen = askAboutReporting && Telemetry.ENABLED
-        )
-        feedbackOffered = true
-        if (offer) openFeedback()
+        if (autoPromptChecked) return@LaunchedEffect
+        autoPromptChecked = true
+        val now = System.currentTimeMillis()
+        val setupComplete = notesUri != null && guideDone
+        val openedFrom = (context as? Activity)?.intent?.getStringExtra(SetupActivity.EXTRA_OPENED_FROM)
+        val due = buildSet {
+            if (askAboutReporting && Telemetry.ENABLED) add(AutoPrompt.Consent)
+            if (WhatsNewReminder.shouldShow(context, setupComplete, openedFrom)) add(AutoPrompt.WhatsNew)
+            if (FeedbackReminder.shouldOffer(context, now, setupComplete, openedFrom)) add(AutoPrompt.Feedback)
+        }
+        val chosen = PromptBudget.pick(context, due, now, promptedThisVisit = autoPrompt != null)
+            ?: return@LaunchedEffect
+        autoPrompt = chosen
+        PromptBudget.markShown(context, now)
+        when (chosen) {
+            AutoPrompt.Consent -> Unit
+            AutoPrompt.WhatsNew -> {
+                WhatsNewReminder.markShown(context, now)
+                showWhatsNew = true
+                Telemetry.event(
+                    UsageEvent.WHATS_NEW_SHOWN,
+                    UsageEvent.PARAM_VERSION to WhatsNew.release(BuildConfig.VERSION_NAME)
+                )
+                // The rate chip keeps its distance from this dialog, so redraw it with the new date.
+                scope.launch { NotesWidget.updateAll(context) }
+            }
+            AutoPrompt.Feedback -> openFeedback()
+        }
+    }
+    if (showWhatsNew) {
+        WhatsNewDialogHost(onClose = { showWhatsNew = false })
     }
     if (showFeedback) {
         FeedbackDialogHost(onClose = { showFeedback = false })
     }
 
-    if (askAboutReporting && Telemetry.ENABLED) {
+    if (askAboutReporting && Telemetry.ENABLED && autoPrompt == AutoPrompt.Consent) {
         ReportingConsentDialog { agreed ->
             Telemetry.setEnabled(context, agreed)
             Telemetry.markAsked(context)

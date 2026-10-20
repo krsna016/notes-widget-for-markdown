@@ -19,6 +19,9 @@ object RatingPrompt {
     @StringRes
     val RATE_BUTTON_RES = R.string.rate_dialog_rate_foss
 
+    @StringRes
+    val WHATS_NEW_FOOTER_RES = R.string.whats_new_footer_foss
+
     /** The row in the settings feedback section, where an icon already stands in for the star. */
     @StringRes
     val ABOUT_RATE_RES = R.string.about_star

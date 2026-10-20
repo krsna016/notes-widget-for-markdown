@@ -14,7 +14,8 @@ import kotlin.math.roundToInt
  */
 internal object WidgetBackground {
 
-    const val DEFAULT_PERCENT = 100
+    /** For everyone who never saved a value, new installs and updated users alike. */
+    const val DEFAULT_PERCENT = 85
     const val STEP_PERCENT = 5
 
     /** Stops between the two ends of a 0–100 slider, as Material's Slider counts them. */
@@ -22,8 +23,9 @@ internal object WidgetBackground {
 
     fun percent(context: Context): Int = percent(store(context))
 
+    /** A stored value outside 0–100 was never picked on the slider, so it reads as the default. */
     internal fun percent(store: KeyValueStore): Int =
-        store.getInt(SetupActivity.KEY_WIDGET_BACKGROUND)?.let(::snap) ?: DEFAULT_PERCENT
+        store.getInt(SetupActivity.KEY_WIDGET_BACKGROUND)?.takeIf { it in 0..100 }?.let(::snap) ?: DEFAULT_PERCENT
 
     fun save(context: Context, percent: Int) = save(store(context), percent)
 

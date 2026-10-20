@@ -1,0 +1,12 @@
+{
+  "conditions": [],
+  "parameters": {
+    "whats_new_enabled": {
+      "defaultValue": {
+        "value": "true"
+      },
+      "description": "Show the one-time What's new dialog after an update",
+      "valueType": "BOOLEAN"
+    }
+  }
+}

@@ -204,4 +204,13 @@
     <string name="about_feedback">Poslat zpětnou vazbu</string>
     <string name="about_rate">Ohodnotit na Google Play</string>
     <string name="about_star">Hvězdička na GitHubu</string>
+
+    <!-- One-time "What's new" dialog after an update -->
+    <string name="whats_new_title">Co je nového ve verzi %1$s</string>
+    <string name="whats_new_130_background">Vyberte si barvu a průhlednost pozadí widgetu</string>
+    <string name="whats_new_130_fast_note">Rychlé poznámky můžou být zaškrtávací políčka a soubor vyberete přímo v dialogu</string>
+    <string name="whats_new_130_feedback">Napište mi, co zlepšit, přímo z nastavení</string>
+    <string name="whats_new_footer_play">Líbí se vám aktualizace? Hodnocení pomůže dalším lidem widget najít.</string>
+    <string name="whats_new_footer_foss">Líbí se vám aktualizace? Hvězdička na GitHubu pomůže dalším lidem widget najít.</string>
+    <string name="whats_new_later">Možná později</string>
 </resources>

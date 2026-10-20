@@ -230,4 +230,13 @@
     <string name="feedback_thanks">Thank you!</string>
     <string name="about_feedback">Send feedback</string>
     <string name="about_star">Star on GitHub</string>
+
+    <!-- One-time "What's new" dialog after an update -->
+    <string name="whats_new_title">What\'s new in %1$s</string>
+    <string name="whats_new_130_background">Pick a colour and transparency for the widget background</string>
+    <string name="whats_new_130_fast_note">Fast notes can be checkboxes, and you choose the file right in the dialog</string>
+    <string name="whats_new_130_feedback">Tell me what to improve, right from settings</string>
+    <string name="whats_new_footer_play">Enjoying the update? A rating helps other people find the widget.</string>
+    <string name="whats_new_footer_foss">Enjoying the update? A star on GitHub helps other people find the widget.</string>
+    <string name="whats_new_later">Maybe later</string>
 </resources>

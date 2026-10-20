@@ -8,7 +8,8 @@ import java.util.concurrent.TimeUnit
  *
  * A week after the first start, once setup is finished, never right after a failed fast note sent
  * the user here to fix something, and never again once answered or declined for good. "Not now"
- * holds it back for a day. A clock earlier than a stored time reads as "not yet".
+ * holds it back for a day. A clock earlier than a stored time reads as "not yet". Whether it may
+ * appear in this visit at all, next to other dialogs, is up to [PromptBudget].
  */
 internal object FeedbackSchedule {
 
@@ -24,11 +25,9 @@ internal object FeedbackSchedule {
         openedFrom: String?,
         answered: Boolean,
         neverAgain: Boolean,
-        snoozedAtMillis: Long?,
-        offeredThisVisit: Boolean,
-        anotherDialogOpen: Boolean
+        snoozedAtMillis: Long?
     ): Boolean {
-        if (!setupComplete || answered || neverAgain || offeredThisVisit || anotherDialogOpen) return false
+        if (!setupComplete || answered || neverAgain) return false
         if (openedFrom == UsageEvent.FROM_FAST_NOTE_ERROR) return false
         if (firstSeenAtMillis == null || nowMillis - firstSeenAtMillis < MIN_AGE_MILLIS) return false
         return snoozedAtMillis == null || nowMillis - snoozedAtMillis >= SNOOZE_MILLIS

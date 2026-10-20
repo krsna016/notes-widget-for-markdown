@@ -16,6 +16,7 @@ class RateChipScheduleTest {
         now: Long,
         firstSeen: Long? = installedAt,
         featureSeen: Long? = installedAt,
+        whatsNewShown: Long? = null,
         rateTapped: Boolean = false,
         neverAgain: Boolean = false,
         disabled: Boolean = false
@@ -23,6 +24,7 @@ class RateChipScheduleTest {
         nowMillis = now,
         firstSeenAtMillis = firstSeen,
         featureSeenAtMillis = featureSeen,
+        whatsNewShownAtMillis = whatsNewShown,
         rateTapped = rateTapped,
         neverAgain = neverAgain,
         disabledInSettings = disabled
@@ -178,5 +180,47 @@ class RateChipScheduleTest {
     fun `setting stays visible after every window has closed`() {
         assertTrue(available(now = installedAt + 7 * day + 100 * day))
         assertTrue(available(now = installedAt + 1000 * day))
+    }
+
+    @Test
+    fun `an updated user who saw what's new waits a full week after it for the chip`() {
+        val updatedAt = installedAt + 120 * day
+        val whatsNewAt = updatedAt + day
+        assertNull(window(now = updatedAt + 2 * day, featureSeen = updatedAt, whatsNewShown = whatsNewAt))
+        assertNull(window(now = whatsNewAt + 7 * day - 1, featureSeen = updatedAt, whatsNewShown = whatsNewAt))
+        assertEquals(0, window(now = whatsNewAt + 7 * day, featureSeen = updatedAt, whatsNewShown = whatsNewAt))
+    }
+
+    @Test
+    fun `the windows that follow count from the later start the dialog gave`() {
+        val updatedAt = installedAt + 120 * day
+        val whatsNewAt = updatedAt + day
+        assertEquals(1, window(now = whatsNewAt + 23 * day, featureSeen = updatedAt, whatsNewShown = whatsNewAt))
+        assertNull(window(now = whatsNewAt + 55 * day, featureSeen = updatedAt, whatsNewShown = whatsNewAt))
+    }
+
+    @Test
+    fun `what's new long before the chip was due does not push it back`() {
+        val whatsNewAt = installedAt - 30 * day
+        assertEquals(0, window(now = installedAt + 7 * day, whatsNewShown = whatsNewAt))
+    }
+
+    @Test
+    fun `rating from what's new hides the chip for good`() {
+        val whatsNewAt = installedAt + 10 * day
+        assertNull(window(now = whatsNewAt + 7 * day, whatsNewShown = whatsNewAt, rateTapped = true))
+    }
+
+    @Test
+    fun `a clock set before what's new was shown shows nothing`() {
+        val whatsNewAt = installedAt + 60 * day
+        assertNull(window(now = whatsNewAt - day, whatsNewShown = whatsNewAt))
+    }
+
+    @Test
+    fun `the setting waits for the same week after what's new`() {
+        val whatsNewAt = installedAt + 10 * day
+        assertFalse(RateChipSchedule.isSettingAvailable(whatsNewAt + 7 * day - 1, installedAt, installedAt, whatsNewAt))
+        assertTrue(RateChipSchedule.isSettingAvailable(whatsNewAt + 7 * day, installedAt, installedAt, whatsNewAt))
     }
 }
