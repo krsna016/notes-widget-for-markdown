@@ -9,7 +9,6 @@ class FeedbackPayloadTest {
     fun `a full answer becomes exactly the fields the rules allow, minus the server time`() {
         val form = FeedbackForm(
             thumbs = FeedbackThumbs.Up,
-            ideas = setOf("monospace", "pinned_note"),
             text = "  Would love a pinned Groceries note.  "
         )
 
@@ -18,7 +17,6 @@ class FeedbackPayloadTest {
                 "appVersion" to "1.3.0",
                 "versionCode" to 6,
                 "thumbs" to "up",
-                "ideas" to listOf("pinned_note", "monospace"),
                 "text" to "Would love a pinned Groceries note."
             ),
             FeedbackPayload.of(form, versionName = "1.3.0", versionCode = 6)
@@ -26,12 +24,11 @@ class FeedbackPayloadTest {
     }
 
     @Test
-    fun `no thumb is sent as null and no ideas as an empty list`() {
+    fun `no thumb is sent as null`() {
         val payload = FeedbackPayload.of(FeedbackForm(text = "Works"), "1.3.0", 6)
 
         assertEquals(null, payload["thumbs"])
-        assertEquals(emptyList<String>(), payload["ideas"])
-        assertEquals(setOf("appVersion", "versionCode", "thumbs", "ideas", "text"), payload.keys)
+        assertEquals(setOf("appVersion", "versionCode", "thumbs", "text"), payload.keys)
     }
 
     @Test

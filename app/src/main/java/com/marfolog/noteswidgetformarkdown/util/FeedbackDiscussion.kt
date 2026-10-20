@@ -10,8 +10,8 @@ internal object FeedbackDiscussion {
 
     const val TITLE = "Feedback from the app"
 
-    fun url(thumbs: FeedbackThumbs?, ideaLabels: List<String>, text: String): String {
-        val body = body(thumbs, ideaLabels, text)
+    fun url(thumbs: FeedbackThumbs?, text: String): String {
+        val body = body(thumbs, text)
         return buildString {
             append(ProjectLinks.NEW_IDEA_URL)
             append("&title=").append(encode(TITLE))
@@ -19,10 +19,8 @@ internal object FeedbackDiscussion {
         }
     }
 
-    fun body(thumbs: FeedbackThumbs?, ideaLabels: List<String>, text: String): String = listOfNotNull(
+    fun body(thumbs: FeedbackThumbs?, text: String): String = listOfNotNull(
         thumbs?.let { "How is it working: ${if (it == FeedbackThumbs.Up) "👍" else "👎"}" },
-        ideaLabels.takeIf { it.isNotEmpty() }
-            ?.joinToString(separator = "\n", prefix = "What would make it better:\n") { "- $it" },
         text.trim().takeIf { it.isNotEmpty() }
     ).joinToString("\n\n")
 

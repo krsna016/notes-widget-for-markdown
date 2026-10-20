@@ -202,14 +202,7 @@
     <string name="feedback_how">How is it working for you?</string>
     <string name="feedback_thumbs_up">Working well</string>
     <string name="feedback_thumbs_down">Not working well</string>
-    <string name="feedback_ideas">What would make it better? (tick any)</string>
-    <string name="feedback_idea_pinned_note">Pinned note on top</string>
-    <string name="feedback_idea_fast_note_time">Time in fast notes</string>
-    <string name="feedback_idea_multi_folder">More widgets, each with its own folder</string>
-    <string name="feedback_idea_search">Search</string>
-    <string name="feedback_idea_monospace">Monospace font</string>
-    <string name="feedback_idea_images">Images in notes</string>
-    <string name="feedback_text">Something else?</string>
+    <string name="feedback_text">What would make it better?</string>
     <string name="feedback_text_counter" translatable="false">%1$d / %2$d</string>
     <string name="feedback_send">Send</string>
     <string name="feedback_later">Not now</string>

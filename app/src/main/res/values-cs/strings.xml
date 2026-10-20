@@ -176,14 +176,7 @@
     <string name="feedback_how">Jak vám to funguje?</string>
     <string name="feedback_thumbs_up">Funguje dobře</string>
     <string name="feedback_thumbs_down">Nefunguje dobře</string>
-    <string name="feedback_ideas">Co by to zlepšilo? (zaškrtněte cokoli)</string>
-    <string name="feedback_idea_pinned_note">Připnutá poznámka nahoře</string>
-    <string name="feedback_idea_fast_note_time">Čas u rychlých poznámek</string>
-    <string name="feedback_idea_multi_folder">Víc widgetů, každý s vlastní složkou</string>
-    <string name="feedback_idea_search">Hledání</string>
-    <string name="feedback_idea_monospace">Neproporcionální písmo</string>
-    <string name="feedback_idea_images">Obrázky v poznámkách</string>
-    <string name="feedback_text">Ještě něco?</string>
+    <string name="feedback_text">Co by to zlepšilo?</string>
     <string name="feedback_send">Odeslat</string>
     <string name="feedback_later">Teď ne</string>
     <string name="feedback_never">Už se neptat</string>

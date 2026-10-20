@@ -21,7 +21,6 @@ class FeedbackFormTest {
     @Test
     fun `any one answer is enough to send`() {
         assertTrue(FeedbackForm(thumbs = FeedbackThumbs.Down).canSend)
-        assertTrue(FeedbackForm(ideas = setOf("search")).canSend)
         assertTrue(FeedbackForm(text = "Love it").canSend)
     }
 
@@ -34,35 +33,6 @@ class FeedbackFormTest {
         assertEquals(FeedbackThumbs.Down, switched.thumbs)
 
         assertNull(switched.withThumbs(FeedbackThumbs.Down).thumbs)
-    }
-
-    @Test
-    fun `ideas toggle on and off independently`() {
-        val form = FeedbackForm()
-            .withIdeaToggled("search")
-            .withIdeaToggled("images")
-            .withIdeaToggled("search")
-
-        assertEquals(setOf("images"), form.ideas)
-    }
-
-    @Test
-    fun `ticked ideas come out in the order the dialog lists them, unknown ones dropped`() {
-        val form = FeedbackForm(ideas = setOf("images", "Groceries", "pinned_note", "search"))
-
-        assertEquals(listOf("pinned_note", "search", "images"), form.orderedIdeas)
-    }
-
-    @Test
-    fun `every idea has a unique id and a label`() {
-        val ids = FeedbackIdeas.ALL.map { it.id }
-        assertEquals(
-            listOf("pinned_note", "fast_note_time", "multi_folder", "search", "monospace", "images"),
-            ids
-        )
-        assertEquals(ids.size, ids.toSet().size)
-        ids.forEach { assertEquals(FeedbackIdeas.ALL.first { idea -> idea.id == it }.labelRes, FeedbackIdeas.labelRes(it)) }
-        assertNull(FeedbackIdeas.labelRes("Projects"))
     }
 
     @Test

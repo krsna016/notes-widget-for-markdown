@@ -39,7 +39,6 @@ object UsageEvent {
 
     const val FEEDBACK_DIALOG_SHOWN = "feedback_dialog_shown"
     const val FEEDBACK_DIALOG_CHOICE = "feedback_dialog_choice"
-    const val FEEDBACK_IDEA_TICKED = "feedback_idea_ticked"
     const val FEEDBACK_THUMBS = "feedback_thumbs"
 
     const val PARAM_STEP = "step"
@@ -52,7 +51,6 @@ object UsageEvent {
     const val PARAM_BUTTON = "button"
     const val PARAM_WINDOW = "window"
     const val PARAM_CHOICE = "choice"
-    const val PARAM_IDEA = "idea"
 
     const val STEP_FOLDER = "folder"
     const val STEP_WIDGET = "widget"
@@ -118,12 +116,11 @@ object UsageEvent {
     }
 
     /**
-     * What a submitted feedback form is counted as: the choice, one event per ticked idea and the
+     * What a submitted feedback form is counted as: the choice and the
      * thumb. The text never leaves through here.
      */
     fun feedbackSent(form: FeedbackForm): List<Pair<String, Pair<String, String>>> =
         listOf(FEEDBACK_DIALOG_CHOICE to (PARAM_CHOICE to CHOICE_SENT)) +
-            form.orderedIdeas.map { FEEDBACK_IDEA_TICKED to (PARAM_IDEA to it) } +
             listOfNotNull(form.thumbs?.let { FEEDBACK_THUMBS to (PARAM_VALUE to it.value) })
 
     /** No extra means the launcher; anything unknown is folded into it rather than sent as is. */

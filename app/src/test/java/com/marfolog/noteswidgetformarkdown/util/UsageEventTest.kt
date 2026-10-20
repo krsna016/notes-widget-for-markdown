@@ -129,18 +129,15 @@ class UsageEventTest {
     }
 
     @Test
-    fun `a sent feedback counts the choice, each ticked idea in list order and the thumb`() {
+    fun `a sent feedback counts the choice and the thumb`() {
         val form = FeedbackForm(
             thumbs = FeedbackThumbs.Down,
-            ideas = setOf("images", "search"),
             text = "Search my Groceries list"
         )
 
         assertEquals(
             listOf(
                 "feedback_dialog_choice" to ("choice" to "sent"),
-                "feedback_idea_ticked" to ("idea" to "search"),
-                "feedback_idea_ticked" to ("idea" to "images"),
                 "feedback_thumbs" to ("value" to "down")
             ),
             UsageEvent.feedbackSent(form)

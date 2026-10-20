@@ -151,7 +151,7 @@ has no rating dialog; its chip and settings row open the GitHub repository in yo
 
 Settings can ask, at most once a day and not before the app is a week old, what you think and what
 to build next; "Send feedback" in settings opens the same form any time. In the Play build, pressing
-Send stores your answer — the thumb, the ticked ideas and what you typed — together with the app
+Send stores your answer — the thumb and what you typed — together with the app
 version in Firebase Firestore. Nothing is sent until you press Send, and nothing else goes with
 it: no account, no device identifier, nothing from your notes. This does not depend on the
 analytics switch, because sending is something you do on purpose. In the foss build Send only opens

@@ -4,8 +4,6 @@ import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -36,7 +34,6 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.marfolog.noteswidgetformarkdown.R
 import com.marfolog.noteswidgetformarkdown.util.FeedbackForm
-import com.marfolog.noteswidgetformarkdown.util.FeedbackIdeas
 import com.marfolog.noteswidgetformarkdown.util.FeedbackReminder
 import com.marfolog.noteswidgetformarkdown.util.FeedbackSendResult
 import com.marfolog.noteswidgetformarkdown.util.FeedbackSender
@@ -45,13 +42,11 @@ import com.marfolog.noteswidgetformarkdown.util.Telemetry
 import com.marfolog.noteswidgetformarkdown.util.UsageEvent
 
 private val FeedbackFormSaver = listSaver<FeedbackForm, Any?>(
-    save = { listOf(it.thumbs?.value, ArrayList(it.ideas), it.text) },
+    save = { listOf(it.thumbs?.value, it.text) },
     restore = { saved ->
-        @Suppress("UNCHECKED_CAST")
         FeedbackForm(
             thumbs = FeedbackThumbs.from(saved[0] as String?),
-            ideas = (saved[1] as List<String>).toSet(),
-            text = saved[2] as String
+            text = saved[1] as String
         )
     }
 )
@@ -108,7 +103,6 @@ internal fun FeedbackDialogHost(onClose: () -> Unit) {
     )
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun FeedbackDialog(
     form: FeedbackForm,
@@ -135,19 +129,6 @@ private fun FeedbackDialog(
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     ThumbChip(FeedbackThumbs.Up, "👍", R.string.feedback_thumbs_up, form, onFormChanged)
                     ThumbChip(FeedbackThumbs.Down, "👎", R.string.feedback_thumbs_down, form, onFormChanged)
-                }
-                Spacer(modifier = Modifier.height(12.dp))
-
-                Text(stringResource(R.string.feedback_ideas), style = MaterialTheme.typography.titleSmall)
-                Spacer(modifier = Modifier.height(4.dp))
-                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    FeedbackIdeas.ALL.forEach { idea ->
-                        FilterChip(
-                            selected = idea.id in form.ideas,
-                            onClick = { onFormChanged(form.withIdeaToggled(idea.id)) },
-                            label = { Text(stringResource(idea.labelRes)) }
-                        )
-                    }
                 }
                 Spacer(modifier = Modifier.height(12.dp))
 

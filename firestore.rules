@@ -14,13 +14,12 @@ service cloud.firestore {
     }
 
     function isFeedback(data) {
-      return data.keys().hasOnly(['appVersion', 'versionCode', 'createdAt', 'thumbs', 'ideas', 'text'])
-        && data.keys().hasAll(['appVersion', 'versionCode', 'createdAt', 'thumbs', 'ideas', 'text'])
+      return data.keys().hasOnly(['appVersion', 'versionCode', 'createdAt', 'thumbs', 'text'])
+        && data.keys().hasAll(['appVersion', 'versionCode', 'createdAt', 'thumbs', 'text'])
         && data.appVersion is string && data.appVersion.size() <= 40
         && data.versionCode is int
         && data.createdAt == request.time
         && (data.thumbs == null || data.thumbs in ['up', 'down'])
-        && data.ideas is list && data.ideas.size() <= 10
         && data.text is string && data.text.size() <= 1000;
     }
   }

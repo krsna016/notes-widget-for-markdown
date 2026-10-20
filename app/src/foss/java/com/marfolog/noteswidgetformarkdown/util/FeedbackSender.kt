@@ -21,7 +21,6 @@ object FeedbackSender {
     suspend fun send(context: Context, form: FeedbackForm): FeedbackSendResult {
         val url = FeedbackDiscussion.url(
             thumbs = form.thumbs,
-            ideaLabels = form.orderedIdeas.mapNotNull { id -> FeedbackIdeas.labelRes(id)?.let(context::getString) },
             text = form.trimmedText
         )
         val opened = runCatching {
