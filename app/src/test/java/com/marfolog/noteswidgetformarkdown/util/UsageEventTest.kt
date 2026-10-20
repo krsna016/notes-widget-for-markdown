@@ -2,6 +2,7 @@ package com.marfolog.noteswidgetformarkdown.util
 
 import com.marfolog.noteswidgetformarkdown.domain.model.FastNoteStyle
 import com.marfolog.noteswidgetformarkdown.presentation.widget.OpenWith
+import com.marfolog.noteswidgetformarkdown.presentation.widget.WidgetBackground
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -49,7 +50,8 @@ class UsageEventTest {
                 "sync_mode" to "git",
                 "open_with" to "default",
                 "has_extra_notes" to "yes",
-                "fast_note_style" to "checkbox"
+                "fast_note_style" to "checkbox",
+                "widget_alpha" to "30-70"
             ),
             UsageProperties.of(
                 cardWidgets = 1,
@@ -57,29 +59,61 @@ class UsageEventTest {
                 syncMode = "git",
                 openWith = OpenWith.DefaultApp,
                 hasExtraNotes = true,
-                fastNoteStyle = FastNoteStyle.Checkbox
+                fastNoteStyle = FastNoteStyle.Checkbox,
+                widgetBackgroundPercent = 40
             )
         )
     }
 
     @Test
     fun `an unknown sync mode in prefs is reported as none`() {
-        val properties = UsageProperties.of(0, 0, "syncthing", OpenWith.Obsidian, false, FastNoteStyle.Bullet).toMap()
+        val properties = UsageProperties.of(0, 0, "syncthing", OpenWith.Obsidian, false, FastNoteStyle.Bullet, 100).toMap()
         assertEquals("none", properties["sync_mode"])
         assertEquals("none", properties["widget_type"])
         assertEquals("no", properties["has_extra_notes"])
+        assertEquals("100", properties["widget_alpha"])
     }
 
     @Test
     fun `user property names and values stay within the Firebase limits`() {
         OpenWith.entries.forEach { openWith ->
             FastNoteStyle.entries.forEach { style ->
-                UsageProperties.of(1, 1, "other", openWith, true, style).forEach { (name, value) ->
-                    assertTrue(name, name.length <= 24)
-                    assertTrue(value, value.length <= 36)
+                (0..100).forEach { percent ->
+                    UsageProperties.of(1, 1, "other", openWith, true, style, percent).forEach { (name, value) ->
+                        assertTrue(name, name.length <= 24)
+                        assertTrue(value, value.length <= 36)
+                    }
                 }
             }
         }
+    }
+
+    @Test
+    fun `widget opacity is reported in four buckets with exact boundaries`() {
+        assertEquals("100", UsageEvent.widgetAlpha(100))
+        assertEquals("75-95", UsageEvent.widgetAlpha(95))
+        assertEquals("75-95", UsageEvent.widgetAlpha(75))
+        assertEquals("30-70", UsageEvent.widgetAlpha(70))
+        assertEquals("30-70", UsageEvent.widgetAlpha(30))
+        assertEquals("0-25", UsageEvent.widgetAlpha(25))
+        assertEquals("0-25", UsageEvent.widgetAlpha(0))
+    }
+
+    @Test
+    fun `widget opacity between steps or out of range lands in the bucket of its step`() {
+        assertEquals("100", UsageEvent.widgetAlpha(98))
+        assertEquals("75-95", UsageEvent.widgetAlpha(73))
+        assertEquals("30-70", UsageEvent.widgetAlpha(72))
+        assertEquals("30-70", UsageEvent.widgetAlpha(28))
+        assertEquals("0-25", UsageEvent.widgetAlpha(27))
+        assertEquals("100", UsageEvent.widgetAlpha(400))
+        assertEquals("0-25", UsageEvent.widgetAlpha(-1))
+    }
+
+    @Test
+    fun `every slider stop is reported as one of the four buckets`() {
+        val buckets = (0..100 step WidgetBackground.STEP_PERCENT).map(UsageEvent::widgetAlpha).toSet()
+        assertEquals(setOf("100", "75-95", "30-70", "0-25"), buckets)
     }
 
     @Test

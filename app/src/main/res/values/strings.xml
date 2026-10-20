@@ -187,4 +187,9 @@
     <string name="fast_note_style_title">Add as</string>
     <string name="fast_note_style_bullet">Bullet</string>
     <string name="fast_note_style_checkbox">Checkbox</string>
+
+    <!-- Widget background opacity -->
+    <string name="widget_background_title">Widget background</string>
+    <string name="widget_background_desc">Lower it to let the wallpaper show through. Note cards keep their colours.</string>
+    <string name="widget_background_value">%1$d%%</string>
 </resources>

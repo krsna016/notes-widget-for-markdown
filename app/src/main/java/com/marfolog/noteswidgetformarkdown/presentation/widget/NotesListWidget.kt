@@ -51,6 +51,7 @@ class NotesListWidget : GlanceAppWidget() {
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         val startedAt = System.currentTimeMillis()
+        val backgroundPercent = WidgetBackground.percent(context)
 
         // Same cache both flavours share — see WidgetDataCache. Seeding from it means a refresh
         // shows what was already there while it reloads, instead of going blank every time.
@@ -69,7 +70,7 @@ class NotesListWidget : GlanceAppWidget() {
                     Box(
                         modifier = GlanceModifier
                             .fillMaxSize()
-                            .background(GlanceTheme.colors.widgetBackground)
+                            .background(widgetBackground(backgroundPercent))
                             .padding(12.dp),
                         contentAlignment = Alignment.Center
                     ) {
@@ -79,10 +80,10 @@ class NotesListWidget : GlanceAppWidget() {
                     Box(
                         modifier = GlanceModifier
                             .fillMaxSize()
-                            .background(GlanceTheme.colors.widgetBackground)
+                            .background(widgetBackground(backgroundPercent))
                             .padding(12.dp)
                     ) {
-                        ConfiguredScaffold(current.vaultName, current.noteFolderPath, current.bottomBarChip, isLoading) {
+                        ConfiguredScaffold(current.vaultName, current.noteFolderPath, current.bottomBarChip, backgroundPercent, isLoading) {
                             when (val state = current.state) {
                                 is WidgetState.Success -> NoteNameList(
                                     notes = state.notes,
@@ -91,7 +92,7 @@ class NotesListWidget : GlanceAppWidget() {
                                     cardSettings = current.cardSettings,
                                     extraNoteFolders = current.extraNoteFolders
                                 )
-                                else -> StatusMessage(state)
+                                else -> StatusMessage(state, backgroundPercent)
                             }
                         }
                     }
@@ -174,7 +175,7 @@ private fun NoteNameRow(
 }
 
 @Composable
-private fun StatusMessage(state: WidgetState) {
+private fun StatusMessage(state: WidgetState, backgroundPercent: Int) {
     val message = when (state) {
         is WidgetState.Uninitialized -> LocalContext.current.getString(R.string.widget_pick_folder_hint)
         is WidgetState.PermissionLost -> LocalContext.current.getString(R.string.widget_permission_lost_short)
@@ -187,9 +188,11 @@ private fun StatusMessage(state: WidgetState) {
         modifier = GlanceModifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        Text(
-            text = message,
-            style = TextStyle(fontSize = 13.sp, color = GlanceTheme.colors.onSurface)
-        )
+        WidgetSurface(backgroundPercent, cornerRadius = 12.dp, horizontalPadding = 12.dp, verticalPadding = 8.dp) {
+            Text(
+                text = message,
+                style = TextStyle(fontSize = 13.sp, color = GlanceTheme.colors.onSurface)
+            )
+        }
     }
 }

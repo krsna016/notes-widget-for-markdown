@@ -1,5 +1,7 @@
 package com.marfolog.noteswidgetformarkdown.util
 
+import com.marfolog.noteswidgetformarkdown.presentation.widget.WidgetBackground
+
 /**
  * Every name and value [Telemetry] may send. Values come only from the fixed sets below or from
  * enums the app defines itself — never from a note, a file name or a folder.
@@ -66,6 +68,7 @@ object UsageEvent {
     const val SETTING_TELEMETRY = "telemetry"
     const val SETTING_RATE_CHIP = "rate_chip"
     const val SETTING_FAST_NOTE_STYLE = "fast_note_style"
+    const val SETTING_WIDGET_BACKGROUND = "widget_background"
 
     const val BUTTON_REPORT_BUG = "report_bug"
     const val BUTTON_RATE = "rate"
@@ -82,6 +85,7 @@ object UsageEvent {
     const val PROPERTY_OPEN_WITH = "open_with"
     const val PROPERTY_HAS_EXTRA_NOTES = "has_extra_notes"
     const val PROPERTY_FAST_NOTE_STYLE = "fast_note_style"
+    const val PROPERTY_WIDGET_ALPHA = "widget_alpha"
 
     private val KNOWN_OPENED_FROM = setOf(FROM_WIDGET, FROM_SYNC_CHIP, FROM_FAST_NOTE_ERROR)
 
@@ -94,6 +98,14 @@ object UsageEvent {
         cardWidgets > 0 -> WIDGET_CARDS
         listWidgets > 0 -> WIDGET_LIST
         else -> WIDGET_NONE
+    }
+
+    /** Widget background opacity in four buckets, so the property says how, not exactly how much. */
+    fun widgetAlpha(percent: Int): String = when (WidgetBackground.snap(percent)) {
+        100 -> "100"
+        in 75..95 -> "75-95"
+        in 30..70 -> "30-70"
+        else -> "0-25"
     }
 
     /** No extra means the launcher; anything unknown is folded into it rather than sent as is. */

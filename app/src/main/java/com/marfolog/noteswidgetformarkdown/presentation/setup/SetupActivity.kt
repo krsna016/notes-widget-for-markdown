@@ -39,6 +39,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -64,6 +65,7 @@ import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.OutlinedTextField
@@ -73,6 +75,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
@@ -120,6 +123,7 @@ import com.marfolog.noteswidgetformarkdown.domain.usecase.GetNotesUseCase
 import com.marfolog.noteswidgetformarkdown.presentation.widget.GitSyncLabel
 import com.marfolog.noteswidgetformarkdown.presentation.widget.NotesWidget
 import com.marfolog.noteswidgetformarkdown.presentation.widget.OpenWith
+import com.marfolog.noteswidgetformarkdown.presentation.widget.WidgetBackground
 import com.marfolog.noteswidgetformarkdown.util.AppLog
 import com.marfolog.noteswidgetformarkdown.util.ProjectLinks
 import com.marfolog.noteswidgetformarkdown.util.RateReminder
@@ -203,6 +207,7 @@ class SetupActivity : ComponentActivity() {
         const val KEY_FAST_NOTE_TARGET_URI = "fast_note_target_uri"
         const val KEY_GIT_ROOT_URI = "git_root_uri"
         const val KEY_FAST_NOTE_STYLE = "fast_note_style"
+        const val KEY_WIDGET_BACKGROUND = "widget_background_percent"
 
         /** One of the `UsageEvent.FROM_*` values; none means the launcher. */
         const val EXTRA_OPENED_FROM = "opened_from"
@@ -312,6 +317,8 @@ private fun SetupScreen(modifier: Modifier = Modifier) {
     var fastNoteStyle by rememberSaveable {
         mutableStateOf(FastNoteStyle.from(prefs.getString(SetupActivity.KEY_FAST_NOTE_STYLE, null)))
     }
+
+    var widgetBackgroundPercent by rememberSaveable { mutableIntStateOf(WidgetBackground.percent(context)) }
 
     LaunchedEffect(vaultUri, notesUri, gitReloadTrigger) {
         gitStatus = GitSyncStatusReader(context.applicationContext).read(vaultUri)
@@ -560,6 +567,15 @@ private fun SetupScreen(modifier: Modifier = Modifier) {
             fastNoteStyle = style
             prefs.edit().putString(SetupActivity.KEY_FAST_NOTE_STYLE, style.storageValue).apply()
             logSettingChanged(UsageEvent.SETTING_FAST_NOTE_STYLE, style.storageValue)
+        },
+        widgetBackgroundPercent = widgetBackgroundPercent,
+        onWidgetBackgroundChanged = { percent ->
+            if (percent != widgetBackgroundPercent) {
+                widgetBackgroundPercent = percent
+                WidgetBackground.save(context, percent)
+                logSettingChanged(UsageEvent.SETTING_WIDGET_BACKGROUND, percent.toString())
+                scope.launch { NotesWidget.updateAll(context) }
+            }
         },
         onCardSizeSelected = { note, size ->
             val updated = (cardSettings[note.fileUri] ?: NoteCardAppearance()).copy(size = size)
@@ -853,6 +869,8 @@ internal fun SetupScreenContent(
     onFastNoteTargetSelected: (NoteSummary) -> Unit = {},
     fastNoteStyle: FastNoteStyle = FastNoteStyle.Bullet,
     onFastNoteStyleChanged: (FastNoteStyle) -> Unit = {},
+    widgetBackgroundPercent: Int = WidgetBackground.DEFAULT_PERCENT,
+    onWidgetBackgroundChanged: (Int) -> Unit = {},
     onCardSizeSelected: (NoteSummary, NoteCardSize) -> Unit = { _, _ -> },
     onCardColorSelected: (NoteSummary, NoteCardColor) -> Unit = { _, _ -> },
     onCardTextSizeSelected: (NoteSummary, NoteCardTextSize) -> Unit = { _, _ -> },
@@ -1217,6 +1235,12 @@ internal fun SetupScreenContent(
         HorizontalDivider()
         Spacer(modifier = Modifier.height(24.dp))
 
+        WidgetBackgroundSetting(percent = widgetBackgroundPercent, onChanged = onWidgetBackgroundChanged)
+
+        Spacer(modifier = Modifier.height(24.dp))
+        HorizontalDivider()
+        Spacer(modifier = Modifier.height(24.dp))
+
         Text(
             text = stringResource(R.string.cards_title),
             style = MaterialTheme.typography.titleMedium,
@@ -1377,6 +1401,43 @@ private fun FastNoteStyleChooser(selected: FastNoteStyle, onSelected: (FastNoteS
                 label = { Text(stringResource(labelRes)) }
             )
         }
+    }
+}
+
+/** Reports only where the slider was let go, so one drag is one change rather than dozens. */
+@Composable
+private fun WidgetBackgroundSetting(percent: Int, onChanged: (Int) -> Unit) {
+    var position by remember(percent) { mutableFloatStateOf(percent.toFloat()) }
+    Text(
+        text = stringResource(R.string.widget_background_title),
+        style = MaterialTheme.typography.titleMedium,
+        color = MaterialTheme.colorScheme.primary
+    )
+    Spacer(modifier = Modifier.height(4.dp))
+    Text(
+        text = stringResource(R.string.widget_background_desc),
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant
+    )
+    Spacer(modifier = Modifier.height(8.dp))
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Slider(
+            value = position,
+            onValueChange = { position = it },
+            onValueChangeFinished = { onChanged(WidgetBackground.fromSlider(position)) },
+            valueRange = 0f..100f,
+            steps = WidgetBackground.SLIDER_STEPS,
+            modifier = Modifier.weight(1f)
+        )
+        Spacer(modifier = Modifier.width(12.dp))
+        Text(
+            text = stringResource(R.string.widget_background_value, WidgetBackground.fromSlider(position)),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface
+        )
     }
 }
 

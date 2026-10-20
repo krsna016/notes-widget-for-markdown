@@ -162,4 +162,9 @@
     <string name="fast_note_style_title">Přidat jako</string>
     <string name="fast_note_style_bullet">Odrážku</string>
     <string name="fast_note_style_checkbox">Zaškrtávací políčko</string>
+
+    <!-- Widget background opacity -->
+    <string name="widget_background_title">Pozadí widgetu</string>
+    <string name="widget_background_desc">Snižte ho a widgetem prosvitne tapeta. Karty poznámek si barvy ponechají.</string>
+    <string name="widget_background_value">%1$d %%</string>
 </resources>

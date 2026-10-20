@@ -66,6 +66,7 @@ class NotesWidget : GlanceAppWidget() {
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         val startedAt = System.currentTimeMillis()
         AppLog.d("Render", "provideGlance entered at $startedAt")
+        val backgroundPercent = WidgetBackground.percent(context)
 
         // loadWidgetData used to run before provideContent, so the first frame anyone saw was
         // already the finished one — on a slow SAF folder that is a multi-second blank widget
@@ -87,7 +88,7 @@ class NotesWidget : GlanceAppWidget() {
             WidgetTheme {
                 val current = data
                 if (current == null) {
-                    LoadingRoot()
+                    LoadingRoot(backgroundPercent)
                 } else {
                     WidgetRoot(
                         current.state,
@@ -96,7 +97,8 @@ class NotesWidget : GlanceAppWidget() {
                         current.cardSettings,
                         current.bottomBarChip,
                         isLoading,
-                        current.extraNoteFolders
+                        current.extraNoteFolders,
+                        backgroundPercent
                     )
                 }
             }
@@ -140,20 +142,21 @@ private fun WidgetRoot(
     cardSettings: Map<String, NoteCardAppearance>,
     bottomBarChip: BottomBarChip,
     isLoading: Boolean = false,
-    extraNoteFolders: Map<String, String> = emptyMap()
+    extraNoteFolders: Map<String, String> = emptyMap(),
+    backgroundPercent: Int = WidgetBackground.DEFAULT_PERCENT
 ) {
     Box(
         modifier = GlanceModifier
             .fillMaxSize()
-            .background(GlanceTheme.colors.widgetBackground)
+            .background(widgetBackground(backgroundPercent))
             .padding(16.dp)
     ) {
         when (state) {
             is WidgetState.Uninitialized -> UninitializedContent()
             is WidgetState.PermissionLost -> PermissionLostContent()
-            is WidgetState.Success -> ConfiguredContent(state.notes, vaultName, noteFolderPath, cardSettings, bottomBarChip, isLoading, extraNoteFolders)
-            is WidgetState.Empty -> ConfiguredContentEmpty(vaultName, noteFolderPath, bottomBarChip, isLoading)
-            is WidgetState.Error -> ConfiguredContentError(state.message, vaultName, noteFolderPath, bottomBarChip, isLoading)
+            is WidgetState.Success -> ConfiguredContent(state.notes, vaultName, noteFolderPath, cardSettings, bottomBarChip, isLoading, extraNoteFolders, backgroundPercent)
+            is WidgetState.Empty -> ConfiguredContentEmpty(vaultName, noteFolderPath, bottomBarChip, isLoading, backgroundPercent)
+            is WidgetState.Error -> ConfiguredContentError(state.message, vaultName, noteFolderPath, bottomBarChip, isLoading, backgroundPercent)
         }
     }
 }
@@ -168,11 +171,11 @@ private fun WidgetRoot(
  * area, same background — for that whole stretch, which reads as frozen rather than working.
  */
 @Composable
-private fun LoadingRoot() {
+private fun LoadingRoot(backgroundPercent: Int) {
     Box(
         modifier = GlanceModifier
             .fillMaxSize()
-            .background(GlanceTheme.colors.widgetBackground)
+            .background(widgetBackground(backgroundPercent))
             .padding(16.dp),
         contentAlignment = Alignment.Center
     ) {
@@ -280,9 +283,10 @@ private fun ConfiguredContent(
     cardSettings: Map<String, NoteCardAppearance>,
     bottomBarChip: BottomBarChip,
     isLoading: Boolean = false,
-    extraNoteFolders: Map<String, String> = emptyMap()
+    extraNoteFolders: Map<String, String> = emptyMap(),
+    backgroundPercent: Int = WidgetBackground.DEFAULT_PERCENT
 ) {
-    ConfiguredScaffold(vaultName, noteFolderPath, bottomBarChip, isLoading) {
+    ConfiguredScaffold(vaultName, noteFolderPath, bottomBarChip, backgroundPercent, isLoading) {
         NotesList(notes, vaultName, noteFolderPath, cardSettings, extraNoteFolders)
     }
 }
@@ -292,10 +296,11 @@ private fun ConfiguredContentEmpty(
     vaultName: String?,
     noteFolderPath: String?,
     bottomBarChip: BottomBarChip,
-    isLoading: Boolean = false
+    isLoading: Boolean = false,
+    backgroundPercent: Int = WidgetBackground.DEFAULT_PERCENT
 ) {
-    ConfiguredScaffold(vaultName, noteFolderPath, bottomBarChip, isLoading) {
-        EmptyContent()
+    ConfiguredScaffold(vaultName, noteFolderPath, bottomBarChip, backgroundPercent, isLoading) {
+        EmptyContent(backgroundPercent)
     }
 }
 
@@ -305,10 +310,11 @@ private fun ConfiguredContentError(
     vaultName: String?,
     noteFolderPath: String?,
     bottomBarChip: BottomBarChip,
-    isLoading: Boolean = false
+    isLoading: Boolean = false,
+    backgroundPercent: Int = WidgetBackground.DEFAULT_PERCENT
 ) {
-    ConfiguredScaffold(vaultName, noteFolderPath, bottomBarChip, isLoading) {
-        ErrorContent(message)
+    ConfiguredScaffold(vaultName, noteFolderPath, bottomBarChip, backgroundPercent, isLoading) {
+        ErrorContent(message, backgroundPercent)
     }
 }
 
@@ -391,42 +397,46 @@ private fun NoteCard(
 // region Empty & Error Content
 
 @Composable
-private fun EmptyContent(modifier: GlanceModifier = GlanceModifier) {
+private fun EmptyContent(backgroundPercent: Int, modifier: GlanceModifier = GlanceModifier) {
     Box(
         modifier = modifier.fillMaxWidth(),
         contentAlignment = Alignment.Center
     ) {
-        Text(
-            text = LocalContext.current.getString(R.string.widget_no_notes),
-            style = TextStyle(
-                fontSize = 14.sp,
-                color = GlanceTheme.colors.onSurface
+        WidgetSurface(backgroundPercent, cornerRadius = 12.dp, horizontalPadding = 12.dp, verticalPadding = 8.dp) {
+            Text(
+                text = LocalContext.current.getString(R.string.widget_no_notes),
+                style = TextStyle(
+                    fontSize = 14.sp,
+                    color = GlanceTheme.colors.onSurface
+                )
             )
-        )
+        }
     }
 }
 
 @Composable
-private fun ErrorContent(message: String, modifier: GlanceModifier = GlanceModifier) {
+private fun ErrorContent(message: String, backgroundPercent: Int, modifier: GlanceModifier = GlanceModifier) {
     Box(
         modifier = modifier.fillMaxWidth(),
         contentAlignment = Alignment.Center
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Image(
-                provider = ImageProvider(R.drawable.ic_error),
-                contentDescription = LocalContext.current.getString(R.string.action_error),
-                modifier = GlanceModifier.size(32.dp),
-                colorFilter = ColorFilter.tint(GlanceTheme.colors.error)
-            )
-            Spacer(modifier = GlanceModifier.height(8.dp))
-            Text(
-                text = message,
-                style = TextStyle(
-                    fontSize = 14.sp,
-                    color = GlanceTheme.colors.error
+        WidgetSurface(backgroundPercent, cornerRadius = 12.dp, horizontalPadding = 12.dp, verticalPadding = 8.dp) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Image(
+                    provider = ImageProvider(R.drawable.ic_error),
+                    contentDescription = LocalContext.current.getString(R.string.action_error),
+                    modifier = GlanceModifier.size(32.dp),
+                    colorFilter = ColorFilter.tint(GlanceTheme.colors.error)
                 )
-            )
+                Spacer(modifier = GlanceModifier.height(8.dp))
+                Text(
+                    text = message,
+                    style = TextStyle(
+                        fontSize = 14.sp,
+                        color = GlanceTheme.colors.error
+                    )
+                )
+            }
         }
     }
 }

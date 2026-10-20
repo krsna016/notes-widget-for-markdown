@@ -1,9 +1,13 @@
 package com.marfolog.noteswidgetformarkdown.presentation.widget
 
+import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.net.Uri
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.ColorFilter
@@ -19,6 +23,7 @@ import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.action.actionStartActivity
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.background
+import androidx.glance.color.ColorProvider as dayNightColor
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.Column
@@ -119,7 +124,8 @@ internal val BAR_TINT = ColorProvider(Color(0x552196F3))
 internal fun BottomBar(
     vaultName: String?,
     noteFolderPath: String?,
-    chip: BottomBarChip
+    chip: BottomBarChip,
+    backgroundPercent: Int
 ) {
     Row(
         modifier = GlanceModifier
@@ -127,20 +133,22 @@ internal fun BottomBar(
             .padding(top = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(
-            modifier = GlanceModifier
-                .cornerRadius(16.dp)
-                .background(BAR_TINT)
-                .padding(horizontal = 8.dp, vertical = 6.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            QuickActions(vaultName, noteFolderPath)
+        WidgetSurface(backgroundPercent, cornerRadius = 16.dp) {
+            Row(
+                modifier = GlanceModifier
+                    .cornerRadius(16.dp)
+                    .background(BAR_TINT)
+                    .padding(horizontal = 8.dp, vertical = 6.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                QuickActions(vaultName, noteFolderPath)
+            }
         }
         Box(modifier = GlanceModifier.defaultWeight()) {}
         when (chip) {
             BottomBarChip.None -> Unit
-            is BottomBarChip.Sync -> SyncStatus(chip.label)
-            is BottomBarChip.Rate -> RateChip(okDot = chip.okDot)
+            is BottomBarChip.Sync -> SyncStatus(chip.label, backgroundPercent)
+            is BottomBarChip.Rate -> RateChip(okDot = chip.okDot, backgroundPercent = backgroundPercent)
         }
     }
 }
@@ -155,7 +163,7 @@ private fun severityColor(severity: GitSyncLabel.Severity): ColorProvider = when
 }
 
 @Composable
-internal fun SyncStatus(label: GitSyncLabel.Label) {
+internal fun SyncStatus(label: GitSyncLabel.Label, backgroundPercent: Int) {
     val context = LocalContext.current
     // Tapping the chip opens settings, where the full story lives: what is wrong, when it
     // last synced, and the picker for the folder that holds .git.
@@ -164,47 +172,51 @@ internal fun SyncStatus(label: GitSyncLabel.Label) {
         dotColor = severityColor(label.severity),
         text = label.arg
             ?.let { context.getString(label.textRes, it) }
-            ?: context.getString(label.textRes)
+            ?: context.getString(label.textRes),
+        backgroundPercent = backgroundPercent
     )
 }
 
 @Composable
-private fun RateChip(okDot: Boolean) {
+private fun RateChip(okDot: Boolean, backgroundPercent: Int) {
     val context = LocalContext.current
     BarChip(
         onClick = actionStartActivity(Intent(context, RateActivity::class.java)),
         dotColor = if (okDot) severityColor(GitSyncLabel.Severity.Ok) else null,
-        text = context.getString(R.string.rate_chip)
+        text = context.getString(R.string.rate_chip),
+        backgroundPercent = backgroundPercent
     )
 }
 
 @Composable
-private fun BarChip(onClick: Action, dotColor: ColorProvider?, text: String) {
-    Row(
-        modifier = GlanceModifier
-            .cornerRadius(16.dp)
-            .background(BAR_TINT)
-            .padding(horizontal = 10.dp, vertical = 6.dp)
-            .clickable(onClick),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        dotColor?.let { color ->
-            Box(
-                modifier = GlanceModifier
-                    .size(8.dp)
-                    .cornerRadius(4.dp)
-                    .background(color)
-            ) {}
-            Spacer(modifier = GlanceModifier.width(6.dp))
+private fun BarChip(onClick: Action, dotColor: ColorProvider?, text: String, backgroundPercent: Int) {
+    WidgetSurface(backgroundPercent, cornerRadius = 16.dp) {
+        Row(
+            modifier = GlanceModifier
+                .cornerRadius(16.dp)
+                .background(BAR_TINT)
+                .padding(horizontal = 10.dp, vertical = 6.dp)
+                .clickable(onClick),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            dotColor?.let { color ->
+                Box(
+                    modifier = GlanceModifier
+                        .size(8.dp)
+                        .cornerRadius(4.dp)
+                        .background(color)
+                ) {}
+                Spacer(modifier = GlanceModifier.width(6.dp))
+            }
+            Text(
+                text = text,
+                style = TextStyle(
+                    fontSize = 12.sp,
+                    color = GlanceTheme.colors.onSurfaceVariant
+                ),
+                maxLines = 1
+            )
         }
-        Text(
-            text = text,
-            style = TextStyle(
-                fontSize = 12.sp,
-                color = GlanceTheme.colors.onSurfaceVariant
-            ),
-            maxLines = 1
-        )
     }
 }
 
@@ -266,6 +278,7 @@ internal fun ConfiguredScaffold(
     vaultName: String?,
     noteFolderPath: String?,
     bottomBarChip: BottomBarChip,
+    backgroundPercent: Int,
     isLoading: Boolean = false,
     content: @Composable () -> Unit
 ) {
@@ -274,7 +287,7 @@ internal fun ConfiguredScaffold(
             content()
             WidgetActionButtons(isLoading)
         }
-        BottomBar(vaultName, noteFolderPath, bottomBarChip)
+        BottomBar(vaultName, noteFolderPath, bottomBarChip, backgroundPercent)
     }
 }
 
@@ -282,6 +295,63 @@ internal fun ConfiguredScaffold(
 internal fun vaultRelativePath(noteFolderPath: String?, fileName: String): String =
     if (noteFolderPath.isNullOrEmpty()) fileName else "$noteFolderPath/$fileName"
 
+
+// region Widget background
+
+/**
+ * The root's colour at the user's opacity. Fully opaque stays the theme's own provider, so the
+ * default widget is untouched. Otherwise the day and night colours are resolved separately before
+ * fading, so a dark home screen keeps a dark, see-through widget rather than a light one.
+ */
+@Composable
+internal fun widgetBackground(percent: Int): ColorProvider {
+    val base = GlanceTheme.colors.widgetBackground
+    if (WidgetBackground.isOpaque(percent)) return base
+    val context = LocalContext.current
+    return remember(base, percent, context) {
+        val alpha = WidgetBackground.alpha(percent)
+        dayNightColor(
+            day = base.getColor(context.withNightMode(false)).copy(alpha = alpha),
+            night = base.getColor(context.withNightMode(true)).copy(alpha = alpha)
+        )
+    }
+}
+
+private fun Context.withNightMode(night: Boolean): Context {
+    val configuration = Configuration(resources.configuration)
+    val nightBits = if (night) Configuration.UI_MODE_NIGHT_YES else Configuration.UI_MODE_NIGHT_NO
+    configuration.uiMode = (configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK.inv()) or nightBits
+    return createConfigurationContext(configuration)
+}
+
+/**
+ * On a see-through widget, puts the opaque widget background under [content], so text keeps the
+ * backdrop it was designed for instead of landing on the wallpaper. On an opaque widget it adds
+ * nothing at all — no extra view, no padding.
+ */
+@Composable
+internal fun WidgetSurface(
+    backgroundPercent: Int,
+    cornerRadius: Dp,
+    horizontalPadding: Dp = 0.dp,
+    verticalPadding: Dp = 0.dp,
+    content: @Composable () -> Unit
+) {
+    if (WidgetBackground.needsBacking(backgroundPercent)) {
+        Box(
+            modifier = GlanceModifier
+                .cornerRadius(cornerRadius)
+                .background(GlanceTheme.colors.widgetBackground)
+                .padding(horizontal = horizontalPadding, vertical = verticalPadding)
+        ) {
+            content()
+        }
+    } else {
+        content()
+    }
+}
+
+// endregion
 
 // region Note card colors (shared by both widget flavours)
 

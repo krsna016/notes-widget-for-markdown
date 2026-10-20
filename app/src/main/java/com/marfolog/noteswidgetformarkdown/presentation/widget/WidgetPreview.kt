@@ -77,11 +77,14 @@ private val sampleNotes = listOf(
 )
 
 @Composable
-private fun WidgetPreviewContent(notes: List<NoteSummary>) {
+private fun WidgetPreviewContent(
+    notes: List<NoteSummary>,
+    backgroundPercent: Int = WidgetBackground.DEFAULT_PERCENT
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surface)
+            .background(MaterialTheme.colorScheme.surface.copy(alpha = WidgetBackground.alpha(backgroundPercent)))
             .padding(16.dp)
     ) {
         // Notes list
@@ -283,5 +286,19 @@ private fun NoteCardSingleDarkPreview() {
         ) {
             NoteCardPreview(sampleNotes.first())
         }
+    }
+}
+
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFF3E6B48,
+    name = "Widget - Dark - 30 % background",
+    widthDp = 360,
+    heightDp = 400
+)
+@Composable
+private fun WidgetNotesTranslucentPreview() {
+    NotesWidgetForMarkdownTheme(dynamicColor = false, darkTheme = true) {
+        WidgetPreviewContent(sampleNotes, backgroundPercent = 30)
     }
 }
