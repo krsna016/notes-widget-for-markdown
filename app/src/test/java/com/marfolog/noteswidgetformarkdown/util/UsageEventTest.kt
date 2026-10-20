@@ -127,4 +127,31 @@ class UsageEventTest {
             assertTrue(name, name.matches(Regex("[a-z][a-z0-9_]*")))
         }
     }
+
+    @Test
+    fun `a sent feedback counts the choice, each ticked idea in list order and the thumb`() {
+        val form = FeedbackForm(
+            thumbs = FeedbackThumbs.Down,
+            ideas = setOf("images", "search"),
+            text = "Search my Groceries list"
+        )
+
+        assertEquals(
+            listOf(
+                "feedback_dialog_choice" to ("choice" to "sent"),
+                "feedback_idea_ticked" to ("idea" to "search"),
+                "feedback_idea_ticked" to ("idea" to "images"),
+                "feedback_thumbs" to ("value" to "down")
+            ),
+            UsageEvent.feedbackSent(form)
+        )
+    }
+
+    @Test
+    fun `a text only feedback is counted as sent and nothing else`() {
+        assertEquals(
+            listOf("feedback_dialog_choice" to ("choice" to "sent")),
+            UsageEvent.feedbackSent(FeedbackForm(text = "Thanks"))
+        )
+    }
 }

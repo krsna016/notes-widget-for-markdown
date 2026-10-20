@@ -37,6 +37,11 @@ object UsageEvent {
     const val RATE_CHIP_TAPPED = "rate_chip_tapped"
     const val RATE_DIALOG_CHOICE = "rate_dialog_choice"
 
+    const val FEEDBACK_DIALOG_SHOWN = "feedback_dialog_shown"
+    const val FEEDBACK_DIALOG_CHOICE = "feedback_dialog_choice"
+    const val FEEDBACK_IDEA_TICKED = "feedback_idea_ticked"
+    const val FEEDBACK_THUMBS = "feedback_thumbs"
+
     const val PARAM_STEP = "step"
     const val PARAM_TYPE = "type"
     const val PARAM_TARGET = "target"
@@ -47,6 +52,7 @@ object UsageEvent {
     const val PARAM_BUTTON = "button"
     const val PARAM_WINDOW = "window"
     const val PARAM_CHOICE = "choice"
+    const val PARAM_IDEA = "idea"
 
     const val STEP_FOLDER = "folder"
     const val STEP_WIDGET = "widget"
@@ -74,11 +80,13 @@ object UsageEvent {
     const val BUTTON_RATE = "rate"
     const val BUTTON_SAY_HI = "say_hi"
     const val BUTTON_SOURCE = "source"
+    const val BUTTON_FEEDBACK = "feedback"
 
     const val CHOICE_RATE = "rate"
     const val CHOICE_IDEA = "idea"
     const val CHOICE_LATER = "later"
     const val CHOICE_NEVER = "never"
+    const val CHOICE_SENT = "sent"
 
     const val PROPERTY_WIDGET_TYPE = "widget_type"
     const val PROPERTY_SYNC_MODE = "sync_mode"
@@ -107,6 +115,15 @@ object UsageEvent {
         in 30..70 -> "30-70"
         else -> "0-25"
     }
+
+    /**
+     * What a submitted feedback form is counted as: the choice, one event per ticked idea and the
+     * thumb. The text never leaves through here.
+     */
+    fun feedbackSent(form: FeedbackForm): List<Pair<String, Pair<String, String>>> =
+        listOf(FEEDBACK_DIALOG_CHOICE to (PARAM_CHOICE to CHOICE_SENT)) +
+            form.orderedIdeas.map { FEEDBACK_IDEA_TICKED to (PARAM_IDEA to it) } +
+            listOfNotNull(form.thumbs?.let { FEEDBACK_THUMBS to (PARAM_VALUE to it.value) })
 
     /** No extra means the launcher; anything unknown is folded into it rather than sent as is. */
     fun openedFrom(extra: String?): String = extra?.takeIf { it in KNOWN_OPENED_FROM } ?: FROM_LAUNCHER

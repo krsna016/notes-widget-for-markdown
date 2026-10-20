@@ -32,7 +32,9 @@ object RateReminder {
         return hadFirstSeen && !hadFeatureSeen
     }
 
-    fun firstSeenAt(context: Context): Long? = store(context).timestamp(KEY_FIRST_SEEN_AT)
+    fun firstSeenAt(context: Context): Long? = firstSeenAt(store(context))
+
+    internal fun firstSeenAt(store: KeyValueStore): Long? = store.timestamp(KEY_FIRST_SEEN_AT)
 
     fun openWindow(context: Context, nowMillis: Long): Int? = openWindow(store(context), nowMillis)
 

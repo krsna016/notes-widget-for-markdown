@@ -51,6 +51,12 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.RemoveCircleOutline
 import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material.icons.filled.DragHandle
+import androidx.compose.material.icons.outlined.BugReport
+import androidx.compose.material.icons.outlined.ChatBubbleOutline
+import androidx.compose.material.icons.outlined.Code
+import androidx.compose.material.icons.outlined.PrivacyTip
+import androidx.compose.material.icons.outlined.RateReview
+import androidx.compose.material.icons.outlined.StarOutline
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -92,6 +98,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import kotlinx.coroutines.delay
@@ -125,6 +132,7 @@ import com.marfolog.noteswidgetformarkdown.presentation.widget.NotesWidget
 import com.marfolog.noteswidgetformarkdown.presentation.widget.OpenWith
 import com.marfolog.noteswidgetformarkdown.presentation.widget.WidgetBackground
 import com.marfolog.noteswidgetformarkdown.util.AppLog
+import com.marfolog.noteswidgetformarkdown.util.FeedbackReminder
 import com.marfolog.noteswidgetformarkdown.util.ProjectLinks
 import com.marfolog.noteswidgetformarkdown.util.RateReminder
 import com.marfolog.noteswidgetformarkdown.util.RatingPrompt
@@ -530,6 +538,30 @@ private fun SetupScreen(modifier: Modifier = Modifier) {
         }
     }
 
+    var feedbackOffered by rememberSaveable { mutableStateOf(false) }
+    var showFeedback by rememberSaveable { mutableStateOf(false) }
+    val openFeedback: () -> Unit = {
+        showFeedback = true
+        Telemetry.event(UsageEvent.FEEDBACK_DIALOG_SHOWN)
+    }
+    // After the guide effect above, so someone who only just got their guide marked done counts
+    // as set up.
+    LaunchedEffect(Unit) {
+        val offer = FeedbackReminder.shouldOffer(
+            context = context,
+            nowMillis = System.currentTimeMillis(),
+            setupComplete = notesUri != null && guideDone,
+            openedFrom = (context as? Activity)?.intent?.getStringExtra(SetupActivity.EXTRA_OPENED_FROM),
+            offeredThisVisit = feedbackOffered,
+            anotherDialogOpen = askAboutReporting && Telemetry.ENABLED
+        )
+        feedbackOffered = true
+        if (offer) openFeedback()
+    }
+    if (showFeedback) {
+        FeedbackDialogHost(onClose = { showFeedback = false })
+    }
+
     if (askAboutReporting && Telemetry.ENABLED) {
         ReportingConsentDialog { agreed ->
             Telemetry.setEnabled(context, agreed)
@@ -672,6 +704,7 @@ private fun SetupScreen(modifier: Modifier = Modifier) {
             prefs.edit().putBoolean(SetupActivity.KEY_SHOW_GIT_STATUS, enabled).apply()
             scope.launch { NotesWidget.updateAll(context) }
         },
+        onSendFeedback = openFeedback,
         rateChipEnabled = rateChipEnabled,
         onRateChipChanged = { enabled ->
             rateChipEnabled = enabled
@@ -899,6 +932,7 @@ internal fun SetupScreenContent(
     onTelemetryChanged: (Boolean) -> Unit = {},
     rateChipEnabled: Boolean = true,
     onRateChipChanged: (Boolean) -> Unit = {},
+    onSendFeedback: () -> Unit = {},
     canSave: Boolean,
     onSave: () -> Unit,
     guideStep: GuideStep? = null,
@@ -1312,7 +1346,7 @@ internal fun SetupScreenContent(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        AboutSection()
+        AboutSection(onSendFeedback = onSendFeedback)
 
         Spacer(modifier = Modifier.height(32.dp))
 
@@ -1849,16 +1883,13 @@ private fun BoxScope.DriftingLogo(containerWidth: Dp, containerHeight: Dp) {
 }
 
 /**
- * Odkazy ven. Otevirat je muze prohlizec, takze to funguje i ve foss variante, ktera sama
- * opravneni k internetu nema.
+ * Odkazy ven a zpetna vazba. Otevirat je muze prohlizec, takze to funguje i ve foss variante,
+ * ktera sama opravneni k internetu nema.
  */
 @Composable
-private fun AboutSection() {
+private fun AboutSection(onSendFeedback: () -> Unit) {
     val context = LocalContext.current
-    fun open(url: String, button: String) {
-        Telemetry.event(UsageEvent.ABOUT_CLICKED, UsageEvent.PARAM_BUTTON to button)
-        ProjectLinks.open(context, url)
-    }
+    fun clicked(button: String) = Telemetry.event(UsageEvent.ABOUT_CLICKED, UsageEvent.PARAM_BUTTON to button)
 
     Text(
         text = stringResource(R.string.about_title),
@@ -1873,41 +1904,55 @@ private fun AboutSection() {
     )
     Spacer(modifier = Modifier.height(12.dp))
 
-    OutlinedButton(
-        onClick = { open(ProjectLinks.ISSUES_URL, UsageEvent.BUTTON_REPORT_BUG) },
+    Surface(
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surfaceContainerLow,
         modifier = Modifier.fillMaxWidth()
     ) {
-        Text(stringResource(R.string.about_report))
-    }
-    // Only the Play build has a store page; the foss build shows nothing here.
-    if (RatingPrompt.HAS_STORE_PAGE) {
-        TextButton(
-            onClick = {
-                Telemetry.event(UsageEvent.ABOUT_CLICKED, UsageEvent.PARAM_BUTTON to UsageEvent.BUTTON_RATE)
-                RatingPrompt.openStorePage(context)
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(stringResource(R.string.about_rate))
+        Column(modifier = Modifier.padding(vertical = 4.dp)) {
+            AboutRow(Icons.Outlined.BugReport, R.string.about_report) {
+                clicked(UsageEvent.BUTTON_REPORT_BUG)
+                ProjectLinks.open(context, ProjectLinks.ISSUES_URL)
+            }
+            AboutRow(Icons.Outlined.RateReview, R.string.about_feedback) {
+                clicked(UsageEvent.BUTTON_FEEDBACK)
+                onSendFeedback()
+            }
+            AboutRow(Icons.Outlined.StarOutline, RatingPrompt.ABOUT_RATE_RES) {
+                clicked(UsageEvent.BUTTON_RATE)
+                RatingPrompt.openRatePage(context)
+            }
+            AboutRow(Icons.Outlined.ChatBubbleOutline, R.string.about_say_hi) {
+                clicked(UsageEvent.BUTTON_SAY_HI)
+                ProjectLinks.open(context, ProjectLinks.DISCUSSIONS_URL)
+            }
+            AboutRow(Icons.Outlined.Code, R.string.about_source) {
+                clicked(UsageEvent.BUTTON_SOURCE)
+                ProjectLinks.open(context, ProjectLinks.REPO_URL)
+            }
+            AboutRow(Icons.Outlined.PrivacyTip, R.string.about_privacy) {
+                ProjectLinks.open(context, ProjectLinks.PRIVACY_URL)
+            }
         }
     }
-    Spacer(modifier = Modifier.height(8.dp))
-    OutlinedButton(
-        onClick = { open(ProjectLinks.DISCUSSIONS_URL, UsageEvent.BUTTON_SAY_HI) },
-        modifier = Modifier.fillMaxWidth()
+}
+
+@Composable
+private fun AboutRow(icon: ImageVector, @StringRes labelRes: Int, onClick: () -> Unit) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 14.dp)
     ) {
-        Text(stringResource(R.string.about_say_hi))
-    }
-    Spacer(modifier = Modifier.height(8.dp))
-    OutlinedButton(
-        onClick = { open(ProjectLinks.REPO_URL, UsageEvent.BUTTON_SOURCE) },
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Text(stringResource(R.string.about_source))
-    }
-    Spacer(modifier = Modifier.height(8.dp))
-    TextButton(onClick = { ProjectLinks.open(context, ProjectLinks.PRIVACY_URL) }, modifier = Modifier.fillMaxWidth()) {
-        Text(stringResource(R.string.about_privacy))
+        Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+        Spacer(modifier = Modifier.width(16.dp))
+        Text(
+            text = stringResource(labelRes),
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurface
+        )
     }
 }
 

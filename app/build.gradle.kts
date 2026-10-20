@@ -45,7 +45,8 @@ android {
     }
 
     // Two ways to ship the same app:
-    //   play — Firebase Analytics and Crashlytics, so sideloaded installs are visible too
+    //   play — Firebase Analytics and Crashlytics, so sideloaded installs are visible too, and
+    //          Firestore for the feedback a user types and sends from settings
     //   foss — no proprietary dependency and no permissions at all, which is what F-Droid
     //          requires and what the privacy claim in the README rests on
     flavorDimensions += "distribution"
@@ -158,6 +159,9 @@ dependencies {
     "playImplementation"(platform(libs.firebase.bom))
     "playImplementation"(libs.firebase.analytics)
     "playImplementation"(libs.firebase.crashlytics)
+
+    // Feedback the user types and sends from settings, Play flavour only
+    "playImplementation"(libs.firebase.firestore)
 
     // Google Play's in-app rating dialog, Play flavour only
     "playImplementation"(libs.play.review.ktx)

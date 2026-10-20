@@ -1,0 +1,27 @@
+rules_version = '2';
+
+// Feedback sent from the settings of the Play build. The app may add one document per answer and
+// nothing else: nobody reads, changes or deletes anything through the client API.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /feedback/{id} {
+      allow create: if isFeedback(request.resource.data);
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isFeedback(data) {
+      return data.keys().hasOnly(['appVersion', 'versionCode', 'createdAt', 'thumbs', 'ideas', 'text'])
+        && data.keys().hasAll(['appVersion', 'versionCode', 'createdAt', 'thumbs', 'ideas', 'text'])
+        && data.appVersion is string && data.appVersion.size() <= 40
+        && data.versionCode is int
+        && data.createdAt == request.time
+        && (data.thumbs == null || data.thumbs in ['up', 'down'])
+        && data.ideas is list && data.ideas.size() <= 10
+        && data.text is string && data.text.size() <= 1000;
+    }
+  }
+}

@@ -13,14 +13,15 @@ import com.marfolog.noteswidgetformarkdown.R
  */
 object RatingPrompt {
 
-    /** No store page to link to, so settings show no rating link. */
-    const val HAS_STORE_PAGE = false
-
     @StringRes
     val RATE_BODY_RES = R.string.rate_dialog_body_foss
 
     @StringRes
     val RATE_BUTTON_RES = R.string.rate_dialog_rate_foss
+
+    /** The row in the settings feedback section, where an icon already stands in for the star. */
+    @StringRes
+    val ABOUT_RATE_RES = R.string.about_star
 
     suspend fun maybeAsk(activity: Activity) = Unit
 

@@ -22,13 +22,15 @@ import kotlinx.coroutines.withTimeoutOrNull
  */
 object RatingPrompt {
 
-    const val HAS_STORE_PAGE = true
-
     @StringRes
     val RATE_BODY_RES = R.string.rate_dialog_body_play
 
     @StringRes
     val RATE_BUTTON_RES = R.string.rate_dialog_rate_play
+
+    /** The row in the settings feedback section, where an icon already stands in for the star. */
+    @StringRes
+    val ABOUT_RATE_RES = R.string.about_rate
 
     private const val AREA = "Rating"
     private const val PREFS = "app_prefs"

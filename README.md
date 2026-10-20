@@ -118,7 +118,8 @@ phone.
 | Analytics | none | Firebase, app usage only |
 | Crash reports | none | Firebase Crashlytics |
 | Can be switched off | nothing to switch off | yes, in settings |
-| Rating prompt | none | Google Play's own dialog, at most every 90 days, and a store link in settings |
+| Rating prompt | none; the ★ Rate chip and settings link to GitHub | Google Play's own dialog, at most every 90 days; the ★ Rate chip and settings link to the store |
+| Feedback you type | opens a GitHub discussion in your browser, the app sends nothing | Firebase Firestore, only when you press Send |
 
 **The foss build declares no `INTERNET` permission.** Without it, Android does not grant the app a
 network connection of its own. That is a property of the file you download rather than an assurance
@@ -141,14 +142,23 @@ breadcrumbs before they are handed to Firebase. No advertising ID is collected, 
 permissions Firebase would otherwise add are removed from the manifest.
 
 Five days after the Play build first runs on your phone (for an update, the first run of the
-version that added this), it may ask Google Play to show its rating dialog:
-right after you save a quick note from the widget, or when you open settings. It asks no more
-than once every 90 days. That request goes to the Play Store app on your phone, and Google decides
-whether the dialog appears. The app is never told whether you rated it or what you gave, and it
-sends nothing about your notes. Settings in the Play build also have a "Rate on Google Play" link
-that opens the store page. The foss build has neither.
+version that added this), it may ask Google Play to show its rating dialog: right after you save a
+quick note from the widget. It asks no more than once every 90 days. That request goes to the Play
+Store app on your phone, and Google decides whether the dialog appears. The app is never told
+whether you rated it or what you gave, and it sends nothing about your notes. The ★ Rate chip on the widget and the "Rate on Google Play" row
+in settings only open the store page. The foss build has no rating dialog; its chip and settings
+row open the GitHub repository in your browser.
 
-Neither build has an account, a server or a database. Files are read only in folders you picked.
+Settings can ask, at most once a day and not before the app is a week old, what you think and what
+to build next; "Send feedback" in settings opens the same form any time. In the Play build, pressing
+Send stores your answer — the thumb, the ticked ideas and what you typed — together with the app
+version in Firebase Firestore. Nothing is sent until you press Send, and nothing else goes with
+it: no account, no device identifier, nothing from your notes. This does not depend on the
+analytics switch, because sending is something you do on purpose. In the foss build Send only opens
+a pre-filled GitHub discussion in your browser, where you decide whether to post it.
+
+Neither build has an account. Apart from the feedback you choose to send from the Play build, no
+server or database holds anything of yours. Files are read only in folders you picked.
 
 Full text: [Privacy Policy](https://folmbuild.cz/notes-widget-privacy/).
 
@@ -173,8 +183,8 @@ Full text: [Privacy Policy](https://folmbuild.cz/notes-widget-privacy/).
 
 Needs Android Studio, JDK 17+ and the API 36 SDK.
 
-There are two flavours: `foss` (no Firebase, no `INTERNET`) and `play` (analytics and crash
-reporting). Build the one you want.
+There are two flavours: `foss` (no Firebase, no `INTERNET`) and `play` (analytics, crash
+reporting and sending feedback). Build the one you want.
 
 ```bash
 ./gradlew assembleFossDebug    # debug APK, no telemetry

@@ -1,0 +1,80 @@
+package com.marfolog.noteswidgetformarkdown.util
+
+import java.util.concurrent.TimeUnit
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import org.junit.Test
+
+class FeedbackReminderTest {
+
+    private class InMemoryStore : KeyValueStore {
+        val values = mutableMapOf<String, Any>()
+        override fun contains(key: String) = key in values
+        override fun getLong(key: String) = values[key] as Long?
+        override fun putLong(key: String, value: Long) { values[key] = value }
+        override fun getInt(key: String) = values[key] as Int?
+        override fun putInt(key: String, value: Int) { values[key] = value }
+        override fun getBoolean(key: String, default: Boolean) = values[key] as Boolean? ?: default
+        override fun putBoolean(key: String, value: Boolean) { values[key] = value }
+    }
+
+    private val day = TimeUnit.DAYS.toMillis(1)
+    private val installedAt = 1_760_000_000_000L
+    private val store = InMemoryStore().also { RateReminder.recordStart(it, installedAt) }
+
+    private fun offer(nowMillis: Long, openedFrom: String? = null) = FeedbackReminder.shouldOffer(
+        store = store,
+        nowMillis = nowMillis,
+        setupComplete = true,
+        openedFrom = openedFrom,
+        offeredThisVisit = false,
+        anotherDialogOpen = false
+    )
+
+    @Test
+    fun `the week is counted from the same first start the rate chip uses`() {
+        assertFalse(offer(installedAt + 6 * day))
+        assertTrue(offer(installedAt + 7 * day))
+    }
+
+    @Test
+    fun `a fresh store without a first start never offers`() {
+        val empty = InMemoryStore()
+        assertFalse(
+            FeedbackReminder.shouldOffer(empty, installedAt + 30 * day, true, null, false, false)
+        )
+    }
+
+    @Test
+    fun `not now comes back on a visit the next day`() {
+        val snoozedAt = installedAt + 8 * day
+        FeedbackReminder.markSnoozed(store, snoozedAt)
+
+        assertFalse(offer(snoozedAt + day / 2))
+        assertTrue(offer(snoozedAt + day))
+    }
+
+    @Test
+    fun `do not ask again sticks`() {
+        FeedbackReminder.markNeverAgain(store)
+
+        assertFalse(offer(installedAt + 300 * day))
+    }
+
+    @Test
+    fun `sending answers the question and starts the one a day limit`() {
+        val sentAt = installedAt + 9 * day
+        FeedbackReminder.markSent(store, sentAt)
+
+        assertFalse(offer(sentAt + 300 * day))
+        assertEquals(sentAt, store.values["feedback_last_sent_at"])
+        assertFalse(FeedbackReminder.canSend(store, sentAt + day - 1))
+        assertTrue(FeedbackReminder.canSend(store, sentAt + day))
+    }
+
+    @Test
+    fun `nothing sent yet means sending is allowed`() {
+        assertTrue(FeedbackReminder.canSend(store, installedAt))
+    }
+}

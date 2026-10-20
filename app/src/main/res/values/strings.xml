@@ -192,4 +192,30 @@
     <string name="widget_background_title">Widget background</string>
     <string name="widget_background_desc">Lower it to let the wallpaper show through. Note cards keep their colours.</string>
     <string name="widget_background_value">%1$d%%</string>
+
+    <!-- Feedback dialog in settings -->
+    <string name="feedback_title">Hi! Sorry for the interruption, this takes ten seconds.</string>
+    <string name="feedback_body">Notes Widget is made by one person in their spare time, and your answer decides what gets built next.</string>
+    <string name="feedback_how">How is it working for you?</string>
+    <string name="feedback_thumbs_up">Working well</string>
+    <string name="feedback_thumbs_down">Not working well</string>
+    <string name="feedback_ideas">What would make it better? (tick any)</string>
+    <string name="feedback_idea_pinned_note">Pinned note on top</string>
+    <string name="feedback_idea_fast_note_time">Time in fast notes</string>
+    <string name="feedback_idea_multi_folder">More widgets, each with its own folder</string>
+    <string name="feedback_idea_search">Search</string>
+    <string name="feedback_idea_monospace">Monospace font</string>
+    <string name="feedback_idea_images">Images in notes</string>
+    <string name="feedback_text">Something else?</string>
+    <string name="feedback_text_counter" translatable="false">%1$d / %2$d</string>
+    <string name="feedback_send">Send</string>
+    <string name="feedback_later">Not now</string>
+    <string name="feedback_never">Don\'t ask again</string>
+    <string name="feedback_footer_play">Sent anonymously: your answer and the app version, nothing from your notes.</string>
+    <string name="feedback_footer_foss">Opens a new GitHub discussion in your browser, so you can read it before posting.</string>
+    <string name="feedback_failed_play">Could not send. Check the connection and try again.</string>
+    <string name="feedback_too_soon">Feedback was already sent today. Thank you, try again tomorrow.</string>
+    <string name="feedback_thanks">Thank you!</string>
+    <string name="about_feedback">Send feedback</string>
+    <string name="about_star">Star on GitHub</string>
 </resources>

@@ -167,4 +167,30 @@
     <string name="widget_background_title">Pozadí widgetu</string>
     <string name="widget_background_desc">Snižte ho a widgetem prosvitne tapeta. Karty poznámek si barvy ponechají.</string>
     <string name="widget_background_value">%1$d %%</string>
+
+    <!-- Feedback dialog in settings -->
+    <string name="feedback_title">Ahoj! Promiňte, že ruším, zabere to deset vteřin.</string>
+    <string name="feedback_body">Notes Widget dělá jeden člověk ve volném čase a vaše odpověď rozhodne, co vznikne příště.</string>
+    <string name="feedback_how">Jak vám to funguje?</string>
+    <string name="feedback_thumbs_up">Funguje dobře</string>
+    <string name="feedback_thumbs_down">Nefunguje dobře</string>
+    <string name="feedback_ideas">Co by to zlepšilo? (zaškrtněte cokoli)</string>
+    <string name="feedback_idea_pinned_note">Připnutá poznámka nahoře</string>
+    <string name="feedback_idea_fast_note_time">Čas u rychlých poznámek</string>
+    <string name="feedback_idea_multi_folder">Víc widgetů, každý s vlastní složkou</string>
+    <string name="feedback_idea_search">Hledání</string>
+    <string name="feedback_idea_monospace">Neproporcionální písmo</string>
+    <string name="feedback_idea_images">Obrázky v poznámkách</string>
+    <string name="feedback_text">Ještě něco?</string>
+    <string name="feedback_send">Odeslat</string>
+    <string name="feedback_later">Teď ne</string>
+    <string name="feedback_never">Už se neptat</string>
+    <string name="feedback_footer_play">Odesílá se anonymně: vaše odpověď a verze aplikace, nic z poznámek.</string>
+    <string name="feedback_footer_foss">Otevře v prohlížeči novou diskusi na GitHubu, takže si ji před odesláním můžete přečíst.</string>
+    <string name="feedback_failed_play">Nepodařilo se odeslat. Zkontrolujte připojení a zkuste to znovu.</string>
+    <string name="feedback_too_soon">Dnes už zpětná vazba odešla. Děkuji, zkuste to zase zítra.</string>
+    <string name="feedback_thanks">Děkuji!</string>
+    <string name="about_feedback">Poslat zpětnou vazbu</string>
+    <string name="about_rate">Ohodnotit na Google Play</string>
+    <string name="about_star">Hvězdička na GitHubu</string>
 </resources>
