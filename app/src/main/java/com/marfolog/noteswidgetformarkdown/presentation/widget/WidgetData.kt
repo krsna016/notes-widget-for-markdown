@@ -11,6 +11,7 @@ import com.marfolog.noteswidgetformarkdown.domain.model.NoteSummary
 import com.marfolog.noteswidgetformarkdown.domain.usecase.GetNotesUseCase
 import com.marfolog.noteswidgetformarkdown.presentation.setup.SetupActivity
 import com.marfolog.noteswidgetformarkdown.util.AppLog
+import com.marfolog.noteswidgetformarkdown.util.RateReminder
 import kotlinx.coroutines.flow.firstOrNull
 import org.koin.java.KoinJavaComponent.get
 
@@ -30,7 +31,8 @@ internal data class WidgetData(
     val cardSettings: Map<String, NoteCardAppearance>,
     val gitSyncStatus: GitSyncStatus?,
     /** Vault-relative folder of each extra note inside the vault, keyed by its uri. */
-    val extraNoteFolders: Map<String, String> = emptyMap()
+    val extraNoteFolders: Map<String, String> = emptyMap(),
+    val bottomBarChip: BottomBarChip = BottomBarChip.None
 )
 
 /**
@@ -110,6 +112,18 @@ internal suspend fun loadWidgetData(context: Context): WidgetData {
             ?.toMap()
     }.orEmpty()
 
+    val now = System.currentTimeMillis()
+    val syncLabel = gitSyncStatus?.let {
+        GitSyncLabel.format(
+            it,
+            now,
+            prefs.getInt(SetupActivity.KEY_STALE_HOURS, GitSyncLabel.DEFAULT_STALE_HOURS)
+        )
+    }
+    val rateChipWindow = RateReminder.openWindow(context, now).takeIf { state.isUsable() }
+    val bottomBarChip = bottomBarChip(rateChipWindow != null, syncLabel)
+    if (bottomBarChip is BottomBarChip.Rate) RateReminder.reportShownOnce(context, rateChipWindow)
+
     AppLog.d(
         "WidgetData",
         "vault=${vaultName ?: "?"} folder=${noteFolderPath ?: "?"} " +
@@ -121,6 +135,10 @@ internal suspend fun loadWidgetData(context: Context): WidgetData {
         noteFolderPath = noteFolderPath,
         cardSettings = cardSettingsStore.getAll(),
         gitSyncStatus = gitSyncStatus,
-        extraNoteFolders = extraNoteFolders
+        extraNoteFolders = extraNoteFolders,
+        bottomBarChip = bottomBarChip
     )
 }
+
+private fun WidgetState.isUsable(): Boolean =
+    this !is WidgetState.Uninitialized && this !is WidgetState.PermissionLost

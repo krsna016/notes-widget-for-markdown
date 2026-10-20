@@ -26,7 +26,10 @@
 
         <activity
             android:name=".presentation.widget.TrampolineActivity"
+            android:excludeFromRecents="true"
             android:exported="false"
+            android:noHistory="true"
+            android:taskAffinity=""
             android:theme="@style/Theme.Translucent" />
 
         <activity
@@ -37,6 +40,13 @@
         <activity
             android:name=".presentation.widget.FastNoteActivity"
             android:exported="false"
+            android:theme="@style/Theme.Translucent" />
+
+        <activity
+            android:name=".presentation.widget.RateActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:taskAffinity=""
             android:theme="@style/Theme.Translucent" />
 
         <service

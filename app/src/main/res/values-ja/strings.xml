@@ -33,7 +33,6 @@
     <string name="fast_note_saved">クイックノートを端末に保存しました</string>
     <string name="fast_note_saved_hint">端末に保存しました。同期は引き続きお使いのツールが担当します。</string>
     <string name="fast_note_target_missing">保存先のファイルがありません</string>
-    <string name="fast_note_target_hint">クイックノートを保存する前に、設定で Markdown ファイルを選んでください。</string>
     <string name="fast_note_pick_target_first">先に設定でクイックノートの保存先を選んでください。</string>
     <string name="fast_note_write_failed">選択したノートに書き込めませんでした。</string>
     <string name="fast_note_failed">クイックノートを保存できませんでした。</string>

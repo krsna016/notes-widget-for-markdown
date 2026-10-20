@@ -41,7 +41,6 @@
     <string name="fast_note_saved">Fast note saved locally</string>
     <string name="fast_note_saved_hint">Saved locally. Sync remains handled by your notes setup.</string>
     <string name="fast_note_target_missing">Fast note target missing</string>
-    <string name="fast_note_target_hint">Choose a Markdown file in settings before saving Fast notes.</string>
     <string name="fast_note_pick_target_first">Choose a Fast note target in settings first.</string>
     <string name="fast_note_write_failed">Unable to write to the selected note.</string>
     <string name="fast_note_failed">Unable to save Fast note.</string>
@@ -166,4 +165,26 @@
     <string name="remove_extra_note_title">Remove %1$s from the widget?</string>
     <string name="remove_extra_note_body">The file stays on your device. Only the widget stops showing it.</string>
     <string name="card_remove_from_widget">Remove from widget, the file stays</string>
+
+    <!-- Rate chip on the widget and the dialog behind it -->
+    <string name="rate_chip">★ Rate</string>
+    <string name="rate_dialog_title">Notes Widget is made by one person.</string>
+    <string name="rate_dialog_body_play">A rating on Google Play helps other people find it.</string>
+    <string name="rate_dialog_body_foss">A star on GitHub helps other people find it.</string>
+    <string name="rate_dialog_rate_play">★ Rate on Google Play</string>
+    <string name="rate_dialog_rate_foss">★ Star on GitHub</string>
+    <string name="rate_dialog_idea">Suggest an idea</string>
+    <string name="rate_dialog_later">Not now</string>
+    <string name="rate_dialog_never">Don\'t ask again</string>
+    <string name="rate_chip_setting">Rating reminder on the widget</string>
+    <string name="rate_chip_setting_desc">A small ★ Rate chip for two days at a time, at most three times. Never while sync needs attention.</string>
+
+    <!-- Fast note target picker and line style -->
+    <string name="fast_note_pick_title">Save fast notes to which file?</string>
+    <string name="fast_note_pick_hint">You can change it later in settings.</string>
+    <string name="fast_note_no_folder">Pick your notes folder in settings first. Fast notes are added to one of its files.</string>
+    <string name="fast_note_folder_empty">Your notes folder has no .md files yet. Create a note with the + button on the widget first.</string>
+    <string name="fast_note_style_title">Add as</string>
+    <string name="fast_note_style_bullet">Bullet</string>
+    <string name="fast_note_style_checkbox">Checkbox</string>
 </resources>

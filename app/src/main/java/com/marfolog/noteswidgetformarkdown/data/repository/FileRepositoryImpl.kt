@@ -6,6 +6,7 @@ import android.provider.DocumentsContract
 import android.util.Log
 import androidx.documentfile.provider.DocumentFile
 import com.marfolog.noteswidgetformarkdown.data.parser.MarkdownFastNoteInserter
+import com.marfolog.noteswidgetformarkdown.domain.model.FastNoteStyle
 import com.marfolog.noteswidgetformarkdown.util.AppLog
 import com.marfolog.noteswidgetformarkdown.data.parser.MarkdownPreviewFormatter
 import com.marfolog.noteswidgetformarkdown.domain.model.NoteSummary
@@ -113,7 +114,7 @@ class FileRepositoryImpl(
         newFile.uri.toString()
     }
 
-    override suspend fun appendFastNote(fileUri: String, noteText: String): Result<Boolean> = withContext(Dispatchers.IO) {
+    override suspend fun appendFastNote(fileUri: String, noteText: String, style: FastNoteStyle): Result<Boolean> = withContext(Dispatchers.IO) {
         runCatching {
             val uri = Uri.parse(fileUri)
             val originalContent = contentResolver.openInputStream(uri)?.use { stream ->
@@ -122,7 +123,7 @@ class FileRepositoryImpl(
                 }
             } ?: return@runCatching false
 
-            val updatedContent = fastNoteInserter.insert(originalContent, noteText)
+            val updatedContent = fastNoteInserter.insert(originalContent, noteText, style)
             val updatedBytes = updatedContent.toByteArray(Charsets.UTF_8)
 
             // "wt" truncates first, so a failure between truncating and writing would leave the

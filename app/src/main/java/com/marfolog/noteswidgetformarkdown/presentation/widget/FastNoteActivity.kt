@@ -1,38 +1,51 @@
 package com.marfolog.noteswidgetformarkdown.presentation.widget
 
-import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
-import com.marfolog.noteswidgetformarkdown.R
-import com.marfolog.noteswidgetformarkdown.util.AppLog
-import com.marfolog.noteswidgetformarkdown.util.RatingPrompt
 import androidx.activity.compose.setContent
-import androidx.compose.ui.res.stringResource
-import androidx.compose.material3.AlertDialog
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.runtime.remember
-import android.net.Uri
-import androidx.documentfile.provider.DocumentFile
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.lifecycleScope
+import com.marfolog.noteswidgetformarkdown.R
+import com.marfolog.noteswidgetformarkdown.data.preferences.NoteCardSettingsStore
+import com.marfolog.noteswidgetformarkdown.domain.model.FastNoteStyle
+import com.marfolog.noteswidgetformarkdown.domain.model.NoteSummary
 import com.marfolog.noteswidgetformarkdown.domain.usecase.AppendFastNoteUseCase
+import com.marfolog.noteswidgetformarkdown.domain.usecase.GetNotesUseCase
 import com.marfolog.noteswidgetformarkdown.presentation.setup.SetupActivity
 import com.marfolog.noteswidgetformarkdown.ui.theme.NotesWidgetForMarkdownTheme
+import com.marfolog.noteswidgetformarkdown.util.AppLog
+import com.marfolog.noteswidgetformarkdown.util.RatingPrompt
+import com.marfolog.noteswidgetformarkdown.util.Telemetry
+import com.marfolog.noteswidgetformarkdown.util.UsageEvent
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import org.koin.java.KoinJavaComponent.get
 
@@ -40,102 +53,204 @@ class FastNoteActivity : ComponentActivity() {
 
     /** Off once the line is saved, so a rating dialog from Play is not drawn over a stale form. */
     private var dialogVisible by mutableStateOf(true)
+    private var targetUri by mutableStateOf<String?>(null)
+    private var targetName by mutableStateOf<String?>(null)
+    private var folderNotes by mutableStateOf<Result<List<NoteSummary>>?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         val prefs = getSharedPreferences(SetupActivity.PREFS_NAME, MODE_PRIVATE)
-        val targetUri = prefs.getString(SetupActivity.KEY_FAST_NOTE_TARGET_URI, null)
-        // Show where the line will land. The target is set once in settings and then forgotten,
-        // so without this the dialog asks you to type into an unknown file.
-        val targetName = targetUri
+        val notesFolderUri = prefs.getString(SetupActivity.KEY_NOTES_URI, null)
+        targetUri = prefs.getString(SetupActivity.KEY_FAST_NOTE_TARGET_URI, null)
+        // Show where the line will land. The target is set once and then forgotten, so without
+        // this the dialog asks you to type into an unknown file.
+        targetName = targetUri
             ?.let { runCatching { DocumentFile.fromSingleUri(this, Uri.parse(it))?.name }.getOrNull() }
+
+        if (targetUri.isNullOrBlank() && !notesFolderUri.isNullOrBlank()) {
+            lifecycleScope.launch { folderNotes = loadFolderNotes(notesFolderUri) }
+        }
 
         setContent {
             NotesWidgetForMarkdownTheme {
-                if (dialogVisible) FastNoteDialog(
-                    hasTarget = !targetUri.isNullOrBlank(),
-                    targetName = targetName,
-                    onCancel = { finish() },
-                    onOpenSettings = {
-                        startActivity(
-                            Intent(this, SetupActivity::class.java).apply {
-                                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-                            }
+                if (dialogVisible) {
+                    when (val step = fastNoteStep(targetUri, notesFolderUri, folderNotes)) {
+                        FastNoteStep.Write -> FastNoteDialog(
+                            targetName = targetName,
+                            onCancel = { finish() },
+                            onSave = ::save
                         )
-                        finish()
-                    },
-                    onSave = { noteText, onError ->
-                        if (targetUri.isNullOrBlank()) {
-                            onError(getString(R.string.fast_note_pick_target_first))
-                        } else {
-                            lifecycleScope.launch {
-                                val appendFastNoteUseCase =
-                                    get<AppendFastNoteUseCase>(AppendFastNoteUseCase::class.java)
-                                appendFastNoteUseCase(targetUri, noteText)
-                                    .onSuccess { saved ->
-                                        if (saved) {
-                                            Toast.makeText(
-                                                this@FastNoteActivity,
-                                                getString(R.string.fast_note_saved),
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                            // Use applicationContext: the widget
-                                            // render is async and outlives this
-                                            // Activity, which finish() destroys.
-                                            NotesWidget.updateAll(applicationContext)
-                                            // A note just saved is a fair moment to ask. Not
-                                            // time yet returns at once, so this closes as fast
-                                            // as it always did; otherwise finish waits for Play.
-                                            dialogVisible = false
-                                            RatingPrompt.maybeAsk(this@FastNoteActivity)
-                                            finish()
-                                        } else {
-                                            onError(getString(R.string.fast_note_write_failed))
-                                        }
-                                    }
-                                    .onFailure { error ->
-                                        onError(error.message ?: getString(R.string.fast_note_failed))
-                                    }
-                            }
-                        }
+                        FastNoteStep.Loading -> LoadingDialog(onCancel = { finish() })
+                        is FastNoteStep.PickTarget -> PickTargetDialog(
+                            notes = step.notes,
+                            onPick = ::pickTarget,
+                            onCancel = { finish() }
+                        )
+                        FastNoteStep.NoNotesFolder -> NoTargetDialog(
+                            messageRes = R.string.fast_note_no_folder,
+                            onOpenSettings = ::openSettings,
+                            onCancel = { finish() }
+                        )
+                        FastNoteStep.NoNotesInFolder -> NoTargetDialog(
+                            messageRes = R.string.fast_note_folder_empty,
+                            onOpenSettings = ::openSettings,
+                            onCancel = { finish() }
+                        )
+                        FastNoteStep.NotesUnreadable -> NoTargetDialog(
+                            messageRes = R.string.notes_load_failed,
+                            onOpenSettings = ::openSettings,
+                            onCancel = { finish() }
+                        )
                     }
-                )
+                }
             }
         }
+    }
+
+    /** Same notes, in the same order, as the target chips in settings. */
+    private suspend fun loadFolderNotes(notesFolderUri: String): Result<List<NoteSummary>> = runCatching {
+        val getNotesUseCase = get<GetNotesUseCase>(GetNotesUseCase::class.java)
+        NoteCardSettingsStore(applicationContext)
+            .applyOrder(getNotesUseCase(notesFolderUri).firstOrNull().orEmpty())
+    }.onFailure { AppLog.w(AREA, "Could not list notes to pick a fast note target", it) }
+
+    private fun pickTarget(note: NoteSummary) {
+        getSharedPreferences(SetupActivity.PREFS_NAME, MODE_PRIVATE)
+            .edit()
+            .putString(SetupActivity.KEY_FAST_NOTE_TARGET_URI, note.fileUri)
+            .apply()
+        Telemetry.event(UsageEvent.FAST_TARGET_SET)
+        targetName = note.fileName
+        targetUri = note.fileUri
+    }
+
+    private fun openSettings() {
+        startActivity(SetupActivity.intent(this, UsageEvent.FROM_FAST_NOTE_ERROR))
+        finish()
+    }
+
+    private fun save(noteText: String, onError: (String) -> Unit) {
+        val target = targetUri
+        if (target.isNullOrBlank()) {
+            onError(getString(R.string.fast_note_pick_target_first))
+            return
+        }
+        val style = FastNoteStyle.from(
+            getSharedPreferences(SetupActivity.PREFS_NAME, MODE_PRIVATE)
+                .getString(SetupActivity.KEY_FAST_NOTE_STYLE, null)
+        )
+        lifecycleScope.launch {
+            val appendFastNoteUseCase = get<AppendFastNoteUseCase>(AppendFastNoteUseCase::class.java)
+            appendFastNoteUseCase(target, noteText, style)
+                .onSuccess { saved ->
+                    if (saved) {
+                        Telemetry.event(UsageEvent.FAST_NOTE_SAVED, UsageEvent.PARAM_STYLE to style.storageValue)
+                        Toast.makeText(
+                            this@FastNoteActivity,
+                            getString(R.string.fast_note_saved),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        // Use applicationContext: the widget render is async and outlives this
+                        // Activity, which finish() destroys.
+                        NotesWidget.updateAll(applicationContext)
+                        // A note just saved is a fair moment to ask. Not time yet returns at once,
+                        // so this closes as fast as it always did; otherwise finish waits for Play.
+                        dialogVisible = false
+                        RatingPrompt.maybeAsk(this@FastNoteActivity)
+                        finish()
+                    } else {
+                        onError(getString(R.string.fast_note_write_failed))
+                    }
+                }
+                .onFailure { error ->
+                    onError(error.message ?: getString(R.string.fast_note_failed))
+                }
+        }
+    }
+
+    private companion object {
+        const val AREA = "FastNote"
     }
 }
 
 @Composable
+private fun LoadingDialog(onCancel: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onCancel,
+        title = { Text(stringResource(R.string.fast_note_pick_title)) },
+        text = {
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onCancel) { Text(stringResource(R.string.action_cancel)) }
+        }
+    )
+}
+
+@Composable
+private fun PickTargetDialog(
+    notes: List<NoteSummary>,
+    onPick: (NoteSummary) -> Unit,
+    onCancel: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onCancel,
+        title = { Text(stringResource(R.string.fast_note_pick_title)) },
+        text = {
+            Column(
+                modifier = Modifier
+                    .heightIn(max = 360.dp)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                Text(
+                    text = stringResource(R.string.fast_note_pick_hint),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                notes.forEach { note ->
+                    TextButton(onClick = { onPick(note) }, modifier = Modifier.fillMaxWidth()) {
+                        Text(text = note.title, modifier = Modifier.fillMaxWidth())
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onCancel) { Text(stringResource(R.string.action_cancel)) }
+        }
+    )
+}
+
+@Composable
+private fun NoTargetDialog(messageRes: Int, onOpenSettings: () -> Unit, onCancel: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onCancel,
+        title = { Text(stringResource(R.string.fast_note_target_missing)) },
+        text = { Text(stringResource(messageRes)) },
+        confirmButton = {
+            TextButton(onClick = onOpenSettings) {
+                Text(stringResource(R.string.action_open_settings_button))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onCancel) {
+                Text(stringResource(R.string.action_cancel))
+            }
+        }
+    )
+}
+
+@Composable
 private fun FastNoteDialog(
-    hasTarget: Boolean,
-    targetName: String? = null,
+    targetName: String?,
     onCancel: () -> Unit,
-    onOpenSettings: () -> Unit,
     onSave: (String, (String) -> Unit) -> Unit
 ) {
     var noteText by rememberSaveable { mutableStateOf("") }
     var isSaving by rememberSaveable { mutableStateOf(false) }
     var errorMessage by rememberSaveable { mutableStateOf<String?>(null) }
-
-    if (!hasTarget) {
-        AlertDialog(
-            onDismissRequest = onCancel,
-            title = { Text(stringResource(R.string.fast_note_target_missing)) },
-            text = { Text(stringResource(R.string.fast_note_target_hint)) },
-            confirmButton = {
-                TextButton(onClick = onOpenSettings) {
-                    Text(stringResource(R.string.action_open_settings_button))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = onCancel) {
-                    Text(stringResource(R.string.action_cancel))
-                }
-            }
-        )
-        return
-    }
 
     AlertDialog(
         onDismissRequest = {

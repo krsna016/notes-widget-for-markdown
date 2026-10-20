@@ -33,7 +33,6 @@
     <string name="fast_note_saved">Rychlá poznámka uložena do zařízení</string>
     <string name="fast_note_saved_hint">Uloženo do zařízení. Synchronizaci má dál na starost váš nástroj.</string>
     <string name="fast_note_target_missing">Chybí cílový soubor</string>
-    <string name="fast_note_target_hint">Než začnete ukládat rychlé poznámky, vyberte v nastavení Markdown soubor.</string>
     <string name="fast_note_pick_target_first">Nejdřív v nastavení vyberte cíl pro rychlé poznámky.</string>
     <string name="fast_note_write_failed">Do vybrané poznámky se nepodařilo zapsat.</string>
     <string name="fast_note_failed">Rychlou poznámku se nepodařilo uložit.</string>
@@ -143,4 +142,24 @@
     <string name="open_with_hint_ask">Android se pokaždé zeptá, čím to otevřít.</string>
     <string name="open_note_with">Otevřít poznámku v</string>
     <string name="new_note_failed">Poznámku se nepodařilo vytvořit</string>
+
+    <string name="rate_chip">★ Ohodnotit</string>
+    <string name="rate_dialog_title">Notes Widget dělá jeden člověk.</string>
+    <string name="rate_dialog_body_play">Hodnocení na Google Play pomůže, aby ho našli i další lidé.</string>
+    <string name="rate_dialog_body_foss">Hvězdička na GitHubu pomůže, aby ho našli i další lidé.</string>
+    <string name="rate_dialog_rate_play">★ Ohodnotit na Google Play</string>
+    <string name="rate_dialog_rate_foss">★ Dát hvězdičku na GitHubu</string>
+    <string name="rate_dialog_idea">Navrhnout nápad</string>
+    <string name="rate_dialog_later">Teď ne</string>
+    <string name="rate_dialog_never">Už se neptat</string>
+    <string name="rate_chip_setting">Připomínka hodnocení na widgetu</string>
+    <string name="rate_chip_setting_desc">Malý čip ★ Ohodnotit vždy na dva dny, nejvýš třikrát. Nikdy, když synchronizace potřebuje pozornost.</string>
+
+    <string name="fast_note_pick_title">Do kterého souboru ukládat rychlé poznámky?</string>
+    <string name="fast_note_pick_hint">Později to můžete změnit v nastavení.</string>
+    <string name="fast_note_no_folder">Nejdřív v nastavení vyberte složku s poznámkami. Rychlé poznámky se přidávají do jednoho z jejích souborů.</string>
+    <string name="fast_note_folder_empty">Ve složce s poznámkami zatím nejsou žádné soubory .md. Nejdřív vytvořte poznámku tlačítkem + na widgetu.</string>
+    <string name="fast_note_style_title">Přidat jako</string>
+    <string name="fast_note_style_bullet">Odrážku</string>
+    <string name="fast_note_style_checkbox">Zaškrtávací políčko</string>
 </resources>

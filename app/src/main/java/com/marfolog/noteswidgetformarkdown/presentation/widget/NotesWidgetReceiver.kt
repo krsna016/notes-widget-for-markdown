@@ -1,5 +1,6 @@
 package com.marfolog.noteswidgetformarkdown.presentation.widget
 
+import android.appwidget.AppWidgetManager
 import android.content.Context
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
@@ -12,9 +13,16 @@ import java.util.concurrent.TimeUnit
 class NotesWidgetReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = NotesWidget()
 
-    // No onUpdate override: GlanceAppWidgetReceiver already recomposes the widget here.
-    // Calling NotesWidget.updateAll() from it would bounce back through the fallback
-    // broadcast that updateAll sends, and the two would keep triggering each other.
+    // Only bookkeeping here: calling NotesWidget.updateAll() from onUpdate would loop.
+    override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
+        super.onUpdate(context, appWidgetManager, appWidgetIds)
+        WidgetInventory.onUpdate(context, WidgetInventory.Kind.Cards, appWidgetIds)
+    }
+
+    override fun onDeleted(context: Context, appWidgetIds: IntArray) {
+        super.onDeleted(context, appWidgetIds)
+        WidgetInventory.onDeleted(context, WidgetInventory.Kind.Cards, appWidgetIds)
+    }
 
     override fun onEnabled(context: Context) {
         super.onEnabled(context)

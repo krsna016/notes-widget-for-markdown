@@ -77,6 +77,10 @@ object Telemetry {
         analytics?.logEvent(name, bundle)
     }
 
+    fun setUserProperty(name: String, value: String) {
+        analytics?.setUserProperty(name, value)
+    }
+
     /** Breadcrumbs, so a crash report shows the last few steps that led to it. */
     fun breadcrumb(message: String) {
         FirebaseCrashlytics.getInstance().log(message)

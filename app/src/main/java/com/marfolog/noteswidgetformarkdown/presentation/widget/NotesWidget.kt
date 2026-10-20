@@ -51,13 +51,13 @@ import com.marfolog.noteswidgetformarkdown.util.AppLog
 import com.marfolog.noteswidgetformarkdown.data.preferences.NoteCardSettingsStore
 import com.marfolog.noteswidgetformarkdown.data.repository.GitSyncStatusReader
 import com.marfolog.noteswidgetformarkdown.data.repository.ObsidianVaultLocator
-import com.marfolog.noteswidgetformarkdown.domain.model.GitSyncStatus
 import com.marfolog.noteswidgetformarkdown.domain.model.NoteCardAppearance
 import com.marfolog.noteswidgetformarkdown.domain.model.NoteCardColor
 import com.marfolog.noteswidgetformarkdown.domain.model.NoteSummary
 import com.marfolog.noteswidgetformarkdown.domain.usecase.GetNotesUseCase
 import com.marfolog.noteswidgetformarkdown.presentation.setup.SetupActivity
 import com.marfolog.noteswidgetformarkdown.ui.theme.WidgetTheme
+import com.marfolog.noteswidgetformarkdown.util.UsageEvent
 import kotlinx.coroutines.flow.firstOrNull
 import org.koin.java.KoinJavaComponent.get
 
@@ -94,7 +94,7 @@ class NotesWidget : GlanceAppWidget() {
                         current.vaultName,
                         current.noteFolderPath,
                         current.cardSettings,
-                        current.gitSyncStatus,
+                        current.bottomBarChip,
                         isLoading,
                         current.extraNoteFolders
                     )
@@ -138,7 +138,7 @@ private fun WidgetRoot(
     vaultName: String?,
     noteFolderPath: String?,
     cardSettings: Map<String, NoteCardAppearance>,
-    gitSyncStatus: GitSyncStatus?,
+    bottomBarChip: BottomBarChip,
     isLoading: Boolean = false,
     extraNoteFolders: Map<String, String> = emptyMap()
 ) {
@@ -151,9 +151,9 @@ private fun WidgetRoot(
         when (state) {
             is WidgetState.Uninitialized -> UninitializedContent()
             is WidgetState.PermissionLost -> PermissionLostContent()
-            is WidgetState.Success -> ConfiguredContent(state.notes, vaultName, noteFolderPath, cardSettings, gitSyncStatus, isLoading, extraNoteFolders)
-            is WidgetState.Empty -> ConfiguredContentEmpty(vaultName, noteFolderPath, gitSyncStatus, isLoading)
-            is WidgetState.Error -> ConfiguredContentError(state.message, vaultName, noteFolderPath, gitSyncStatus, isLoading)
+            is WidgetState.Success -> ConfiguredContent(state.notes, vaultName, noteFolderPath, cardSettings, bottomBarChip, isLoading, extraNoteFolders)
+            is WidgetState.Empty -> ConfiguredContentEmpty(vaultName, noteFolderPath, bottomBarChip, isLoading)
+            is WidgetState.Error -> ConfiguredContentError(state.message, vaultName, noteFolderPath, bottomBarChip, isLoading)
         }
     }
 }
@@ -186,12 +186,7 @@ private fun LoadingRoot() {
 
 @Composable
 private fun UninitializedContent() {
-    val setupIntent = Intent(
-        androidx.glance.LocalContext.current,
-        SetupActivity::class.java
-    ).apply {
-        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-    }
+    val setupIntent = SetupActivity.intent(LocalContext.current, UsageEvent.FROM_WIDGET)
 
     Column(
         modifier = GlanceModifier
@@ -235,12 +230,7 @@ private fun UninitializedContent() {
 
 @Composable
 private fun PermissionLostContent() {
-    val setupIntent = Intent(
-        androidx.glance.LocalContext.current,
-        SetupActivity::class.java
-    ).apply {
-        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-    }
+    val setupIntent = SetupActivity.intent(LocalContext.current, UsageEvent.FROM_WIDGET)
 
     Column(
         modifier = GlanceModifier
@@ -288,11 +278,11 @@ private fun ConfiguredContent(
     vaultName: String?,
     noteFolderPath: String?,
     cardSettings: Map<String, NoteCardAppearance>,
-    gitSyncStatus: GitSyncStatus?,
+    bottomBarChip: BottomBarChip,
     isLoading: Boolean = false,
     extraNoteFolders: Map<String, String> = emptyMap()
 ) {
-    ConfiguredScaffold(vaultName, noteFolderPath, gitSyncStatus, isLoading) {
+    ConfiguredScaffold(vaultName, noteFolderPath, bottomBarChip, isLoading) {
         NotesList(notes, vaultName, noteFolderPath, cardSettings, extraNoteFolders)
     }
 }
@@ -301,10 +291,10 @@ private fun ConfiguredContent(
 private fun ConfiguredContentEmpty(
     vaultName: String?,
     noteFolderPath: String?,
-    gitSyncStatus: GitSyncStatus?,
+    bottomBarChip: BottomBarChip,
     isLoading: Boolean = false
 ) {
-    ConfiguredScaffold(vaultName, noteFolderPath, gitSyncStatus, isLoading) {
+    ConfiguredScaffold(vaultName, noteFolderPath, bottomBarChip, isLoading) {
         EmptyContent()
     }
 }
@@ -314,10 +304,10 @@ private fun ConfiguredContentError(
     message: String,
     vaultName: String?,
     noteFolderPath: String?,
-    gitSyncStatus: GitSyncStatus?,
+    bottomBarChip: BottomBarChip,
     isLoading: Boolean = false
 ) {
-    ConfiguredScaffold(vaultName, noteFolderPath, gitSyncStatus, isLoading) {
+    ConfiguredScaffold(vaultName, noteFolderPath, bottomBarChip, isLoading) {
         ErrorContent(message)
     }
 }
@@ -364,7 +354,7 @@ private fun NoteCard(
     noteFolderPath: String?,
     appearance: NoteCardAppearance
 ) {
-    val openIntent = noteOpenIntent(LocalContext.current, note, vaultName, noteFolderPath)
+    val openIntent = widgetNoteOpenIntent(LocalContext.current, note, vaultName, noteFolderPath)
 
     Column(
         modifier = GlanceModifier

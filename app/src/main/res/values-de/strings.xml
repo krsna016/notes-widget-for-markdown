@@ -33,7 +33,6 @@
     <string name="fast_note_saved">Schnellnotiz lokal gespeichert</string>
     <string name="fast_note_saved_hint">Lokal gespeichert. Das Synchronisieren übernimmt weiterhin dein eigenes Werkzeug.</string>
     <string name="fast_note_target_missing">Zieldatei fehlt</string>
-    <string name="fast_note_target_hint">Wähle in den Einstellungen eine Markdown-Datei, bevor du Schnellnotizen speicherst.</string>
     <string name="fast_note_pick_target_first">Wähle zuerst in den Einstellungen ein Ziel für Schnellnotizen.</string>
     <string name="fast_note_write_failed">In die gewählte Notiz konnte nicht geschrieben werden.</string>
     <string name="fast_note_failed">Schnellnotiz konnte nicht gespeichert werden.</string>

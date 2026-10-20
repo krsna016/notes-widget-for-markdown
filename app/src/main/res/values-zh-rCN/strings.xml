@@ -33,7 +33,6 @@
     <string name="fast_note_saved">快速笔记已保存到本机</string>
     <string name="fast_note_saved_hint">已保存到本机。同步仍由你自己的工具负责。</string>
     <string name="fast_note_target_missing">缺少目标文件</string>
-    <string name="fast_note_target_hint">保存快速笔记前，请先在设置中选择一个 Markdown 文件。</string>
     <string name="fast_note_pick_target_first">请先在设置中选择快速笔记的目标文件。</string>
     <string name="fast_note_write_failed">无法写入所选笔记。</string>
     <string name="fast_note_failed">无法保存快速笔记。</string>

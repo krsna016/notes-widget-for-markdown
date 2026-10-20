@@ -1,12 +1,14 @@
 package com.marfolog.noteswidgetformarkdown.data.parser
 
+import com.marfolog.noteswidgetformarkdown.domain.model.FastNoteStyle
+
 class MarkdownFastNoteInserter {
 
-    fun insert(content: String, noteText: String): String {
+    fun insert(content: String, noteText: String, style: FastNoteStyle = FastNoteStyle.Bullet): String {
         val trimmedNote = noteText.trim()
         require(trimmedNote.isNotEmpty()) { "Fast note cannot be empty." }
 
-        val bullet = "- $trimmedNote"
+        val bullet = style.linePrefix + trimmedNote
         val normalizedContent = content.replace("\r\n", "\n").replace("\r", "\n")
         if (normalizedContent.isEmpty()) {
             return "$bullet\n"

@@ -69,8 +69,16 @@ internal fun noteOpenIntent(
     OpenWith.AskEveryTime -> Intent.createChooser(
         fileIntent(note),
         context.getString(R.string.open_note_with)
-    )
+    ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 }
+
+/** A tap on the widget goes through [TrampolineActivity], which then opens [noteOpenIntent]. */
+internal fun widgetNoteOpenIntent(
+    context: Context,
+    note: NoteSummary,
+    vaultName: String?,
+    noteFolderPath: String?
+): Intent = TrampolineActivity.intent(context, note, vaultName, noteFolderPath)
 
 private fun fileIntent(note: NoteSummary): Intent =
     Intent(Intent.ACTION_VIEW).apply {

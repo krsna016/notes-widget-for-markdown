@@ -5,6 +5,8 @@ import androidx.glance.GlanceId
 import androidx.glance.action.ActionParameters
 import androidx.glance.appwidget.action.ActionCallback
 import com.marfolog.noteswidgetformarkdown.util.AppLog
+import com.marfolog.noteswidgetformarkdown.util.Telemetry
+import com.marfolog.noteswidgetformarkdown.util.UsageEvent
 
 class RefreshWidgetAction : ActionCallback {
     override suspend fun onAction(
@@ -14,6 +16,7 @@ class RefreshWidgetAction : ActionCallback {
     ) {
         val startedAt = System.currentTimeMillis()
         AppLog.d("Refresh", "Manual tap at $startedAt")
+        Telemetry.event(UsageEvent.REFRESH_TAPPED)
         // A single update(glanceId) call has no defence against the Glance session race — the
         // button was the one caller that skipped the retry every other trigger already gets.
         // Route it through the same path so a tap gets the same second attempt.

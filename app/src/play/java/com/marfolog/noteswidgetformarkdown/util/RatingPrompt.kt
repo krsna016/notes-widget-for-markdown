@@ -5,6 +5,8 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import androidx.annotation.StringRes
+import com.marfolog.noteswidgetformarkdown.R
 import com.google.android.play.core.ktx.launchReview
 import com.google.android.play.core.ktx.requestReview
 import com.google.android.play.core.review.ReviewManagerFactory
@@ -13,34 +15,27 @@ import kotlinx.coroutines.withTimeoutOrNull
 /**
  * Play flavour: asks Google Play to show its in-app rating dialog, now and then.
  *
- * The app adds no prompt of its own — it only tells Play that this would be a fair moment, and
- * Play decides whether the dialog actually appears. The app never learns whether it did, or what
- * was rated. The only own UI is a plain link to the store page in settings. The foss flavour
- * ships a no-op twin of this file.
+ * [maybeAsk] only tells Play that this would be a fair moment, and Play decides whether the dialog
+ * actually appears. The app never learns whether it did, or what was rated. The app's own rate
+ * chip and settings link only ever open the store page — Google does not allow the in-app review
+ * to be started from a button. The foss flavour ships a twin of this file that points at GitHub.
  */
 object RatingPrompt {
 
     const val HAS_STORE_PAGE = true
 
+    @StringRes
+    val RATE_BODY_RES = R.string.rate_dialog_body_play
+
+    @StringRes
+    val RATE_BUTTON_RES = R.string.rate_dialog_rate_play
+
     private const val AREA = "Rating"
     private const val PREFS = "app_prefs"
-    private const val KEY_FIRST_SEEN_AT = "rating_first_seen_at"
     private const val KEY_LAST_REQUEST_AT = "rating_last_request_at"
 
     /** Play normally answers in well under a second; a save must not hang on a slow one. */
     private const val REQUEST_TIMEOUT_MILLIS = 3_000L
-
-    /**
-     * Called on every process start, which widget updates cause too — so it also counts people
-     * who never open the app itself. Only the first call writes: for someone updating from a
-     * version without this, the five days start now, not at their install date.
-     */
-    fun recordFirstSeen(context: Context) {
-        val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-        if (!prefs.contains(KEY_FIRST_SEEN_AT)) {
-            prefs.edit().putLong(KEY_FIRST_SEEN_AT, System.currentTimeMillis()).apply()
-        }
-    }
 
     /**
      * Returns once Play is done with its flow, so a caller that finishes right after does not cut
@@ -52,7 +47,7 @@ object RatingPrompt {
         val now = System.currentTimeMillis()
         val eligible = RatingEligibility.isEligible(
             nowMillis = now,
-            firstSeenAtMillis = prefs.getLong(KEY_FIRST_SEEN_AT, -1L).takeIf { it >= 0 },
+            firstSeenAtMillis = RateReminder.firstSeenAt(activity),
             lastRequestAtMillis = prefs.getLong(KEY_LAST_REQUEST_AT, -1L).takeIf { it >= 0 }
         )
         if (!eligible) return
@@ -69,6 +64,8 @@ object RatingPrompt {
             manager.launchReview(activity, reviewInfo)
         }.onFailure { AppLog.d(AREA, "Rating prompt not available: ${it.javaClass.simpleName}") }
     }
+
+    fun openRatePage(context: Context) = openStorePage(context)
 
     /** The Play Store app if there is one, the web page otherwise. */
     fun openStorePage(context: Context) {

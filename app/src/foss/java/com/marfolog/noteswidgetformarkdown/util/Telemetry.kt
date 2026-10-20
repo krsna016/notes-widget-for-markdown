@@ -26,6 +26,8 @@ object Telemetry {
 
     fun event(name: String, vararg params: Pair<String, String>) = Unit
 
+    fun setUserProperty(name: String, value: String) = Unit
+
     fun breadcrumb(message: String) = Unit
 
     fun recordError(error: Throwable) = Unit

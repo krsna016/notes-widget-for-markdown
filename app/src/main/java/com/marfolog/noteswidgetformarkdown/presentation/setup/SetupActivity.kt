@@ -108,6 +108,7 @@ import com.marfolog.noteswidgetformarkdown.data.repository.ObsidianVaultLocator
 import java.text.DateFormat
 import java.util.Date
 import com.marfolog.noteswidgetformarkdown.domain.model.GitSyncStatus
+import com.marfolog.noteswidgetformarkdown.domain.model.FastNoteStyle
 import com.marfolog.noteswidgetformarkdown.domain.model.NoteCardAppearance
 import com.marfolog.noteswidgetformarkdown.domain.model.NoteCardColor
 import com.marfolog.noteswidgetformarkdown.domain.model.NoteCardSize
@@ -120,8 +121,12 @@ import com.marfolog.noteswidgetformarkdown.presentation.widget.GitSyncLabel
 import com.marfolog.noteswidgetformarkdown.presentation.widget.NotesWidget
 import com.marfolog.noteswidgetformarkdown.presentation.widget.OpenWith
 import com.marfolog.noteswidgetformarkdown.util.AppLog
+import com.marfolog.noteswidgetformarkdown.util.ProjectLinks
+import com.marfolog.noteswidgetformarkdown.util.RateReminder
 import com.marfolog.noteswidgetformarkdown.util.RatingPrompt
 import com.marfolog.noteswidgetformarkdown.util.Telemetry
+import com.marfolog.noteswidgetformarkdown.util.UsageEvent
+import com.marfolog.noteswidgetformarkdown.util.UsageProperties
 import com.marfolog.noteswidgetformarkdown.worker.NotesFolderObserverJob
 import com.marfolog.noteswidgetformarkdown.ui.theme.NoteCardPalette
 import com.marfolog.noteswidgetformarkdown.ui.theme.NotesWidgetForMarkdownTheme
@@ -140,6 +145,12 @@ class SetupActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         ThemePreference.load(this)
+        if (savedInstanceState == null) {
+            Telemetry.event(
+                UsageEvent.SETTINGS_OPENED,
+                UsageEvent.PARAM_FROM to UsageEvent.openedFrom(intent.getStringExtra(EXTRA_OPENED_FROM))
+            )
+        }
         setContent {
             NotesWidgetForMarkdownTheme(
                 darkTheme = when (ThemePreference.mode) {
@@ -173,6 +184,11 @@ class SetupActivity : ComponentActivity() {
         }
     }
 
+    override fun onPause() {
+        super.onPause()
+        UsageProperties.publish(this)
+    }
+
     companion object {
         internal const val AREA = "Setup"
         const val PREFS_NAME = "app_prefs"
@@ -186,6 +202,15 @@ class SetupActivity : ComponentActivity() {
         const val KEY_NOTE_FOLDER_PATH = "note_folder_path"
         const val KEY_FAST_NOTE_TARGET_URI = "fast_note_target_uri"
         const val KEY_GIT_ROOT_URI = "git_root_uri"
+        const val KEY_FAST_NOTE_STYLE = "fast_note_style"
+
+        /** One of the `UsageEvent.FROM_*` values; none means the launcher. */
+        const val EXTRA_OPENED_FROM = "opened_from"
+
+        fun intent(context: Context, openedFrom: String): Intent =
+            Intent(context, SetupActivity::class.java)
+                .putExtra(EXTRA_OPENED_FROM, openedFrom)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
 
         /** Users who sync by other means (Syncthing, Obsidian Sync…) can hide the chip. */
         const val KEY_SHOW_GIT_STATUS = "show_git_status"
@@ -283,6 +308,10 @@ private fun SetupScreen(modifier: Modifier = Modifier) {
         )
     }
     var gitReloadTrigger by remember { mutableIntStateOf(0) }
+    var rateChipEnabled by rememberSaveable { mutableStateOf(RateReminder.isEnabled(context)) }
+    var fastNoteStyle by rememberSaveable {
+        mutableStateOf(FastNoteStyle.from(prefs.getString(SetupActivity.KEY_FAST_NOTE_STYLE, null)))
+    }
 
     LaunchedEffect(vaultUri, notesUri, gitReloadTrigger) {
         gitStatus = GitSyncStatusReader(context.applicationContext).read(vaultUri)
@@ -302,6 +331,7 @@ private fun SetupScreen(modifier: Modifier = Modifier) {
             )
             AppLog.i(SetupActivity.AREA, "Git folder granted: $uri")
             prefs.edit().putString(SetupActivity.KEY_GIT_ROOT_URI, uri.toString()).apply()
+            Telemetry.event(UsageEvent.GIT_ROOT_SET)
             gitReloadTrigger++
             scope.launch { NotesWidget.updateAll(context) }
         }
@@ -352,6 +382,7 @@ private fun SetupScreen(modifier: Modifier = Modifier) {
 
             vaultUri = uriStr
             vaultName = name
+            Telemetry.event(UsageEvent.VAULT_ROOT_SET)
 
             // Recompute relative path if notes folder is already selected
             val currentNotesUri = notesUri
@@ -388,7 +419,11 @@ private fun SetupScreen(modifier: Modifier = Modifier) {
                 .putString(SetupActivity.KEY_NOTES_URI, uriStr)
                 .apply()
 
+            if (notesUri == null && !prefs.getBoolean(SetupActivity.KEY_GUIDE_DONE, false)) {
+                Telemetry.event(UsageEvent.SETUP_STEP_DONE, UsageEvent.PARAM_STEP to UsageEvent.STEP_FOLDER)
+            }
             notesUri = uriStr
+            Telemetry.event(UsageEvent.FOLDER_SELECTED)
             AppLog.i(SetupActivity.AREA, "Notes folder granted: $uriStr")
             // Re-arm the folder watcher: it is bound to one specific tree URI.
             NotesFolderObserverJob.schedule(context)
@@ -426,6 +461,7 @@ private fun SetupScreen(modifier: Modifier = Modifier) {
         extraNotesStore.add(uri.toString())
             .onSuccess { added ->
                 if (added) {
+                    Telemetry.event(UsageEvent.EXTRA_FILE_ADDED)
                     extraNoteUris = extraNotesStore.getAll()
                     scope.launch { NotesWidget.updateAll(context) }
                 } else {
@@ -464,6 +500,10 @@ private fun SetupScreen(modifier: Modifier = Modifier) {
         prefs.edit().putBoolean(SetupActivity.KEY_GUIDE_DONE, true).apply()
         guideDone = true
     }
+    val skipGuide: () -> Unit = {
+        Telemetry.event(UsageEvent.SETUP_SKIPPED)
+        dismissGuide()
+    }
     val guideStep: GuideStep? = when {
         guideDone -> null
         notesUri == null -> GuideStep.PickFolder
@@ -471,6 +511,9 @@ private fun SetupScreen(modifier: Modifier = Modifier) {
     }
 
     val onSave: () -> Unit = {
+        if (guideStep == GuideStep.Save) {
+            Telemetry.event(UsageEvent.SETUP_STEP_DONE, UsageEvent.PARAM_STEP to UsageEvent.STEP_WIDGET)
+        }
         dismissGuide()
         Toast.makeText(context, R.string.widget_updated_toast, Toast.LENGTH_SHORT).show()
 
@@ -478,19 +521,6 @@ private fun SetupScreen(modifier: Modifier = Modifier) {
             NotesWidget.updateAll(context)
             (context as? Activity)?.finish()
         }
-    }
-
-    // Only a returning user with a working setup, and never over a dialog of our own. The delay
-    // lets the screen settle first, and opening a dialog in the meantime cancels it.
-    val canAskForRating = guideStep == null &&
-        notesUri != null &&
-        !(askAboutReporting && Telemetry.ENABLED) &&
-        noteToDelete == null &&
-        extraNoteToRemove == null
-    LaunchedEffect(canAskForRating) {
-        if (!canAskForRating) return@LaunchedEffect
-        delay(RATING_PROMPT_DELAY_MILLIS)
-        (context as? Activity)?.let { RatingPrompt.maybeAsk(it) }
     }
 
     if (askAboutReporting && Telemetry.ENABLED) {
@@ -504,7 +534,7 @@ private fun SetupScreen(modifier: Modifier = Modifier) {
 
     SetupScreenContent(
         guideStep = guideStep,
-        onSkipGuide = dismissGuide,
+        onSkipGuide = skipGuide,
         vaultName = vaultDisplayName,
         onSelectVault = { vaultPicker.launch(null) },
         notesFolderName = notesDisplayName,
@@ -523,16 +553,25 @@ private fun SetupScreen(modifier: Modifier = Modifier) {
             prefs.edit()
                 .putString(SetupActivity.KEY_FAST_NOTE_TARGET_URI, note.fileUri)
                 .commit()
+            Telemetry.event(UsageEvent.FAST_TARGET_SET)
+        },
+        fastNoteStyle = fastNoteStyle,
+        onFastNoteStyleChanged = { style ->
+            fastNoteStyle = style
+            prefs.edit().putString(SetupActivity.KEY_FAST_NOTE_STYLE, style.storageValue).apply()
+            logSettingChanged(UsageEvent.SETTING_FAST_NOTE_STYLE, style.storageValue)
         },
         onCardSizeSelected = { note, size ->
             val updated = (cardSettings[note.fileUri] ?: NoteCardAppearance()).copy(size = size)
             cardSettingsStore.save(note.fileUri, updated)
+            Telemetry.event(UsageEvent.CARD_HEIGHT_CHANGED)
             cardSettings = cardSettingsStore.getAll()
             scope.launch { NotesWidget.updateAll(context) }
         },
         onCardColorSelected = { note, color ->
             val updated = (cardSettings[note.fileUri] ?: NoteCardAppearance()).copy(color = color)
             cardSettingsStore.save(note.fileUri, updated)
+            Telemetry.event(UsageEvent.CARD_COLOR_CHANGED)
             cardSettings = cardSettingsStore.getAll()
             scope.launch { NotesWidget.updateAll(context) }
         },
@@ -557,6 +596,7 @@ private fun SetupScreen(modifier: Modifier = Modifier) {
                     notes.add(to, notes.removeAt(from))
                 }
                 cardSettingsStore.saveOrder(notesForSettings.map { it.fileUri })
+                Telemetry.event(UsageEvent.CARD_REORDERED)
                 scope.launch { NotesWidget.updateAll(context) }
             }
         },
@@ -577,18 +617,21 @@ private fun SetupScreen(modifier: Modifier = Modifier) {
         onOpenWithChanged = { mode ->
             openWith = mode
             prefs.edit().putString(SetupActivity.KEY_OPEN_WITH, mode.storageValue).apply()
+            logSettingChanged(UsageEvent.SETTING_OPEN_WITH, mode.storageValue)
             scope.launch { NotesWidget.updateAll(context) }
         },
         syncMode = syncMode,
         onSyncModeChanged = { mode ->
             syncMode = mode
             prefs.edit().putString(SetupActivity.KEY_SYNC_MODE, mode).apply()
+            logSettingChanged(UsageEvent.SETTING_SYNC_MODE, mode)
             scope.launch { NotesWidget.updateAll(context) }
         },
         staleHours = staleHours,
         onStaleHoursChanged = { hours ->
             staleHours = hours
             prefs.edit().putInt(SetupActivity.KEY_STALE_HOURS, hours).apply()
+            logSettingChanged(UsageEvent.SETTING_STALE_HOURS, hours.toString())
             scope.launch { NotesWidget.updateAll(context) }
         },
         gitStatusText = gitStatusText(context, gitStatus),
@@ -600,13 +643,24 @@ private fun SetupScreen(modifier: Modifier = Modifier) {
         telemetryEnabled = telemetryEnabled,
         onTelemetryChanged = { enabled ->
             telemetryEnabled = enabled
+            // Logged while reporting is still on: switching it off is the one change that would
+            // otherwise never arrive.
+            if (!enabled) logSettingChanged(UsageEvent.SETTING_TELEMETRY, UsageEvent.onOff(false))
             Telemetry.setEnabled(context, enabled)
+            if (enabled) logSettingChanged(UsageEvent.SETTING_TELEMETRY, UsageEvent.onOff(true))
             AppLog.i(SetupActivity.AREA, "Reporting switched ${if (enabled) "on" else "off"}")
         },
         showGitStatus = showGitStatus,
         onShowGitStatusChanged = { enabled ->
             showGitStatus = enabled
             prefs.edit().putBoolean(SetupActivity.KEY_SHOW_GIT_STATUS, enabled).apply()
+            scope.launch { NotesWidget.updateAll(context) }
+        },
+        rateChipEnabled = rateChipEnabled,
+        onRateChipChanged = { enabled ->
+            rateChipEnabled = enabled
+            RateReminder.setEnabled(context, enabled)
+            logSettingChanged(UsageEvent.SETTING_RATE_CHIP, UsageEvent.onOff(enabled))
             scope.launch { NotesWidget.updateAll(context) }
         },
         canSave = notesUri != null,
@@ -680,6 +734,7 @@ private fun SetupScreen(modifier: Modifier = Modifier) {
             onConfirm = {
                 extraNoteToRemove = null
                 extraNotesStore.remove(entry.fileUri)
+                Telemetry.event(UsageEvent.EXTRA_FILE_REMOVED)
                 cardSettingsStore.forget(entry.fileUri)
                 extraNoteUris = extraNotesStore.getAll()
                 notesForSettings = notesForSettings.filterNot { it.isExtra && it.fileUri == entry.fileUri }
@@ -693,7 +748,9 @@ private fun SetupScreen(modifier: Modifier = Modifier) {
     }
 }
 
-private const val RATING_PROMPT_DELAY_MILLIS = 1_500L
+private fun logSettingChanged(setting: String, value: String) {
+    Telemetry.event(UsageEvent.SETTING_CHANGED, UsageEvent.PARAM_SETTING to setting, UsageEvent.PARAM_VALUE to value)
+}
 
 /** What the single-file picker offers. See the picker for why the list is this wide. */
 private val EXTRA_NOTE_MIME_TYPES = arrayOf(
@@ -794,6 +851,8 @@ internal fun SetupScreenContent(
     notesLoadError: String? = null,
     fastNoteTargetUri: String? = null,
     onFastNoteTargetSelected: (NoteSummary) -> Unit = {},
+    fastNoteStyle: FastNoteStyle = FastNoteStyle.Bullet,
+    onFastNoteStyleChanged: (FastNoteStyle) -> Unit = {},
     onCardSizeSelected: (NoteSummary, NoteCardSize) -> Unit = { _, _ -> },
     onCardColorSelected: (NoteSummary, NoteCardColor) -> Unit = { _, _ -> },
     onCardTextSizeSelected: (NoteSummary, NoteCardTextSize) -> Unit = { _, _ -> },
@@ -820,6 +879,8 @@ internal fun SetupScreenContent(
     telemetryAvailable: Boolean = false,
     telemetryEnabled: Boolean = false,
     onTelemetryChanged: (Boolean) -> Unit = {},
+    rateChipEnabled: Boolean = true,
+    onRateChipChanged: (Boolean) -> Unit = {},
     canSave: Boolean,
     onSave: () -> Unit,
     guideStep: GuideStep? = null,
@@ -963,6 +1024,8 @@ internal fun SetupScreenContent(
             onTargetSelected = onFastNoteTargetSelected,
             folderSelected = notesFolderName != null
         )
+        Spacer(modifier = Modifier.height(12.dp))
+        FastNoteStyleChooser(selected = fastNoteStyle, onSelected = onFastNoteStyleChanged)
 
         Spacer(modifier = Modifier.height(32.dp))
 
@@ -1206,7 +1269,10 @@ internal fun SetupScreenContent(
             ThemePreference.Mode.entries.forEach { mode ->
                 FilterChip(
                     selected = ThemePreference.mode == mode,
-                    onClick = { ThemePreference.set(appearanceContext, mode) },
+                    onClick = {
+                        ThemePreference.set(appearanceContext, mode)
+                        logSettingChanged(UsageEvent.SETTING_THEME, mode.name.lowercase(Locale.ROOT))
+                    },
                     label = { Text(stringResource(themeModeLabel(mode))) }
                 )
             }
@@ -1216,6 +1282,10 @@ internal fun SetupScreenContent(
 
         Spacer(modifier = Modifier.height(24.dp))
         HorizontalDivider()
+        Spacer(modifier = Modifier.height(24.dp))
+
+        RateChipSetting(enabled = rateChipEnabled, onChanged = onRateChipChanged)
+
         Spacer(modifier = Modifier.height(24.dp))
 
         AboutSection()
@@ -1289,6 +1359,47 @@ private fun FastNoteTargetSection(
             }
         }
     }
+}
+
+@Composable
+private fun FastNoteStyleChooser(selected: FastNoteStyle, onSelected: (FastNoteStyle) -> Unit) {
+    Text(
+        text = stringResource(R.string.fast_note_style_title),
+        style = MaterialTheme.typography.labelMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant
+    )
+    Spacer(modifier = Modifier.height(4.dp))
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        FAST_NOTE_STYLE_CHOICES.forEach { (style, labelRes) ->
+            FilterChip(
+                selected = selected == style,
+                onClick = { onSelected(style) },
+                label = { Text(stringResource(labelRes)) }
+            )
+        }
+    }
+}
+
+@Composable
+private fun RateChipSetting(enabled: Boolean, onChanged: (Boolean) -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = stringResource(R.string.rate_chip_setting),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.weight(1f)
+        )
+        Switch(checked = enabled, onCheckedChange = onChanged)
+    }
+    Spacer(modifier = Modifier.height(4.dp))
+    Text(
+        text = stringResource(R.string.rate_chip_setting_desc),
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant
+    )
 }
 
 @Composable
@@ -1676,11 +1787,6 @@ private fun BoxScope.DriftingLogo(containerWidth: Dp, containerHeight: Dp) {
     )
 }
 
-private const val REPO_URL = "https://github.com/marfolog/notes-widget-for-markdown"
-private const val ISSUES_URL = "$REPO_URL/issues/new/choose"
-private const val DISCUSSIONS_URL = "$REPO_URL/discussions"
-private const val PRIVACY_URL = "https://folmbuild.cz/notes-widget-privacy/"
-
 /**
  * Odkazy ven. Otevirat je muze prohlizec, takze to funguje i ve foss variante, ktera sama
  * opravneni k internetu nema.
@@ -1688,12 +1794,9 @@ private const val PRIVACY_URL = "https://folmbuild.cz/notes-widget-privacy/"
 @Composable
 private fun AboutSection() {
     val context = LocalContext.current
-    fun open(url: String) {
-        runCatching {
-            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-        }.onFailure {
-            Toast.makeText(context, R.string.about_no_browser, Toast.LENGTH_SHORT).show()
-        }
+    fun open(url: String, button: String) {
+        Telemetry.event(UsageEvent.ABOUT_CLICKED, UsageEvent.PARAM_BUTTON to button)
+        ProjectLinks.open(context, url)
     }
 
     Text(
@@ -1709,25 +1812,40 @@ private fun AboutSection() {
     )
     Spacer(modifier = Modifier.height(12.dp))
 
-    OutlinedButton(onClick = { open(ISSUES_URL) }, modifier = Modifier.fillMaxWidth()) {
+    OutlinedButton(
+        onClick = { open(ProjectLinks.ISSUES_URL, UsageEvent.BUTTON_REPORT_BUG) },
+        modifier = Modifier.fillMaxWidth()
+    ) {
         Text(stringResource(R.string.about_report))
     }
     // Only the Play build has a store page; the foss build shows nothing here.
     if (RatingPrompt.HAS_STORE_PAGE) {
-        TextButton(onClick = { RatingPrompt.openStorePage(context) }, modifier = Modifier.fillMaxWidth()) {
+        TextButton(
+            onClick = {
+                Telemetry.event(UsageEvent.ABOUT_CLICKED, UsageEvent.PARAM_BUTTON to UsageEvent.BUTTON_RATE)
+                RatingPrompt.openStorePage(context)
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
             Text(stringResource(R.string.about_rate))
         }
     }
     Spacer(modifier = Modifier.height(8.dp))
-    OutlinedButton(onClick = { open(DISCUSSIONS_URL) }, modifier = Modifier.fillMaxWidth()) {
+    OutlinedButton(
+        onClick = { open(ProjectLinks.DISCUSSIONS_URL, UsageEvent.BUTTON_SAY_HI) },
+        modifier = Modifier.fillMaxWidth()
+    ) {
         Text(stringResource(R.string.about_say_hi))
     }
     Spacer(modifier = Modifier.height(8.dp))
-    OutlinedButton(onClick = { open(REPO_URL) }, modifier = Modifier.fillMaxWidth()) {
+    OutlinedButton(
+        onClick = { open(ProjectLinks.REPO_URL, UsageEvent.BUTTON_SOURCE) },
+        modifier = Modifier.fillMaxWidth()
+    ) {
         Text(stringResource(R.string.about_source))
     }
     Spacer(modifier = Modifier.height(8.dp))
-    TextButton(onClick = { open(PRIVACY_URL) }, modifier = Modifier.fillMaxWidth()) {
+    TextButton(onClick = { ProjectLinks.open(context, ProjectLinks.PRIVACY_URL) }, modifier = Modifier.fillMaxWidth()) {
         Text(stringResource(R.string.about_privacy))
     }
 }
@@ -1757,4 +1875,9 @@ private val OPEN_WITH_CHOICES = listOf(
     OpenWith.Obsidian to R.string.open_with_obsidian,
     OpenWith.DefaultApp to R.string.open_with_default,
     OpenWith.AskEveryTime to R.string.open_with_ask
+)
+
+private val FAST_NOTE_STYLE_CHOICES = listOf(
+    FastNoteStyle.Bullet to R.string.fast_note_style_bullet,
+    FastNoteStyle.Checkbox to R.string.fast_note_style_checkbox
 )

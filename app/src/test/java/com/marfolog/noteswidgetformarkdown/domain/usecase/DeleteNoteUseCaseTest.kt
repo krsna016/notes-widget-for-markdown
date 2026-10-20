@@ -1,5 +1,6 @@
 package com.marfolog.noteswidgetformarkdown.domain.usecase
 
+import com.marfolog.noteswidgetformarkdown.domain.model.FastNoteStyle
 import com.marfolog.noteswidgetformarkdown.domain.model.NoteSummary
 import com.marfolog.noteswidgetformarkdown.domain.repository.FileRepository
 import kotlinx.coroutines.flow.Flow
@@ -21,7 +22,7 @@ class DeleteNoteUseCaseTest {
         override suspend fun getExtraNote(fileUri: String): Result<NoteSummary> = Result.failure(UnsupportedOperationException())
         override suspend fun createNote(folderUri: String, title: String, content: String): Result<String> =
             Result.failure(UnsupportedOperationException())
-        override suspend fun appendFastNote(fileUri: String, noteText: String): Result<Boolean> =
+        override suspend fun appendFastNote(fileUri: String, noteText: String, style: FastNoteStyle): Result<Boolean> =
             Result.failure(UnsupportedOperationException())
         override suspend fun deleteNote(fileUri: String): Result<Boolean> {
             deleted += fileUri

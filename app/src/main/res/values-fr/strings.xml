@@ -33,7 +33,6 @@
     <string name="fast_note_saved">Note rapide enregistrée sur l\'appareil</string>
     <string name="fast_note_saved_hint">Enregistrée sur l\'appareil. La synchronisation reste gérée par votre propre outil.</string>
     <string name="fast_note_target_missing">Fichier de destination manquant</string>
-    <string name="fast_note_target_hint">Choisissez un fichier Markdown dans les réglages avant d\'enregistrer des notes rapides.</string>
     <string name="fast_note_pick_target_first">Choisissez d\'abord une destination pour les notes rapides dans les réglages.</string>
     <string name="fast_note_write_failed">Impossible d\'écrire dans la note choisie.</string>
     <string name="fast_note_failed">Impossible d\'enregistrer la note rapide.</string>

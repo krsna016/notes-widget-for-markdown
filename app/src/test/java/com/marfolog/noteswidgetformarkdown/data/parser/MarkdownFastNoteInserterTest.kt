@@ -1,5 +1,6 @@
 package com.marfolog.noteswidgetformarkdown.data.parser
 
+import com.marfolog.noteswidgetformarkdown.domain.model.FastNoteStyle
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -172,5 +173,83 @@ class MarkdownFastNoteInserterTest {
             """.trimIndent(),
             updated
         )
+    }
+
+    @Test
+    fun `bullet style is the plain list item it always was`() {
+        assertEquals(
+            "# Inbox\n- Buy milk",
+            inserter.insert("# Inbox", "Buy milk", FastNoteStyle.Bullet)
+        )
+    }
+
+    @Test
+    fun `checkbox style adds an open task below the first heading`() {
+        val updated = inserter.insert(
+            """
+            # Groceries
+            - [x] Bread
+            """.trimIndent(),
+            "Buy milk",
+            FastNoteStyle.Checkbox
+        )
+
+        assertEquals(
+            """
+            # Groceries
+            - [ ] Buy milk
+            - [x] Bread
+            """.trimIndent(),
+            updated
+        )
+    }
+
+    @Test
+    fun `checkbox style lands after frontmatter and heading like a bullet does`() {
+        val updated = inserter.insert(
+            """
+            ---
+            tags:
+              - todo
+            ---
+            # Projects
+            Existing text
+            """.trimIndent(),
+            "Call the plumber",
+            FastNoteStyle.Checkbox
+        )
+
+        assertEquals(
+            """
+            ---
+            tags:
+              - todo
+            ---
+            # Projects
+            - [ ] Call the plumber
+            Existing text
+            """.trimIndent(),
+            updated
+        )
+    }
+
+    @Test
+    fun `checkbox style goes to the top when there is no heading`() {
+        assertEquals(
+            "- [ ] New idea\nExisting text",
+            inserter.insert("Existing text", "New idea", FastNoteStyle.Checkbox)
+        )
+    }
+
+    @Test
+    fun `checkbox style in an empty file becomes a single open task`() {
+        assertEquals("- [ ] First thought\n", inserter.insert("", "  First thought ", FastNoteStyle.Checkbox))
+    }
+
+    @Test
+    fun `checkbox style still refuses blank text`() {
+        val result = runCatching { inserter.insert("# Inbox", " ", FastNoteStyle.Checkbox) }
+
+        assertTrue(result.exceptionOrNull() is IllegalArgumentException)
     }
 }

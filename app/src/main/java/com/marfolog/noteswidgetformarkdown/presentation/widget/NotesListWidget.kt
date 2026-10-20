@@ -82,7 +82,7 @@ class NotesListWidget : GlanceAppWidget() {
                             .background(GlanceTheme.colors.widgetBackground)
                             .padding(12.dp)
                     ) {
-                        ConfiguredScaffold(current.vaultName, current.noteFolderPath, current.gitSyncStatus, isLoading) {
+                        ConfiguredScaffold(current.vaultName, current.noteFolderPath, current.bottomBarChip, isLoading) {
                             when (val state = current.state) {
                                 is WidgetState.Success -> NoteNameList(
                                     notes = state.notes,
@@ -149,7 +149,7 @@ private fun NoteNameRow(
     noteFolderPath: String?,
     appearance: NoteCardAppearance
 ) {
-    val openIntent = noteOpenIntent(LocalContext.current, note, vaultName, noteFolderPath)
+    val openIntent = widgetNoteOpenIntent(LocalContext.current, note, vaultName, noteFolderPath)
 
     Row(
         modifier = GlanceModifier

@@ -1,10 +1,11 @@
 package com.marfolog.noteswidgetformarkdown.domain.usecase
 
+import com.marfolog.noteswidgetformarkdown.domain.model.FastNoteStyle
 import com.marfolog.noteswidgetformarkdown.domain.repository.FileRepository
 
 class AppendFastNoteUseCase(private val fileRepository: FileRepository) {
 
-    suspend operator fun invoke(fileUri: String, noteText: String): Result<Boolean> {
-        return fileRepository.appendFastNote(fileUri, noteText)
+    suspend operator fun invoke(fileUri: String, noteText: String, style: FastNoteStyle): Result<Boolean> {
+        return fileRepository.appendFastNote(fileUri, noteText, style)
     }
 }

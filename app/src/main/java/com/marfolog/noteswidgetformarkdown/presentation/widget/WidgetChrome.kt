@@ -2,7 +2,6 @@ package com.marfolog.noteswidgetformarkdown.presentation.widget
 
 import android.content.Intent
 import android.net.Uri
-import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -13,6 +12,7 @@ import androidx.glance.LocalContext
 import androidx.glance.GlanceTheme
 import androidx.glance.Image
 import androidx.glance.ImageProvider
+import androidx.glance.action.Action
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.CircularProgressIndicator
 import androidx.glance.appwidget.action.actionRunCallback
@@ -34,11 +34,11 @@ import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
 import com.marfolog.noteswidgetformarkdown.R
-import com.marfolog.noteswidgetformarkdown.domain.model.GitSyncStatus
 import com.marfolog.noteswidgetformarkdown.domain.model.NoteCardAppearance
 import com.marfolog.noteswidgetformarkdown.domain.model.NoteCardColor
 import com.marfolog.noteswidgetformarkdown.presentation.setup.SetupActivity
 import com.marfolog.noteswidgetformarkdown.ui.theme.NoteCardPalette
+import com.marfolog.noteswidgetformarkdown.util.UsageEvent
 
 /**
  * Chrome shared by every widget flavour: the settings/refresh buttons, the bottom action bar
@@ -49,12 +49,7 @@ import com.marfolog.noteswidgetformarkdown.ui.theme.NoteCardPalette
 
 @Composable
 internal fun WidgetActionButtons(isLoading: Boolean = false) {
-    val setupIntent = Intent(
-        androidx.glance.LocalContext.current,
-        SetupActivity::class.java
-    ).apply {
-        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-    }
+    val setupIntent = SetupActivity.intent(LocalContext.current, UsageEvent.FROM_WIDGET)
 
     Box(
         modifier = GlanceModifier.fillMaxSize().padding(4.dp),
@@ -124,7 +119,7 @@ internal val BAR_TINT = ColorProvider(Color(0x552196F3))
 internal fun BottomBar(
     vaultName: String?,
     noteFolderPath: String?,
-    gitSyncStatus: GitSyncStatus?
+    chip: BottomBarChip
 ) {
     Row(
         modifier = GlanceModifier
@@ -142,54 +137,68 @@ internal fun BottomBar(
             QuickActions(vaultName, noteFolderPath)
         }
         Box(modifier = GlanceModifier.defaultWeight()) {}
-        // Hidden entirely when the user syncs by other means.
-        gitSyncStatus?.let { SyncStatus(it) }
+        when (chip) {
+            BottomBarChip.None -> Unit
+            is BottomBarChip.Sync -> SyncStatus(chip.label)
+            is BottomBarChip.Rate -> RateChip(okDot = chip.okDot)
+        }
     }
 }
 
+/** Explicit traffic-light colours: the theme's primary is not readable as "healthy". */
 @Composable
-internal fun SyncStatus(gitSyncStatus: GitSyncStatus) {
-    val context = LocalContext.current
-    val staleHours = context
-        .getSharedPreferences(SetupActivity.PREFS_NAME, Context.MODE_PRIVATE)
-        .getInt(SetupActivity.KEY_STALE_HOURS, GitSyncLabel.DEFAULT_STALE_HOURS)
-    val label = GitSyncLabel.format(gitSyncStatus, System.currentTimeMillis(), staleHours)
-    // Explicit traffic-light colors: the theme's primary is not readable as "healthy".
-    val color = when (label.severity) {
-        GitSyncLabel.Severity.Ok -> ColorProvider(Color(0xFF4CAF50))
-        GitSyncLabel.Severity.Stale -> ColorProvider(Color(0xFFFFB300))
-        GitSyncLabel.Severity.Problem -> ColorProvider(Color(0xFFE53935))
-        GitSyncLabel.Severity.Off -> GlanceTheme.colors.onSurfaceVariant
-    }
+private fun severityColor(severity: GitSyncLabel.Severity): ColorProvider = when (severity) {
+    GitSyncLabel.Severity.Ok -> ColorProvider(Color(0xFF4CAF50))
+    GitSyncLabel.Severity.Stale -> ColorProvider(Color(0xFFFFB300))
+    GitSyncLabel.Severity.Problem -> ColorProvider(Color(0xFFE53935))
+    GitSyncLabel.Severity.Off -> GlanceTheme.colors.onSurfaceVariant
+}
 
+@Composable
+internal fun SyncStatus(label: GitSyncLabel.Label) {
+    val context = LocalContext.current
     // Tapping the chip opens settings, where the full story lives: what is wrong, when it
     // last synced, and the picker for the folder that holds .git.
-    val setupIntent = Intent(
-        androidx.glance.LocalContext.current,
-        SetupActivity::class.java
-    ).apply {
-        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-    }
+    BarChip(
+        onClick = actionStartActivity(SetupActivity.intent(context, UsageEvent.FROM_SYNC_CHIP)),
+        dotColor = severityColor(label.severity),
+        text = label.arg
+            ?.let { context.getString(label.textRes, it) }
+            ?: context.getString(label.textRes)
+    )
+}
 
+@Composable
+private fun RateChip(okDot: Boolean) {
+    val context = LocalContext.current
+    BarChip(
+        onClick = actionStartActivity(Intent(context, RateActivity::class.java)),
+        dotColor = if (okDot) severityColor(GitSyncLabel.Severity.Ok) else null,
+        text = context.getString(R.string.rate_chip)
+    )
+}
+
+@Composable
+private fun BarChip(onClick: Action, dotColor: ColorProvider?, text: String) {
     Row(
         modifier = GlanceModifier
             .cornerRadius(16.dp)
             .background(BAR_TINT)
             .padding(horizontal = 10.dp, vertical = 6.dp)
-            .clickable(actionStartActivity(setupIntent)),
+            .clickable(onClick),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Box(
-            modifier = GlanceModifier
-                .size(8.dp)
-                .cornerRadius(4.dp)
-                .background(color)
-        ) {}
-        Spacer(modifier = GlanceModifier.width(6.dp))
+        dotColor?.let { color ->
+            Box(
+                modifier = GlanceModifier
+                    .size(8.dp)
+                    .cornerRadius(4.dp)
+                    .background(color)
+            ) {}
+            Spacer(modifier = GlanceModifier.width(6.dp))
+        }
         Text(
-            text = label.arg
-                ?.let { context.getString(label.textRes, it) }
-                ?: context.getString(label.textRes),
+            text = text,
             style = TextStyle(
                 fontSize = 12.sp,
                 color = GlanceTheme.colors.onSurfaceVariant
@@ -256,7 +265,7 @@ internal fun QuickActions(vaultName: String?, noteFolderPath: String?) {
 internal fun ConfiguredScaffold(
     vaultName: String?,
     noteFolderPath: String?,
-    gitSyncStatus: GitSyncStatus?,
+    bottomBarChip: BottomBarChip,
     isLoading: Boolean = false,
     content: @Composable () -> Unit
 ) {
@@ -265,7 +274,7 @@ internal fun ConfiguredScaffold(
             content()
             WidgetActionButtons(isLoading)
         }
-        BottomBar(vaultName, noteFolderPath, gitSyncStatus)
+        BottomBar(vaultName, noteFolderPath, bottomBarChip)
     }
 }
 

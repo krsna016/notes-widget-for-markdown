@@ -13,6 +13,8 @@ import com.marfolog.noteswidgetformarkdown.domain.model.NoteSummary
 import com.marfolog.noteswidgetformarkdown.domain.usecase.CreateNoteUseCase
 import com.marfolog.noteswidgetformarkdown.presentation.setup.SetupActivity
 import com.marfolog.noteswidgetformarkdown.util.AppLog
+import com.marfolog.noteswidgetformarkdown.util.Telemetry
+import com.marfolog.noteswidgetformarkdown.util.UsageEvent
 import kotlinx.coroutines.launch
 import org.koin.java.KoinJavaComponent.get
 
@@ -47,6 +49,7 @@ class AddNoteActivity : ComponentActivity() {
             val created = createNoteUseCase(folderUri, title, "")
 
             created.onSuccess { noteUri ->
+                Telemetry.event(UsageEvent.NOTE_CREATED)
                 // The provider's own uri, not a guess built from the title: on a name collision
                 // — which a stale listFiles() cache can hide from uniqueTitle() — the provider is
                 // free to pick a different name than the one asked for, and looking the file back
