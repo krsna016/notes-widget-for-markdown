@@ -71,7 +71,7 @@ class WidgetPaletteTest {
         val light = Color(0xFFF2F2F5)
         assertEquals(dark, WidgetPalette.colors(WidgetColorChoice(WidgetColor.Amber))!!.content)
         assertEquals(dark, WidgetPalette.colors(WidgetColorChoice(WidgetColor.Sky))!!.onBar)
-        assertEquals(light, WidgetPalette.colors(WidgetColorChoice(WidgetColor.Midnight))!!.content)
+        assertEquals(light, WidgetPalette.colors(WidgetColorChoice(WidgetColor.Graphite))!!.content)
         assertEquals(light, WidgetPalette.colors(WidgetColorChoice(WidgetColor.Forest))!!.onBar)
     }
 

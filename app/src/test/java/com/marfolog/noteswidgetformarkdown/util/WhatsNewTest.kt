@@ -24,12 +24,13 @@ class WhatsNewTest {
     ) = WhatsNew.shouldShow(versionName, updatedToVersion, seenVersion, openedFrom, remoteEnabled, setupComplete, releases)
 
     @Test
-    fun `1_3_0 lists the background, fast note and feedback news in that order`() {
+    fun `1_3_0 lists the background, fast note, feedback and new languages news in that order`() {
         assertEquals(
             listOf(
                 WhatsNewItem(WhatsNewIcon.Palette, R.string.whats_new_130_background),
                 WhatsNewItem(WhatsNewIcon.Checklist, R.string.whats_new_130_fast_note),
-                WhatsNewItem(WhatsNewIcon.Chat, R.string.whats_new_130_feedback)
+                WhatsNewItem(WhatsNewIcon.Chat, R.string.whats_new_130_feedback),
+                WhatsNewItem(WhatsNewIcon.Translate, R.string.whats_new_130_languages)
             ),
             WhatsNew.itemsFor("1.3.0")
         )

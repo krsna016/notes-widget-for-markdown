@@ -136,9 +136,12 @@ It does ask for `WAKE_LOCK`, `ACCESS_NETWORK_STATE`, `RECEIVE_BOOT_COMPLETED` an
 them can move data off the device. It also wakes on screen unlock, so what you see is current by
 the time you look.
 
-The Play build reports app and crash events. It can be switched off in settings. It is written not
-to send note contents, file names or folder paths: storage locations are stripped from crash
-breadcrumbs before they are handed to Firebase. No advertising ID is collected, and the ad-related
+The Play build can report app and crash events, but only after you say yes. It does not ask on
+first launch: settings ask once, the first time you open them after picking a notes folder and
+placing a widget (or after skipping the setup guide), and until you answer nothing is sent. You can
+change your answer in settings any time. It is written not to send note contents, file names or
+folder paths: storage locations are stripped from crash messages and breadcrumbs before they are
+handed to Firebase. No advertising ID is collected, and the ad-related
 permissions Firebase would otherwise add are removed from the manifest.
 
 Five days after the Play build first runs on your phone (for an update, the first run of the
@@ -173,8 +176,8 @@ Full text: [Privacy Policy](https://folmbuild.cz/notes-widget-privacy/).
 - Reports sync state, never performs it — pulling and pushing stays with your client.
 - No editing inside the widget; opening and creating go through Obsidian deep links.
 - Android widgets cannot render full Markdown, so previews are simplified.
-- Translated into Czech, German, Spanish, French, Chinese and Japanese. Only the Czech and the
-  English were written by someone who speaks the language well.
+- Translated into Czech, German, Spanish, French, Italian, Portuguese, Russian, Ukrainian, Chinese
+  and Japanese. See [Translations](#translations).
 - For Obsidian Sync, Syncthing and similar there is no real status — those clients keep their state
   in private app storage no other app can read. The chip falls back to when a note last changed.
 
@@ -228,6 +231,15 @@ The one worth doing first is making refreshes prompt without asking anyone to to
 settings — see Limitations.
 
 </details>
+
+## Translations
+
+Only the English and the Czech were written by someone who speaks the language well. The other
+languages are machine-assisted translations, so some wording will be off. If something reads wrong
+in your language, tell me in an [issue](https://github.com/marfolog/notes-widget-for-markdown/issues/new)
+or in [Discussions](https://github.com/marfolog/notes-widget-for-markdown/discussions) — the screen,
+what it says, and what it should say is enough. On Android 13 and newer you can pick the app's
+language in settings, separately from the phone's.
 
 ## Feedback and contributing
 

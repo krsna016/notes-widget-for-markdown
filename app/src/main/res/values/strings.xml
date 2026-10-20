@@ -78,6 +78,7 @@
     <string name="cards_empty">No notes to set up yet — this folder has no .md files.</string>
     <string name="appearance_title">Appearance</string>
     <string name="appearance_desc">Applies to this screen and the Fast note dialog. Widget card colours are set separately.</string>
+    <string name="language_setting">Language</string>
     <string name="action_done">Done</string>
     <string name="action_delete">Delete</string>
     <string name="action_skip">Skip</string>
@@ -138,10 +139,10 @@
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
     <string name="about_sponsor">Chip in — one-off, entirely optional</string>
-    <string name="consent_title">Send reports?</string>
-    <string name="consent_body">Crash reports show me what breaks, and usage numbers show how many people the app is for. They never include your notes, their names or your folder paths. You can change this later in settings.</string>
-    <string name="consent_yes">Yes, send them</string>
-    <string name="consent_no">No thanks</string>
+    <string name="consent_prompt_title">Help me improve the app?</string>
+    <string name="consent_prompt_body">Anonymous stats show me what you use. Nothing from your notes.</string>
+    <string name="consent_prompt_yes">Sure</string>
+    <string name="consent_prompt_no">No thanks</string>
     <string name="open_with_title">Open notes with</string>
     <string name="open_with_desc">Tapping a note on the widget opens it here.</string>
     <string name="open_with_obsidian">Obsidian</string>
@@ -197,18 +198,17 @@
     <string name="widget_background_value">%1$d%%</string>
     <string name="widget_color_desc">System follows the phone\'s theme. Any other colour stays the same in light and dark mode.</string>
     <string name="widget_color_system">System</string>
-    <string name="widget_color_rose">Rose</string>
-    <string name="widget_color_red">Red</string>
-    <string name="widget_color_amber">Amber</string>
-    <string name="widget_color_orange">Orange</string>
-    <string name="widget_color_mint">Mint</string>
-    <string name="widget_color_green">Green</string>
-    <string name="widget_color_sky">Sky</string>
-    <string name="widget_color_blue">Blue</string>
-    <string name="widget_color_lavender">Lavender</string>
-    <string name="widget_color_graphite">Graphite</string>
-    <string name="widget_color_midnight">Midnight</string>
-    <string name="widget_color_forest">Forest</string>
+    <string name="widget_color_rose" translatable="false">Rose</string>
+    <string name="widget_color_red" translatable="false">Red</string>
+    <string name="widget_color_amber" translatable="false">Amber</string>
+    <string name="widget_color_orange" translatable="false">Orange</string>
+    <string name="widget_color_mint" translatable="false">Mint</string>
+    <string name="widget_color_green" translatable="false">Green</string>
+    <string name="widget_color_sky" translatable="false">Sky</string>
+    <string name="widget_color_blue" translatable="false">Blue</string>
+    <string name="widget_color_lavender" translatable="false">Lavender</string>
+    <string name="widget_color_graphite" translatable="false">Graphite</string>
+    <string name="widget_color_forest" translatable="false">Forest</string>
     <string name="widget_color_custom">Custom</string>
 
     <!-- Feedback dialog in settings -->
@@ -236,6 +236,7 @@
     <string name="whats_new_130_background">Pick a colour and transparency for the widget background</string>
     <string name="whats_new_130_fast_note">Fast notes can be checkboxes, and you choose the file right in the dialog</string>
     <string name="whats_new_130_feedback">Tell me what to improve, right from settings</string>
+    <string name="whats_new_130_languages">Now also in Russian, Portuguese, Italian and Ukrainian</string>
     <string name="whats_new_footer_play">Enjoying the update? A rating helps other people find the widget.</string>
     <string name="whats_new_footer_foss">Enjoying the update? A star on GitHub helps other people find the widget.</string>
     <string name="whats_new_later">Maybe later</string>

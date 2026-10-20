@@ -128,10 +128,6 @@
     <string name="theme_light">浅色</string>
     <string name="theme_dark">深色</string>
     <string name="about_sponsor">赞助一下 — 一次性，完全自愿</string>
-    <string name="consent_title">发送报告吗？</string>
-    <string name="consent_body">崩溃报告让我知道哪里出了问题，使用数据让我知道有多少人在用。其中绝不包含你的笔记、笔记名称或文件夹路径。之后可以随时在设置中更改。</string>
-    <string name="consent_yes">好，发送</string>
-    <string name="consent_no">不用了</string>
     <string name="open_with_title">用什么打开笔记</string>
     <string name="open_with_desc">在小组件上点按笔记时，会用这里选择的方式打开。</string>
     <string name="open_with_obsidian">Obsidian</string>

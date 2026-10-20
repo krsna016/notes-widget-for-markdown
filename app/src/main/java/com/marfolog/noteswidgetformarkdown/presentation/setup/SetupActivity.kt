@@ -1,11 +1,16 @@
 package com.marfolog.noteswidgetformarkdown.presentation.setup
 
 import android.app.Activity
+import android.app.LocaleManager
 import android.content.Context
 import android.content.Intent
+import android.content.res.Resources
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.LocaleList
 import android.provider.DocumentsContract
+import android.provider.Settings
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.activity.ComponentActivity
@@ -134,8 +139,11 @@ import com.marfolog.noteswidgetformarkdown.presentation.widget.GitSyncLabel
 import com.marfolog.noteswidgetformarkdown.presentation.widget.NotesWidget
 import com.marfolog.noteswidgetformarkdown.presentation.widget.OpenWith
 import com.marfolog.noteswidgetformarkdown.presentation.widget.WidgetBackground
+import com.marfolog.noteswidgetformarkdown.presentation.widget.WidgetInventory
+import com.marfolog.noteswidgetformarkdown.util.AppLanguage
 import com.marfolog.noteswidgetformarkdown.util.AppLog
 import com.marfolog.noteswidgetformarkdown.util.AutoPrompt
+import com.marfolog.noteswidgetformarkdown.util.ConsentPrompt
 import com.marfolog.noteswidgetformarkdown.util.FeedbackReminder
 import com.marfolog.noteswidgetformarkdown.util.PromptBudget
 import com.marfolog.noteswidgetformarkdown.util.ProjectLinks
@@ -213,6 +221,7 @@ class SetupActivity : ComponentActivity() {
         internal const val AREA = "Setup"
         const val PREFS_NAME = "app_prefs"
         const val KEY_GUIDE_DONE = "guide_done"
+        const val KEY_GUIDE_SKIPPED = "guide_skipped"
         const val KEY_OPEN_WITH = "open_with"
         const val KEY_SYNC_MODE = "sync_mode"
         const val KEY_STALE_HOURS = "sync_stale_hours"
@@ -335,6 +344,7 @@ private fun SetupScreen(modifier: Modifier = Modifier) {
         RateReminder.isSettingAvailable(context, System.currentTimeMillis())
     }
     var rateChipEnabled by rememberSaveable { mutableStateOf(RateReminder.isEnabled(context)) }
+    val languageName = remember { currentLanguageName(context) }
     var fastNoteStyle by rememberSaveable {
         mutableStateOf(FastNoteStyle.from(prefs.getString(SetupActivity.KEY_FAST_NOTE_STYLE, null)))
     }
@@ -543,6 +553,7 @@ private fun SetupScreen(modifier: Modifier = Modifier) {
     }
     val skipGuide: () -> Unit = {
         Telemetry.event(UsageEvent.SETUP_SKIPPED)
+        prefs.edit().putBoolean(SetupActivity.KEY_GUIDE_SKIPPED, true).apply()
         dismissGuide()
     }
     val guideStep: GuideStep? = when {
@@ -582,7 +593,14 @@ private fun SetupScreen(modifier: Modifier = Modifier) {
         val setupComplete = notesUri != null && guideDone
         val openedFrom = (context as? Activity)?.intent?.getStringExtra(SetupActivity.EXTRA_OPENED_FROM)
         val due = buildSet {
-            if (askAboutReporting && Telemetry.ENABLED) add(AutoPrompt.Consent)
+            val consentDue = ConsentPrompt.isDue(
+                canReport = Telemetry.ENABLED,
+                alreadyAsked = !askAboutReporting,
+                notesFolderChosen = notesUri != null,
+                widgetsPlaced = WidgetInventory.Kind.entries.sumOf { WidgetInventory.count(context, it) },
+                guideSkipped = prefs.getBoolean(SetupActivity.KEY_GUIDE_SKIPPED, false)
+            )
+            if (consentDue) add(AutoPrompt.Consent)
             if (WhatsNewReminder.shouldShow(context, setupComplete, openedFrom)) add(AutoPrompt.WhatsNew)
             if (FeedbackReminder.shouldOffer(context, now, setupComplete, openedFrom)) add(AutoPrompt.Feedback)
         }
@@ -763,6 +781,11 @@ private fun SetupScreen(modifier: Modifier = Modifier) {
             scope.launch { NotesWidget.updateAll(context) }
         },
         onSendFeedback = openFeedback,
+        languageName = languageName,
+        onOpenLanguage = {
+            Telemetry.event(UsageEvent.LANGUAGE_OPENED)
+            openAppLanguageSettings(context)
+        },
         rateChipSettingAvailable = rateChipSettingAvailable,
         rateChipEnabled = rateChipEnabled,
         onRateChipChanged = { enabled ->
@@ -885,13 +908,13 @@ private fun humanFolderPath(treeUri: String): String? = runCatching {
 private fun ReportingConsentDialog(onAnswer: (Boolean) -> Unit) {
     AlertDialog(
         onDismissRequest = { onAnswer(false) },
-        title = { Text(stringResource(R.string.consent_title)) },
-        text = { Text(stringResource(R.string.consent_body)) },
+        title = { Text(stringResource(R.string.consent_prompt_title)) },
+        text = { Text(stringResource(R.string.consent_prompt_body)) },
         confirmButton = {
-            Button(onClick = { onAnswer(true) }) { Text(stringResource(R.string.consent_yes)) }
+            TextButton(onClick = { onAnswer(true) }) { Text(stringResource(R.string.consent_prompt_yes)) }
         },
         dismissButton = {
-            OutlinedButton(onClick = { onAnswer(false) }) { Text(stringResource(R.string.consent_no)) }
+            TextButton(onClick = { onAnswer(false) }) { Text(stringResource(R.string.consent_prompt_no)) }
         }
     )
 }
@@ -992,6 +1015,8 @@ internal fun SetupScreenContent(
     telemetryAvailable: Boolean = false,
     telemetryEnabled: Boolean = false,
     onTelemetryChanged: (Boolean) -> Unit = {},
+    languageName: String? = null,
+    onOpenLanguage: () -> Unit = {},
     rateChipSettingAvailable: Boolean = true,
     rateChipEnabled: Boolean = true,
     onRateChipChanged: (Boolean) -> Unit = {},
@@ -1404,6 +1429,10 @@ internal fun SetupScreenContent(
                 )
             }
         }
+        if (languageName != null) {
+            Spacer(modifier = Modifier.height(12.dp))
+            LanguageSetting(languageName = languageName, onClick = onOpenLanguage)
+        }
 
         Spacer(modifier = Modifier.height(32.dp))
 
@@ -1578,6 +1607,49 @@ private fun WidgetBackgroundSetting(
             text = stringResource(R.string.widget_background_value, WidgetBackground.fromSlider(position)),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface
+        )
+    }
+}
+
+/** Only on Android 13 and newer, where system settings have a language page for each app. */
+private fun currentLanguageName(context: Context): String? {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return null
+    val appLocales = context.getSystemService(LocaleManager::class.java)?.applicationLocales
+    val shown = AppLanguage.shown(
+        appLocales = appLocales?.toList().orEmpty(),
+        systemLocales = Resources.getSystem().configuration.locales.toList()
+    )
+    return AppLanguage.displayName(shown)
+}
+
+private fun LocaleList.toList(): List<Locale> = (0 until size()).map { get(it) }
+
+private fun openAppLanguageSettings(context: Context) {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
+    val intent = Intent(Settings.ACTION_APP_LOCALE_SETTINGS, Uri.fromParts("package", context.packageName, null))
+    runCatching { context.startActivity(intent) }
+        .onFailure { AppLog.w(SetupActivity.AREA, "No app language page in system settings", it) }
+}
+
+@Composable
+private fun LanguageSetting(languageName: String, onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = stringResource(R.string.language_setting),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.weight(1f)
+        )
+        Text(
+            text = languageName,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.primary
         )
     }
 }
@@ -1866,7 +1938,6 @@ private fun widgetColorLabel(color: WidgetColor): Int = when (color) {
     WidgetColor.Blue -> R.string.widget_color_blue
     WidgetColor.Lavender -> R.string.widget_color_lavender
     WidgetColor.Graphite -> R.string.widget_color_graphite
-    WidgetColor.Midnight -> R.string.widget_color_midnight
     WidgetColor.Forest -> R.string.widget_color_forest
     WidgetColor.Custom -> R.string.widget_color_custom
 }

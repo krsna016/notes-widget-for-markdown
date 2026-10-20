@@ -17,12 +17,15 @@ enum class WidgetColor(val storageValue: String) {
     Blue("blue"),
     Lavender("lavender"),
     Graphite("graphite"),
-    Midnight("midnight"),
     Forest("forest"),
     Custom("custom");
 
     companion object {
-        fun fromStorage(value: String?): WidgetColor = entries.firstOrNull { it.storageValue == value } ?: System
+        /** Colours no longer offered, and the closest one still there. */
+        private val RETIRED = mapOf("midnight" to Graphite)
+
+        fun fromStorage(value: String?): WidgetColor =
+            entries.firstOrNull { it.storageValue == value } ?: RETIRED[value] ?: System
     }
 }
 

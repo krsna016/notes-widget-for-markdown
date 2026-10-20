@@ -128,10 +128,6 @@
     <string name="theme_light">ライト</string>
     <string name="theme_dark">ダーク</string>
     <string name="about_sponsor">支援する — 一度きり、まったくの任意です</string>
-    <string name="consent_title">レポートを送信しますか？</string>
-    <string name="consent_body">クラッシュレポートは何が壊れたかを、利用状況はどれだけの人に使われているかを教えてくれます。ノートの中身、その名前、フォルダのパスが含まれることはありません。あとから設定で変更できます。</string>
-    <string name="consent_yes">はい、送信する</string>
-    <string name="consent_no">いいえ</string>
     <string name="open_with_title">ノートを開くアプリ</string>
     <string name="open_with_desc">ウィジェットでノートをタップすると、ここで開きます。</string>
     <string name="open_with_obsidian">Obsidian</string>

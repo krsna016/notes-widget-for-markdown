@@ -21,6 +21,16 @@ class WidgetColorTest {
     }
 
     @Test
+    fun `someone who had picked the retired midnight colour gets graphite`() {
+        assertEquals(WidgetColor.Graphite, WidgetColor.fromStorage("midnight"))
+    }
+
+    @Test
+    fun `midnight is no longer offered`() {
+        assertTrue(WidgetColor.entries.none { it.storageValue == "midnight" })
+    }
+
+    @Test
     fun `stored values double as analytics values`() {
         WidgetColor.entries.forEach { color ->
             assertTrue(color.storageValue, color.storageValue.matches(Regex("[a-z]{3,36}")))

@@ -40,23 +40,8 @@ object AppLog {
     fun e(area: String, message: String, error: Throwable? = null) {
         if (error == null) Log.e(TAG, "[$area] $message") else Log.e(TAG, "[$area] $message", error)
         Telemetry.breadcrumb("[$area] ${redactLocations(message)}")
-        error?.let { Telemetry.recordError(redacted(it)) }
+        error?.let { Telemetry.recordError(it) }
     }
-
-    /**
-     * A throwable's own message is not ours to trust. SAF failures put the whole tree URI in it,
-     * which spells out the vault folder and the note file name, and that would reach the crash
-     * reporter untouched. This keeps the type and the stack trace, which is what makes a report
-     * useful, and rewrites only the text.
-     */
-    private fun redacted(error: Throwable): Throwable =
-        RedactedThrowable(
-            "${error.javaClass.name}: ${redactLocations(error.message.orEmpty())}",
-            error.cause?.let { redacted(it) }
-        ).also { it.stackTrace = error.stackTrace }
-
-    /** Carries a cleaned message; the original type is kept in the text. */
-    internal class RedactedThrowable(message: String, cause: Throwable?) : Throwable(message, cause)
 
     /** Folder URIs contain the full path, which is fine, but note file names are not logged. */
     fun redactFileName(uri: String): String = uri.substringBeforeLast("%2F", uri)
@@ -66,9 +51,5 @@ object AppLog {
      * A SAF tree URI spells out the vault folder name and its path, which is exactly what the
      * privacy policy says is never transmitted.
      */
-    internal fun redactLocations(message: String): String =
-        STORAGE_URI.replace(message, "<storage location>")
-
-    // Also plain paths: providers and the framework hand those back in messages just as often.
-    private val STORAGE_URI = Regex("""((content|file)://|/storage/|/sdcard/)\S*""")
+    internal fun redactLocations(message: String): String = CrashRedactor.message(message)
 }

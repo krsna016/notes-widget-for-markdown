@@ -32,6 +32,7 @@ object UsageEvent {
     const val CARD_HEIGHT_CHANGED = "card_height_changed"
     const val SETTING_CHANGED = "setting_changed"
     const val ABOUT_CLICKED = "about_clicked"
+    const val LANGUAGE_OPENED = "language_opened"
 
     const val RATE_CHIP_SHOWN = "rate_chip_shown"
     const val RATE_CHIP_TAPPED = "rate_chip_tapped"

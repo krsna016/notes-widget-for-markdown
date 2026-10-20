@@ -17,4 +17,17 @@
         android:name="android.permission.ACCESS_ADSERVICES_AD_ID"
         tools:node="remove" />
 
+    <!--
+      Nothing is collected until the user says yes in settings, not even in the moment between the
+      process starting and Telemetry.init reading that answer.
+    -->
+    <application>
+        <meta-data
+            android:name="firebase_analytics_collection_enabled"
+            android:value="false" />
+        <meta-data
+            android:name="firebase_crashlytics_collection_enabled"
+            android:value="false" />
+    </application>
+
 </manifest>

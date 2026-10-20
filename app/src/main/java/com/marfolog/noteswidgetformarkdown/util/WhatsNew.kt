@@ -3,7 +3,7 @@ package com.marfolog.noteswidgetformarkdown.util
 import androidx.annotation.StringRes
 import com.marfolog.noteswidgetformarkdown.R
 
-enum class WhatsNewIcon { Palette, Checklist, Chat }
+enum class WhatsNewIcon { Palette, Checklist, Chat, Translate }
 
 data class WhatsNewItem(val icon: WhatsNewIcon, @StringRes val textRes: Int)
 
@@ -18,7 +18,8 @@ object WhatsNew {
         "1.3.0" to listOf(
             WhatsNewItem(WhatsNewIcon.Palette, R.string.whats_new_130_background),
             WhatsNewItem(WhatsNewIcon.Checklist, R.string.whats_new_130_fast_note),
-            WhatsNewItem(WhatsNewIcon.Chat, R.string.whats_new_130_feedback)
+            WhatsNewItem(WhatsNewIcon.Chat, R.string.whats_new_130_feedback),
+            WhatsNewItem(WhatsNewIcon.Translate, R.string.whats_new_130_languages)
         )
     )
 

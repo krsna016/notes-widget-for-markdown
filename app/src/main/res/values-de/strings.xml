@@ -128,10 +128,6 @@
     <string name="theme_light">Hell</string>
     <string name="theme_dark">Dunkel</string>
     <string name="about_sponsor">Etwas beitragen — einmalig, völlig freiwillig</string>
-    <string name="consent_title">Berichte senden?</string>
-    <string name="consent_body">Absturzberichte zeigen mir, was kaputtgeht, Nutzungszahlen, für wie viele Leute die App da ist. Sie enthalten nie deine Notizen, deren Namen oder deine Ordnerpfade. Du kannst das später in den Einstellungen ändern.</string>
-    <string name="consent_yes">Ja, senden</string>
-    <string name="consent_no">Nein, danke</string>
     <string name="open_with_title">Notizen öffnen mit</string>
     <string name="open_with_desc">Ein Tippen auf eine Notiz im Widget öffnet sie hier.</string>
     <string name="open_with_obsidian">Obsidian</string>

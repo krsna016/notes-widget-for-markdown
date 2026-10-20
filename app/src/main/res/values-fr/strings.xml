@@ -128,10 +128,6 @@
     <string name="theme_light">Clair</string>
     <string name="theme_dark">Sombre</string>
     <string name="about_sponsor">Contribuer — une fois, totalement facultatif</string>
-    <string name="consent_title">Envoyer des rapports ?</string>
-    <string name="consent_body">Les rapports de plantage me montrent ce qui casse, et les chiffres d\'usage pour combien de personnes l\'application existe. Ils n\'incluent jamais vos notes, leurs noms ni vos chemins de dossiers. Vous pourrez changer cela dans les réglages.</string>
-    <string name="consent_yes">Oui, les envoyer</string>
-    <string name="consent_no">Non merci</string>
     <string name="open_with_title">Ouvrir les notes avec</string>
     <string name="open_with_desc">Toucher une note dans le widget l\'ouvre ici.</string>
     <string name="open_with_obsidian">Obsidian</string>

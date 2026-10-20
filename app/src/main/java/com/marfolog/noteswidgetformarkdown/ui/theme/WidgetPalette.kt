@@ -50,7 +50,6 @@ object WidgetPalette {
         WidgetColor.Blue -> NoteCardPalette.background(NoteCardColor.Blue)
         WidgetColor.Lavender -> NoteCardPalette.background(NoteCardColor.Lavender)
         WidgetColor.Graphite -> Color(0xFF2B2D31)
-        WidgetColor.Midnight -> Color(0xFF1B2333)
         WidgetColor.Forest -> Color(0xFF1E2B22)
         WidgetColor.Custom -> NoteCardPalette.parseCustom(choice.customHex)
     }

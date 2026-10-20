@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ChatBubbleOutline
 import androidx.compose.material.icons.outlined.Checklist
 import androidx.compose.material.icons.outlined.Palette
+import androidx.compose.material.icons.outlined.Translate
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
@@ -122,4 +123,5 @@ private fun WhatsNewIcon.vector(): ImageVector = when (this) {
     WhatsNewIcon.Palette -> Icons.Outlined.Palette
     WhatsNewIcon.Checklist -> Icons.Outlined.Checklist
     WhatsNewIcon.Chat -> Icons.Outlined.ChatBubbleOutline
+    WhatsNewIcon.Translate -> Icons.Outlined.Translate
 }

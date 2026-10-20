@@ -128,10 +128,6 @@
     <string name="theme_light">Claro</string>
     <string name="theme_dark">Oscuro</string>
     <string name="about_sponsor">Contribuir — pago único, totalmente voluntario</string>
-    <string name="consent_title">¿Enviar informes?</string>
-    <string name="consent_body">Los informes de fallos me muestran qué se rompe, y las cifras de uso para cuánta gente es la app. Nunca incluyen tus notas, sus nombres ni las rutas de tus carpetas. Puedes cambiarlo luego en los ajustes.</string>
-    <string name="consent_yes">Sí, enviarlos</string>
-    <string name="consent_no">No, gracias</string>
     <string name="open_with_title">Abrir las notas con</string>
     <string name="open_with_desc">Tocar una nota en el widget la abre aquí.</string>
     <string name="open_with_obsidian">Obsidian</string>

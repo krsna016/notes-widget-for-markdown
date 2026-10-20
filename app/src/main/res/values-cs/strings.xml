@@ -69,6 +69,7 @@
     <string name="cards_empty">Zatím není co nastavovat — v této složce nejsou žádné soubory .md.</string>
     <string name="appearance_title">Vzhled</string>
     <string name="appearance_desc">Platí pro tuto obrazovku a dialog rychlé poznámky. Barvy karet ve widgetu se nastavují zvlášť.</string>
+    <string name="language_setting">Jazyk</string>
     <string name="action_done">Hotovo</string>
     <string name="action_delete">Smazat</string>
     <string name="action_skip">Přeskočit</string>
@@ -128,10 +129,10 @@
     <string name="theme_light">Světlé</string>
     <string name="theme_dark">Tmavé</string>
     <string name="about_sponsor">Přispět — jednorázově, zcela dobrovolně</string>
-    <string name="consent_title">Odesílat hlášení?</string>
-    <string name="consent_body">Hlášení o pádech mi ukážou, co se rozbilo, a čísla o používání, pro kolik lidí ta aplikace je. Nikdy neobsahují vaše poznámky, jejich názvy ani cesty ke složkám. Změnit to jde kdykoli v nastavení.</string>
-    <string name="consent_yes">Ano, odesílat</string>
-    <string name="consent_no">Ne, děkuji</string>
+    <string name="consent_prompt_title">Pomůžeš mi appku zlepšit?</string>
+    <string name="consent_prompt_body">Anonymní statistiky mi ukážou, co používáš. Nic z poznámek.</string>
+    <string name="consent_prompt_yes">Ano</string>
+    <string name="consent_prompt_no">Ne, díky</string>
     <string name="open_with_title">Otevírat poznámky v</string>
     <string name="open_with_desc">Klepnutí na poznámku ve widgetu ji otevře tady.</string>
     <string name="open_with_obsidian">Obsidianu</string>
@@ -171,18 +172,6 @@
     <string name="widget_background_value">%1$d %%</string>
     <string name="widget_color_desc">Systémová se řídí motivem telefonu. Ostatní barvy zůstávají stejné ve světlém i tmavém režimu.</string>
     <string name="widget_color_system">Systémová</string>
-    <string name="widget_color_rose">Růžová</string>
-    <string name="widget_color_red">Červená</string>
-    <string name="widget_color_amber">Jantarová</string>
-    <string name="widget_color_orange">Oranžová</string>
-    <string name="widget_color_mint">Mátová</string>
-    <string name="widget_color_green">Zelená</string>
-    <string name="widget_color_sky">Nebeská</string>
-    <string name="widget_color_blue">Modrá</string>
-    <string name="widget_color_lavender">Levandulová</string>
-    <string name="widget_color_graphite">Grafitová</string>
-    <string name="widget_color_midnight">Půlnoční</string>
-    <string name="widget_color_forest">Lesní</string>
     <string name="widget_color_custom">Vlastní</string>
 
     <!-- Feedback dialog in settings -->
@@ -210,6 +199,7 @@
     <string name="whats_new_130_background">Vyberte si barvu a průhlednost pozadí widgetu</string>
     <string name="whats_new_130_fast_note">Rychlé poznámky můžou být zaškrtávací políčka a soubor vyberete přímo v dialogu</string>
     <string name="whats_new_130_feedback">Napište mi, co zlepšit, přímo z nastavení</string>
+    <string name="whats_new_130_languages">Nově také v ruštině, portugalštině, italštině a ukrajinštině</string>
     <string name="whats_new_footer_play">Líbí se vám aktualizace? Hodnocení pomůže dalším lidem widget najít.</string>
     <string name="whats_new_footer_foss">Líbí se vám aktualizace? Hvězdička na GitHubu pomůže dalším lidem widget najít.</string>
     <string name="whats_new_later">Možná později</string>
