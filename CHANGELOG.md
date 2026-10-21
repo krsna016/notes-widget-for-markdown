@@ -2,6 +2,15 @@
 
 All notable public changes will be documented in this file.
 
+## v1.3.1 - 2026-10-21
+
+- Fast notes: choose bullet or checkbox right in the fast note dialog; it is the same setting as in settings.
+- Fixed: the fast note and new note dialogs could bring the settings screen to the front when settings were left open in the background.
+- Fixed: a note whose first heading repeats its file name showed the title twice on the widget card.
+- Play build: the reporting question now appears as soon as you return to settings after adding the widget, and switching reporting on or off in settings counts as the answer.
+- Settings: optional sections are marked as optional, and the fast note target now comes right after the notes folder.
+- The "What's new" dialog also appears for people updating straight to 1.3.1.
+
 ## v1.3.0 - 2026-10-20
 
 - Widget background: pick a colour (System, card pastels, Graphite, Forest or a custom hex) and its transparency. The default is now 85 % opacity; buttons and chips switch to readable colours automatically.

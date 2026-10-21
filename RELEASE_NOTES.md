@@ -1,12 +1,13 @@
-# v1.3.0
+# v1.3.1
 
-- Widget background colour and transparency (default 85 %)
-- Fast notes as checkboxes, and you pick the target file right in the dialog
-- A small rating chip on the widget, now and then, easy to turn off
-- Tell me what to improve from settings, no account needed
-- A one-time "What's new" dialog after updates
-- Now also in Russian, Portuguese, Italian and Ukrainian
-- Fixed: settings no longer drain battery with a moving logo
+- Bullet or checkbox right in the fast note dialog
+- Fixed: fast note and new note dialogs no longer bring settings to the front
+- Fixed: a note title is no longer shown twice on its card
+- Optional settings are marked as optional
+
+Includes everything from 1.3.0: widget background colour and transparency, fast notes as
+checkboxes, feedback from settings, a one-time "What's new" dialog, and Russian, Portuguese,
+Italian and Ukrainian.
 
 Two builds: `foss` has no `INTERNET` permission, `play` adds analytics and crash reporting that are
 off until you agree, plus the optional feedback form. Take `foss` unless you want to send reports.

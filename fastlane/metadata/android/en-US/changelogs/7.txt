@@ -1,0 +1,5 @@
+- Bullet or checkbox right in the fast note dialog
+- Widget background colour and transparency
+- Tell me what to improve from settings
+- Now also in Russian, Portuguese, Italian and Ukrainian
+- Fixes: note title shown once, dialogs no longer open settings
