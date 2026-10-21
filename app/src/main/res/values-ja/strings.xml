@@ -44,12 +44,12 @@
     <string name="notes_folder_plus_hint">ウィジェットの + ボタンは、ここに新しいノートを作ります。</string>
     <string name="notes_folder_select">ノートのフォルダを選ぶ</string>
     <string name="notes_folder_change">ノートのフォルダを変更</string>
-    <string name="fast_note_target_title">クイックノートの保存先</string>
+    <string name="fast_note_target_title">クイックノートの保存先（任意）</string>
     <string name="fast_note_target_desc">クイックノートは端末内のこの Markdown ファイルに保存されます。同期は引き続きお使いのツールが担当します。</string>
     <string name="vault_root_title">Vault のルート（任意）</string>
     <string name="vault_root_change">ルートフォルダを変更</string>
     <string name="vault_root_select">ルートフォルダを選ぶ</string>
-    <string name="reporting_title">レポート</string>
+    <string name="reporting_title">レポート（任意）</string>
     <string name="reporting_switch">利用状況とクラッシュレポートを送信する</string>
     <string name="sync_section_title">同期状態の表示（任意）</string>
     <string name="sync_question">ノートはどうやって同期していますか？</string>
@@ -60,10 +60,10 @@
     <string name="sync_not_checked_yet">上でノートのフォルダを選ぶと確認されます。</string>
     <string name="git_folder_change">git フォルダを変更</string>
     <string name="git_folder_select">.git を含むフォルダを選ぶ</string>
-    <string name="cards_title">カードの見た目</string>
+    <string name="cards_title">カードの見た目（任意）</string>
     <string name="cards_desc">ウィジェット内の各ノートカードの高さと色を設定します。</string>
     <string name="cards_empty">まだ設定するものがありません — このフォルダに .md ファイルはありません。</string>
-    <string name="appearance_title">外観</string>
+    <string name="appearance_title">外観（任意）</string>
     <string name="appearance_desc">この画面とクイックノートのダイアログに適用されます。ウィジェットのカードの色は別に設定します。</string>
     <string name="language_setting">言語</string>
     <string name="action_done">完了</string>
@@ -130,7 +130,7 @@
     <string name="consent_prompt_body">匿名の利用統計から、どの機能が使われているかが分かります。ノートの内容は送信されません。</string>
     <string name="consent_prompt_yes">はい</string>
     <string name="consent_prompt_no">いいえ</string>
-    <string name="open_with_title">ノートを開くアプリ</string>
+    <string name="open_with_title">ノートを開くアプリ（任意）</string>
     <string name="open_with_desc">ウィジェットでノートをタップすると、ここで開きます。</string>
     <string name="open_with_obsidian">Obsidian</string>
     <string name="open_with_default">既定のアプリ</string>
@@ -140,8 +140,8 @@
     <string name="open_with_hint_ask">開くアプリを毎回 Android がたずねます。</string>
     <string name="open_note_with">ノートを開く</string>
     <string name="new_note_failed">ノートを作成できませんでした</string>
-    <string name="extra_notes_title">追加のノート</string>
-    <string name="extra_notes_desc">任意です。端末内のどこにあっても構わない Markdown ファイルを 1 つずつ追加でき、フォルダ内のノートと一緒にウィジェットに表示されます。</string>
+    <string name="extra_notes_title">追加のノート（任意）</string>
+    <string name="extra_notes_desc">端末内のどこにあっても構わない Markdown ファイルを 1 つずつ追加でき、フォルダ内のノートと一緒にウィジェットに表示されます。</string>
     <string name="extra_notes_add">ファイルを追加</string>
     <string name="extra_notes_unavailable">利用できません。ファイルが移動または削除されたか、アクセス権を失いました。</string>
     <string name="extra_notes_unknown_name">不明なファイル</string>
@@ -173,7 +173,7 @@
     <string name="fast_note_style_title">追加の形式</string>
     <string name="fast_note_style_bullet">箇条書き</string>
     <string name="fast_note_style_checkbox">チェックボックス</string>
-    <string name="widget_background_title">ウィジェットの背景</string>
+    <string name="widget_background_title">ウィジェットの背景（任意）</string>
     <string name="widget_background_desc">下げると壁紙が透けて見えます。ノートのカードは色を保ちます。</string>
     <string name="widget_background_value">%1$d%%</string>
     <string name="widget_color_desc">「システム」は端末のテーマに従います。それ以外の色はライトモードとダークモードで同じままです。</string>

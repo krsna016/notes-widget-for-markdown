@@ -44,12 +44,12 @@
     <string name="notes_folder_plus_hint">Tlačítko + na widgetu vytváří nové poznámky sem.</string>
     <string name="notes_folder_select">Vybrat složku s poznámkami</string>
     <string name="notes_folder_change">Změnit složku s poznámkami</string>
-    <string name="fast_note_target_title">Cíl rychlých poznámek</string>
+    <string name="fast_note_target_title">Cíl rychlých poznámek (nepovinné)</string>
     <string name="fast_note_target_desc">Rychlé poznámky se ukládají do zařízení, do tohoto Markdown souboru. Synchronizaci má dál na starost váš nástroj.</string>
     <string name="vault_root_title">Kořen vaultu (nepovinné)</string>
     <string name="vault_root_change">Změnit kořenovou složku</string>
     <string name="vault_root_select">Vybrat kořenovou složku</string>
-    <string name="reporting_title">Hlášení</string>
+    <string name="reporting_title">Hlášení (nepovinné)</string>
     <string name="reporting_switch">Odesílat údaje o používání a pádech</string>
     <string name="sync_section_title">Ukazatel synchronizace (nepovinné)</string>
     <string name="sync_question">Jak poznámky synchronizujete?</string>
@@ -60,10 +60,10 @@
     <string name="sync_not_checked_yet">Zkontroluje se, jakmile výše vyberete složku s poznámkami.</string>
     <string name="git_folder_change">Změnit složku s .git</string>
     <string name="git_folder_select">Vybrat složku obsahující .git</string>
-    <string name="cards_title">Vzhled karet</string>
+    <string name="cards_title">Vzhled karet (nepovinné)</string>
     <string name="cards_desc">Nastavte výšku a barvu každé karty ve widgetu.</string>
     <string name="cards_empty">Zatím není co nastavovat — v této složce nejsou žádné soubory .md.</string>
-    <string name="appearance_title">Vzhled</string>
+    <string name="appearance_title">Vzhled (nepovinné)</string>
     <string name="appearance_desc">Platí pro tuto obrazovku a dialog rychlé poznámky. Barvy karet ve widgetu se nastavují zvlášť.</string>
     <string name="language_setting">Jazyk</string>
     <string name="action_done">Hotovo</string>
@@ -130,7 +130,7 @@
     <string name="consent_prompt_body">Anonymní statistiky mi ukážou, co používáte. Nic z poznámek.</string>
     <string name="consent_prompt_yes">Ano</string>
     <string name="consent_prompt_no">Ne, díky</string>
-    <string name="open_with_title">Otevírat poznámky v</string>
+    <string name="open_with_title">Otevírat poznámky v (nepovinné)</string>
     <string name="open_with_desc">Klepnutí na poznámku ve widgetu ji otevře tady.</string>
     <string name="open_with_obsidian">Obsidianu</string>
     <string name="open_with_default">Výchozí aplikaci</string>
@@ -140,8 +140,8 @@
     <string name="open_with_hint_ask">Android se pokaždé zeptá, čím to otevřít.</string>
     <string name="open_note_with">Otevřít poznámku v</string>
     <string name="new_note_failed">Poznámku se nepodařilo vytvořit</string>
-    <string name="extra_notes_title">Další poznámky</string>
-    <string name="extra_notes_desc">Nepovinné. Jednotlivé soubory Markdown z libovolného místa v telefonu se ve widgetu zobrazí spolu s poznámkami ze vaší složky. Přidávejte je jeden po druhém.</string>
+    <string name="extra_notes_title">Další poznámky (nepovinné)</string>
+    <string name="extra_notes_desc">Jednotlivé soubory Markdown z libovolného místa v telefonu se ve widgetu zobrazí spolu s poznámkami ze vaší složky. Přidávejte je jeden po druhém.</string>
     <string name="extra_notes_add">Přidat soubor</string>
     <string name="extra_notes_unavailable">Nedostupné. Soubor byl přesunut nebo smazán, nebo jste ztratili přístup k němu.</string>
     <string name="extra_notes_unknown_name">Neznámý soubor</string>
@@ -173,7 +173,7 @@
     <string name="fast_note_style_title">Přidat jako</string>
     <string name="fast_note_style_bullet">Odrážku</string>
     <string name="fast_note_style_checkbox">Zaškrtávací políčko</string>
-    <string name="widget_background_title">Pozadí widgetu</string>
+    <string name="widget_background_title">Pozadí widgetu (nepovinné)</string>
     <string name="widget_background_desc">Snižte ho a widgetem prosvitne tapeta. Karty poznámek si barvy ponechají.</string>
     <string name="widget_background_value">%1$d %%</string>
     <string name="widget_color_desc">Systémová se řídí motivem telefonu. Ostatní barvy zůstávají stejné ve světlém i tmavém režimu.</string>

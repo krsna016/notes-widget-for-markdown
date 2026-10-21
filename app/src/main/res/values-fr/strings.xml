@@ -44,12 +44,12 @@
     <string name="notes_folder_plus_hint">Le bouton + du widget crée les nouvelles notes ici.</string>
     <string name="notes_folder_select">Choisir le dossier de notes</string>
     <string name="notes_folder_change">Changer de dossier de notes</string>
-    <string name="fast_note_target_title">Destination des notes rapides</string>
+    <string name="fast_note_target_title">Destination des notes rapides (facultatif)</string>
     <string name="fast_note_target_desc">Les notes rapides sont enregistrées sur l\'appareil, dans ce fichier Markdown. La synchronisation reste gérée par votre propre outil.</string>
     <string name="vault_root_title">Racine du coffre (facultatif)</string>
     <string name="vault_root_change">Changer de dossier racine</string>
     <string name="vault_root_select">Choisir le dossier racine</string>
-    <string name="reporting_title">Rapports</string>
+    <string name="reporting_title">Rapports (facultatif)</string>
     <string name="reporting_switch">Envoyer des rapports d\'usage et de plantage</string>
     <string name="sync_section_title">Indicateur de synchronisation (facultatif)</string>
     <string name="sync_question">Comment synchronisez-vous vos notes ?</string>
@@ -60,10 +60,10 @@
     <string name="sync_not_checked_yet">Vérifié dès que vous aurez choisi un dossier de notes ci-dessus.</string>
     <string name="git_folder_change">Changer de dossier git</string>
     <string name="git_folder_select">Choisir le dossier contenant .git</string>
-    <string name="cards_title">Apparence des cartes</string>
+    <string name="cards_title">Apparence des cartes (facultatif)</string>
     <string name="cards_desc">Réglez la hauteur et la couleur de chaque carte du widget.</string>
     <string name="cards_empty">Rien à régler pour l\'instant : ce dossier ne contient aucun fichier .md.</string>
-    <string name="appearance_title">Apparence</string>
+    <string name="appearance_title">Apparence (facultatif)</string>
     <string name="appearance_desc">S\'applique à cet écran et à la boîte de dialogue de note rapide. Les couleurs des cartes du widget se règlent à part.</string>
     <string name="language_setting">Langue</string>
     <string name="action_done">Terminé</string>
@@ -130,7 +130,7 @@
     <string name="consent_prompt_body">Des statistiques anonymes me montrent ce que vous utilisez. Rien de vos notes.</string>
     <string name="consent_prompt_yes">Bien sûr</string>
     <string name="consent_prompt_no">Non merci</string>
-    <string name="open_with_title">Ouvrir les notes avec</string>
+    <string name="open_with_title">Ouvrir les notes avec (facultatif)</string>
     <string name="open_with_desc">Toucher une note dans le widget l\'ouvre ici.</string>
     <string name="open_with_obsidian">Obsidian</string>
     <string name="open_with_default">Application par défaut</string>
@@ -140,8 +140,8 @@
     <string name="open_with_hint_ask">Android demande à chaque fois avec quoi l\'ouvrir.</string>
     <string name="open_note_with">Ouvrir la note avec</string>
     <string name="new_note_failed">Impossible de créer la note</string>
-    <string name="extra_notes_title">Notes supplémentaires</string>
-    <string name="extra_notes_desc">Facultatif. Fichiers Markdown isolés, où qu\'ils se trouvent sur l\'appareil, affichés dans le widget avec les notes de votre dossier. Ajoutez-les un par un.</string>
+    <string name="extra_notes_title">Notes supplémentaires (facultatif)</string>
+    <string name="extra_notes_desc">Fichiers Markdown isolés, où qu\'ils se trouvent sur l\'appareil, affichés dans le widget avec les notes de votre dossier. Ajoutez-les un par un.</string>
     <string name="extra_notes_add">Ajouter un fichier</string>
     <string name="extra_notes_unavailable">Indisponible. Le fichier a été déplacé ou supprimé, ou l\'accès y a été perdu.</string>
     <string name="extra_notes_unknown_name">Fichier inconnu</string>
@@ -173,7 +173,7 @@
     <string name="fast_note_style_title">Ajouter comme</string>
     <string name="fast_note_style_bullet">Puce</string>
     <string name="fast_note_style_checkbox">Case à cocher</string>
-    <string name="widget_background_title">Arrière-plan du widget</string>
+    <string name="widget_background_title">Arrière-plan du widget (facultatif)</string>
     <string name="widget_background_desc">Baissez-le pour laisser transparaître le fond d\'écran. Les cartes de notes gardent leurs couleurs.</string>
     <string name="widget_background_value">%1$d%%</string>
     <string name="widget_color_desc">La couleur Système suit le thème du téléphone. Les autres couleurs restent identiques en mode clair et sombre.</string>

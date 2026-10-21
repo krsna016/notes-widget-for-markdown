@@ -44,12 +44,12 @@
     <string name="notes_folder_plus_hint">Il pulsante + del widget crea qui le nuove note.</string>
     <string name="notes_folder_select">Seleziona cartella delle note</string>
     <string name="notes_folder_change">Cambia cartella delle note</string>
-    <string name="fast_note_target_title">Destinazione delle note veloci</string>
+    <string name="fast_note_target_title">Destinazione delle note veloci (facoltativo)</string>
     <string name="fast_note_target_desc">Le note veloci vengono salvate sul dispositivo in questo file Markdown. La sincronizzazione resta gestita dalla tua configurazione delle note.</string>
     <string name="vault_root_title">Radice del vault (facoltativo)</string>
     <string name="vault_root_change">Cambia cartella radice</string>
     <string name="vault_root_select">Seleziona cartella radice</string>
-    <string name="reporting_title">Segnalazioni</string>
+    <string name="reporting_title">Segnalazioni (facoltativo)</string>
     <string name="reporting_switch">Invia dati di utilizzo e segnalazioni di arresti anomali</string>
     <string name="sync_section_title">Indicatore di sincronizzazione (facoltativo)</string>
     <string name="sync_question">Come sincronizzi le tue note?</string>
@@ -60,10 +60,10 @@
     <string name="sync_not_checked_yet">Verrà controllato quando sceglierai una cartella delle note qui sopra.</string>
     <string name="git_folder_change">Cambia cartella Git</string>
     <string name="git_folder_select">Seleziona cartella che contiene .git</string>
-    <string name="cards_title">Aspetto delle schede</string>
+    <string name="cards_title">Aspetto delle schede (facoltativo)</string>
     <string name="cards_desc">Imposta altezza e colore di ogni scheda nota nel widget.</string>
     <string name="cards_empty">Niente da configurare per ora — questa cartella non contiene file .md.</string>
-    <string name="appearance_title">Aspetto</string>
+    <string name="appearance_title">Aspetto (facoltativo)</string>
     <string name="appearance_desc">Vale per questa schermata e per la finestra della nota veloce. I colori delle schede del widget si impostano a parte.</string>
     <string name="language_setting">Lingua</string>
     <string name="action_done">Fine</string>
@@ -130,7 +130,7 @@
     <string name="consent_prompt_body">Le statistiche anonime mi mostrano cosa usi. Nulla dalle tue note.</string>
     <string name="consent_prompt_yes">Certo</string>
     <string name="consent_prompt_no">No, grazie</string>
-    <string name="open_with_title">Apri le note con</string>
+    <string name="open_with_title">Apri le note con (facoltativo)</string>
     <string name="open_with_desc">Toccando una nota nel widget, si apre qui.</string>
     <string name="open_with_obsidian">Obsidian</string>
     <string name="open_with_default">App predefinita</string>
@@ -140,8 +140,8 @@
     <string name="open_with_hint_ask">Android chiede ogni volta quale app usare.</string>
     <string name="open_note_with">Apri nota con</string>
     <string name="new_note_failed">Impossibile creare la nota</string>
-    <string name="extra_notes_title">Note extra</string>
-    <string name="extra_notes_desc">Facoltativo. File Markdown singoli da qualsiasi punto del dispositivo, mostrati nel widget insieme alle note della tua cartella. Aggiungili uno alla volta.</string>
+    <string name="extra_notes_title">Note extra (facoltativo)</string>
+    <string name="extra_notes_desc">File Markdown singoli da qualsiasi punto del dispositivo, mostrati nel widget insieme alle note della tua cartella. Aggiungili uno alla volta.</string>
     <string name="extra_notes_add">Aggiungi file</string>
     <string name="extra_notes_unavailable">Non disponibile. Il file è stato spostato o eliminato, oppure l\'accesso è andato perso.</string>
     <string name="extra_notes_unknown_name">File sconosciuto</string>
@@ -173,7 +173,7 @@
     <string name="fast_note_style_title">Aggiungi come</string>
     <string name="fast_note_style_bullet">Elenco puntato</string>
     <string name="fast_note_style_checkbox">Casella di controllo</string>
-    <string name="widget_background_title">Sfondo del widget</string>
+    <string name="widget_background_title">Sfondo del widget (facoltativo)</string>
     <string name="widget_background_desc">Abbassalo per far trasparire lo sfondo. Le schede delle note mantengono i loro colori.</string>
     <string name="widget_background_value">%1$d%%</string>
     <string name="widget_color_desc">Sistema segue il tema del telefono. Ogni altro colore resta uguale in modalità chiara e scura.</string>

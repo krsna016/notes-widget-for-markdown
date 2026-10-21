@@ -44,12 +44,12 @@
     <string name="notes_folder_plus_hint">Кнопка + на віджеті створює тут нові нотатки.</string>
     <string name="notes_folder_select">Вибрати теку з нотатками</string>
     <string name="notes_folder_change">Змінити теку з нотатками</string>
-    <string name="fast_note_target_title">Ціль швидких нотаток</string>
+    <string name="fast_note_target_title">Ціль швидких нотаток (необов\'язково)</string>
     <string name="fast_note_target_desc">Швидкі нотатки зберігаються на пристрої в цей файл Markdown. Синхронізацію далі веде твоє налаштування нотаток.</string>
     <string name="vault_root_title">Кореневе сховище (необов\'язково)</string>
     <string name="vault_root_change">Змінити кореневу теку</string>
     <string name="vault_root_select">Вибрати кореневу теку</string>
-    <string name="reporting_title">Звіти</string>
+    <string name="reporting_title">Звіти (необов\'язково)</string>
     <string name="reporting_switch">Надсилати дані про використання та збої</string>
     <string name="sync_section_title">Індикатор синхронізації (необов\'язково)</string>
     <string name="sync_question">Як ти синхронізуєш нотатки?</string>
@@ -60,10 +60,10 @@
     <string name="sync_not_checked_yet">Перевірка відбудеться, коли ти вибереш теку з нотатками вище.</string>
     <string name="git_folder_change">Змінити теку з .git</string>
     <string name="git_folder_select">Вибрати теку, що містить .git</string>
-    <string name="cards_title">Оформлення карток</string>
+    <string name="cards_title">Оформлення карток (необов\'язково)</string>
     <string name="cards_desc">Задай висоту і колір кожної картки нотатки у віджеті.</string>
     <string name="cards_empty">Поки нічого налаштовувати — у цій теці немає файлів .md.</string>
-    <string name="appearance_title">Вигляд</string>
+    <string name="appearance_title">Вигляд (необов\'язково)</string>
     <string name="appearance_desc">Діє на цей екран і діалог швидкої нотатки. Кольори карток віджета налаштовуються окремо.</string>
     <string name="language_setting">Мова</string>
     <string name="action_done">Готово</string>
@@ -130,7 +130,7 @@
     <string name="consent_prompt_body">Анонімна статистика покаже мені, чим ти користуєшся. Нічого з нотаток.</string>
     <string name="consent_prompt_yes">Звісно</string>
     <string name="consent_prompt_no">Ні, дякую</string>
-    <string name="open_with_title">Відкривати нотатки в</string>
+    <string name="open_with_title">Відкривати нотатки в (необов\'язково)</string>
     <string name="open_with_desc">Натискання на нотатку у віджеті відкриє її тут.</string>
     <string name="open_with_obsidian">Obsidian</string>
     <string name="open_with_default">Типовий застосунок</string>
@@ -140,8 +140,8 @@
     <string name="open_with_hint_ask">Android щоразу питає, яким застосунком відкрити.</string>
     <string name="open_note_with">Відкрити нотатку в</string>
     <string name="new_note_failed">Не вдалося створити нотатку</string>
-    <string name="extra_notes_title">Додаткові нотатки</string>
-    <string name="extra_notes_desc">Необов\'язково. Окремі файли Markdown з будь-якого місця на пристрої, які показуються у віджеті разом з нотатками з твоєї теки. Додавай їх по одному.</string>
+    <string name="extra_notes_title">Додаткові нотатки (необов\'язково)</string>
+    <string name="extra_notes_desc">Окремі файли Markdown з будь-якого місця на пристрої, які показуються у віджеті разом з нотатками з твоєї теки. Додавай їх по одному.</string>
     <string name="extra_notes_add">Додати файл</string>
     <string name="extra_notes_unavailable">Недоступно. Файл переміщено чи видалено, або втрачено доступ до нього.</string>
     <string name="extra_notes_unknown_name">Невідомий файл</string>
@@ -173,7 +173,7 @@
     <string name="fast_note_style_title">Додавати як</string>
     <string name="fast_note_style_bullet">Маркер</string>
     <string name="fast_note_style_checkbox">Прапорець</string>
-    <string name="widget_background_title">Фон віджета</string>
+    <string name="widget_background_title">Фон віджета (необов\'язково)</string>
     <string name="widget_background_desc">Зменш, щоб проступали шпалери. Картки нотаток зберігають свої кольори.</string>
     <string name="widget_background_value">%1$d%%</string>
     <string name="widget_color_desc">«Системний» слідує темі телефона. Будь-який інший колір залишається тим самим у світлому і темному режимах.</string>

@@ -44,12 +44,12 @@
     <string name="notes_folder_plus_hint">O botão + do widget cria novas notas aqui.</string>
     <string name="notes_folder_select">Selecionar pasta de notas</string>
     <string name="notes_folder_change">Alterar pasta de notas</string>
-    <string name="fast_note_target_title">Destino das notas rápidas</string>
+    <string name="fast_note_target_title">Destino das notas rápidas (opcional)</string>
     <string name="fast_note_target_desc">As notas rápidas são salvas localmente neste arquivo Markdown. A sincronização continua a cargo da sua configuração de notas.</string>
     <string name="vault_root_title">Raiz do vault (opcional)</string>
     <string name="vault_root_change">Alterar pasta raiz</string>
     <string name="vault_root_select">Selecionar pasta raiz</string>
-    <string name="reporting_title">Relatórios</string>
+    <string name="reporting_title">Relatórios (opcional)</string>
     <string name="reporting_switch">Enviar relatórios de uso e de falhas</string>
     <string name="sync_section_title">Indicador de sincronização (opcional)</string>
     <string name="sync_question">Como você sincroniza suas notas?</string>
@@ -60,10 +60,10 @@
     <string name="sync_not_checked_yet">Será verificado quando você escolher uma pasta de notas acima.</string>
     <string name="git_folder_change">Alterar pasta do Git</string>
     <string name="git_folder_select">Selecionar pasta que contém .git</string>
-    <string name="cards_title">Aparência dos cartões</string>
+    <string name="cards_title">Aparência dos cartões (opcional)</string>
     <string name="cards_desc">Defina a altura e a cor de cada cartão de nota no widget.</string>
     <string name="cards_empty">Nada para configurar ainda — esta pasta não tem arquivos .md.</string>
-    <string name="appearance_title">Aparência</string>
+    <string name="appearance_title">Aparência (opcional)</string>
     <string name="appearance_desc">Vale para esta tela e para a caixa de nota rápida. As cores dos cartões do widget são definidas à parte.</string>
     <string name="language_setting">Idioma</string>
     <string name="action_done">Concluído</string>
@@ -130,7 +130,7 @@
     <string name="consent_prompt_body">Estatísticas anônimas me mostram o que você usa. Nada das suas notas.</string>
     <string name="consent_prompt_yes">Claro</string>
     <string name="consent_prompt_no">Não, obrigado</string>
-    <string name="open_with_title">Abrir notas com</string>
+    <string name="open_with_title">Abrir notas com (opcional)</string>
     <string name="open_with_desc">Tocar numa nota no widget a abre aqui.</string>
     <string name="open_with_obsidian">Obsidian</string>
     <string name="open_with_default">App padrão</string>
@@ -140,8 +140,8 @@
     <string name="open_with_hint_ask">O Android pergunta qual app usar toda vez.</string>
     <string name="open_note_with">Abrir nota com</string>
     <string name="new_note_failed">Não foi possível criar a nota</string>
-    <string name="extra_notes_title">Notas extras</string>
-    <string name="extra_notes_desc">Opcional. Arquivos Markdown avulsos de qualquer lugar do aparelho, exibidos no widget junto com as notas da sua pasta. Adicione um de cada vez.</string>
+    <string name="extra_notes_title">Notas extras (opcional)</string>
+    <string name="extra_notes_desc">Arquivos Markdown avulsos de qualquer lugar do aparelho, exibidos no widget junto com as notas da sua pasta. Adicione um de cada vez.</string>
     <string name="extra_notes_add">Adicionar arquivo</string>
     <string name="extra_notes_unavailable">Indisponível. O arquivo foi movido ou excluído, ou o acesso a ele foi perdido.</string>
     <string name="extra_notes_unknown_name">Arquivo desconhecido</string>
@@ -173,7 +173,7 @@
     <string name="fast_note_style_title">Adicionar como</string>
     <string name="fast_note_style_bullet">Marcador</string>
     <string name="fast_note_style_checkbox">Caixa de seleção</string>
-    <string name="widget_background_title">Fundo do widget</string>
+    <string name="widget_background_title">Fundo do widget (opcional)</string>
     <string name="widget_background_desc">Diminua para deixar o papel de parede aparecer. Os cartões de notas mantêm suas cores.</string>
     <string name="widget_background_value">%1$d%%</string>
     <string name="widget_color_desc">Sistema segue o tema do celular. Qualquer outra cor continua igual no modo claro e no escuro.</string>

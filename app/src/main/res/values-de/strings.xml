@@ -44,12 +44,12 @@
     <string name="notes_folder_plus_hint">Die Taste + im Widget legt neue Notizen hier an.</string>
     <string name="notes_folder_select">Notizordner wählen</string>
     <string name="notes_folder_change">Notizordner ändern</string>
-    <string name="fast_note_target_title">Ziel für Schnellnotizen</string>
+    <string name="fast_note_target_title">Ziel für Schnellnotizen (optional)</string>
     <string name="fast_note_target_desc">Schnellnotizen werden lokal in diese Markdown-Datei geschrieben. Das Synchronisieren übernimmt weiterhin dein eigenes Werkzeug.</string>
     <string name="vault_root_title">Vault-Stamm (optional)</string>
     <string name="vault_root_change">Stammordner ändern</string>
     <string name="vault_root_select">Stammordner wählen</string>
-    <string name="reporting_title">Berichte</string>
+    <string name="reporting_title">Berichte (optional)</string>
     <string name="reporting_switch">Nutzungs- und Absturzberichte senden</string>
     <string name="sync_section_title">Sync-Anzeige (optional)</string>
     <string name="sync_question">Wie synchronisierst du deine Notizen?</string>
@@ -60,10 +60,10 @@
     <string name="sync_not_checked_yet">Wird geprüft, sobald du oben einen Notizordner wählst.</string>
     <string name="git_folder_change">Git-Ordner ändern</string>
     <string name="git_folder_select">Ordner mit .git wählen</string>
-    <string name="cards_title">Kartendarstellung</string>
+    <string name="cards_title">Kartendarstellung (optional)</string>
     <string name="cards_desc">Höhe und Farbe jeder Notizkarte im Widget einstellen.</string>
     <string name="cards_empty">Noch nichts einzustellen — dieser Ordner enthält keine .md-Dateien.</string>
-    <string name="appearance_title">Darstellung</string>
+    <string name="appearance_title">Darstellung (optional)</string>
     <string name="appearance_desc">Gilt für diesen Bildschirm und den Schnellnotiz-Dialog. Kartenfarben im Widget werden separat eingestellt.</string>
     <string name="language_setting">Sprache</string>
     <string name="action_done">Fertig</string>
@@ -130,7 +130,7 @@
     <string name="consent_prompt_body">Anonyme Statistiken zeigen mir, was du nutzt. Nichts aus deinen Notizen.</string>
     <string name="consent_prompt_yes">Klar</string>
     <string name="consent_prompt_no">Nein, danke</string>
-    <string name="open_with_title">Notizen öffnen mit</string>
+    <string name="open_with_title">Notizen öffnen mit (optional)</string>
     <string name="open_with_desc">Ein Tippen auf eine Notiz im Widget öffnet sie hier.</string>
     <string name="open_with_obsidian">Obsidian</string>
     <string name="open_with_default">Standard-App</string>
@@ -140,8 +140,8 @@
     <string name="open_with_hint_ask">Android fragt jedes Mal, womit geöffnet werden soll.</string>
     <string name="open_note_with">Notiz öffnen mit</string>
     <string name="new_note_failed">Notiz konnte nicht erstellt werden</string>
-    <string name="extra_notes_title">Zusätzliche Notizen</string>
-    <string name="extra_notes_desc">Optional. Einzelne Markdown-Dateien von überall auf deinem Gerät, die zusammen mit den Notizen aus deinem Ordner im Widget angezeigt werden. Füge sie nacheinander hinzu.</string>
+    <string name="extra_notes_title">Zusätzliche Notizen (optional)</string>
+    <string name="extra_notes_desc">Einzelne Markdown-Dateien von überall auf deinem Gerät, die zusammen mit den Notizen aus deinem Ordner im Widget angezeigt werden. Füge sie nacheinander hinzu.</string>
     <string name="extra_notes_add">Datei hinzufügen</string>
     <string name="extra_notes_unavailable">Nicht verfügbar. Die Datei wurde verschoben oder gelöscht, oder der Zugriff darauf ging verloren.</string>
     <string name="extra_notes_unknown_name">Unbekannte Datei</string>
@@ -173,7 +173,7 @@
     <string name="fast_note_style_title">Hinzufügen als</string>
     <string name="fast_note_style_bullet">Aufzählungspunkt</string>
     <string name="fast_note_style_checkbox">Kontrollkästchen</string>
-    <string name="widget_background_title">Widget-Hintergrund</string>
+    <string name="widget_background_title">Widget-Hintergrund (optional)</string>
     <string name="widget_background_desc">Senke den Wert, damit das Hintergrundbild durchscheint. Notizkarten behalten ihre Farben.</string>
     <string name="widget_background_value">%1$d%%</string>
     <string name="widget_color_desc">Systemfarbe folgt dem Design des Telefons. Jede andere Farbe bleibt im hellen und dunklen Modus gleich.</string>

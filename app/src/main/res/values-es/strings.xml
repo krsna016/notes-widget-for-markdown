@@ -44,12 +44,12 @@
     <string name="notes_folder_plus_hint">El botón + del widget crea las notas nuevas aquí.</string>
     <string name="notes_folder_select">Elegir carpeta de notas</string>
     <string name="notes_folder_change">Cambiar carpeta de notas</string>
-    <string name="fast_note_target_title">Destino de las notas rápidas</string>
+    <string name="fast_note_target_title">Destino de las notas rápidas (opcional)</string>
     <string name="fast_note_target_desc">Las notas rápidas se guardan en el dispositivo, dentro de este archivo Markdown. De la sincronización sigue encargándose tu herramienta.</string>
     <string name="vault_root_title">Raíz del vault (opcional)</string>
     <string name="vault_root_change">Cambiar carpeta raíz</string>
     <string name="vault_root_select">Elegir carpeta raíz</string>
-    <string name="reporting_title">Informes</string>
+    <string name="reporting_title">Informes (opcional)</string>
     <string name="reporting_switch">Enviar informes de uso y de fallos</string>
     <string name="sync_section_title">Indicador de sincronización (opcional)</string>
     <string name="sync_question">¿Cómo sincronizas tus notas?</string>
@@ -60,10 +60,10 @@
     <string name="sync_not_checked_yet">Se comprobará en cuanto elijas arriba una carpeta de notas.</string>
     <string name="git_folder_change">Cambiar carpeta de git</string>
     <string name="git_folder_select">Elegir carpeta que contiene .git</string>
-    <string name="cards_title">Aspecto de las tarjetas</string>
+    <string name="cards_title">Aspecto de las tarjetas (opcional)</string>
     <string name="cards_desc">Define la altura y el color de cada tarjeta del widget.</string>
     <string name="cards_empty">Todavía no hay nada que ajustar: esta carpeta no tiene archivos .md.</string>
-    <string name="appearance_title">Aspecto</string>
+    <string name="appearance_title">Aspecto (opcional)</string>
     <string name="appearance_desc">Se aplica a esta pantalla y al diálogo de nota rápida. Los colores de las tarjetas del widget se ajustan aparte.</string>
     <string name="language_setting">Idioma</string>
     <string name="action_done">Listo</string>
@@ -130,7 +130,7 @@
     <string name="consent_prompt_body">Las estadísticas anónimas me muestran qué usas. Nada de tus notas.</string>
     <string name="consent_prompt_yes">Claro</string>
     <string name="consent_prompt_no">No, gracias</string>
-    <string name="open_with_title">Abrir las notas con</string>
+    <string name="open_with_title">Abrir las notas con (opcional)</string>
     <string name="open_with_desc">Tocar una nota en el widget la abre aquí.</string>
     <string name="open_with_obsidian">Obsidian</string>
     <string name="open_with_default">App predeterminada</string>
@@ -140,8 +140,8 @@
     <string name="open_with_hint_ask">Android pregunta cada vez con qué abrirla.</string>
     <string name="open_note_with">Abrir la nota con</string>
     <string name="new_note_failed">No se pudo crear la nota</string>
-    <string name="extra_notes_title">Notas adicionales</string>
-    <string name="extra_notes_desc">Opcional. Archivos Markdown sueltos de cualquier parte del dispositivo, que se muestran en el widget junto con las notas de tu carpeta. Añádelos uno a uno.</string>
+    <string name="extra_notes_title">Notas adicionales (opcional)</string>
+    <string name="extra_notes_desc">Archivos Markdown sueltos de cualquier parte del dispositivo, que se muestran en el widget junto con las notas de tu carpeta. Añádelos uno a uno.</string>
     <string name="extra_notes_add">Añadir archivo</string>
     <string name="extra_notes_unavailable">No disponible. El archivo se ha movido o borrado, o se ha perdido el acceso a él.</string>
     <string name="extra_notes_unknown_name">Archivo desconocido</string>
@@ -173,7 +173,7 @@
     <string name="fast_note_style_title">Añadir como</string>
     <string name="fast_note_style_bullet">Viñeta</string>
     <string name="fast_note_style_checkbox">Casilla</string>
-    <string name="widget_background_title">Fondo del widget</string>
+    <string name="widget_background_title">Fondo del widget (opcional)</string>
     <string name="widget_background_desc">Bájalo para que se vea el fondo de pantalla. Las tarjetas de notas mantienen sus colores.</string>
     <string name="widget_background_value">%1$d%%</string>
     <string name="widget_color_desc">El color del sistema sigue el tema del teléfono. Cualquier otro color se mantiene igual en modo claro y oscuro.</string>

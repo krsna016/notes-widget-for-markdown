@@ -44,12 +44,12 @@
     <string name="notes_folder_plus_hint">Кнопка + на виджете создаёт здесь новые заметки.</string>
     <string name="notes_folder_select">Выбрать папку с заметками</string>
     <string name="notes_folder_change">Сменить папку с заметками</string>
-    <string name="fast_note_target_title">Файл для быстрых заметок</string>
+    <string name="fast_note_target_title">Файл для быстрых заметок (необязательно)</string>
     <string name="fast_note_target_desc">Быстрые заметки сохраняются на устройстве в этот файл Markdown. Синхронизацию по-прежнему ведёт твоя настройка заметок.</string>
     <string name="vault_root_title">Корень хранилища (необязательно)</string>
     <string name="vault_root_change">Сменить корневую папку</string>
     <string name="vault_root_select">Выбрать корневую папку</string>
-    <string name="reporting_title">Отчёты</string>
+    <string name="reporting_title">Отчёты (необязательно)</string>
     <string name="reporting_switch">Отправлять данные об использовании и сбоях</string>
     <string name="sync_section_title">Индикатор синхронизации (необязательно)</string>
     <string name="sync_question">Как ты синхронизируешь заметки?</string>
@@ -60,10 +60,10 @@
     <string name="sync_not_checked_yet">Проверка выполнится, когда ты выберешь папку с заметками выше.</string>
     <string name="git_folder_change">Сменить папку с .git</string>
     <string name="git_folder_select">Выбрать папку, содержащую .git</string>
-    <string name="cards_title">Оформление карточек</string>
+    <string name="cards_title">Оформление карточек (необязательно)</string>
     <string name="cards_desc">Задай высоту и цвет каждой карточки заметки в виджете.</string>
     <string name="cards_empty">Пока нечего настраивать — в этой папке нет файлов .md.</string>
-    <string name="appearance_title">Внешний вид</string>
+    <string name="appearance_title">Внешний вид (необязательно)</string>
     <string name="appearance_desc">Действует на этот экран и диалог быстрой заметки. Цвета карточек виджета настраиваются отдельно.</string>
     <string name="language_setting">Язык</string>
     <string name="action_done">Готово</string>
@@ -130,7 +130,7 @@
     <string name="consent_prompt_body">Анонимная статистика покажет мне, чем ты пользуешься. Ничего из заметок.</string>
     <string name="consent_prompt_yes">Конечно</string>
     <string name="consent_prompt_no">Нет, спасибо</string>
-    <string name="open_with_title">Открывать заметки в</string>
+    <string name="open_with_title">Открывать заметки в (необязательно)</string>
     <string name="open_with_desc">Нажатие на заметку в виджете откроет её здесь.</string>
     <string name="open_with_obsidian">Obsidian</string>
     <string name="open_with_default">Приложение по умолчанию</string>
@@ -140,8 +140,8 @@
     <string name="open_with_hint_ask">Android каждый раз спрашивает, каким приложением открыть.</string>
     <string name="open_note_with">Открыть заметку в</string>
     <string name="new_note_failed">Не удалось создать заметку</string>
-    <string name="extra_notes_title">Дополнительные заметки</string>
-    <string name="extra_notes_desc">Необязательно. Отдельные файлы Markdown из любого места на устройстве, которые показываются в виджете вместе с заметками из папки. Добавляй по одному.</string>
+    <string name="extra_notes_title">Дополнительные заметки (необязательно)</string>
+    <string name="extra_notes_desc">Отдельные файлы Markdown из любого места на устройстве, которые показываются в виджете вместе с заметками из папки. Добавляй по одному.</string>
     <string name="extra_notes_add">Добавить файл</string>
     <string name="extra_notes_unavailable">Недоступно. Файл перемещён или удалён, либо доступ к нему потерян.</string>
     <string name="extra_notes_unknown_name">Неизвестный файл</string>
@@ -173,7 +173,7 @@
     <string name="fast_note_style_title">Добавлять как</string>
     <string name="fast_note_style_bullet">Маркированный список</string>
     <string name="fast_note_style_checkbox">Флажок</string>
-    <string name="widget_background_title">Фон виджета</string>
+    <string name="widget_background_title">Фон виджета (необязательно)</string>
     <string name="widget_background_desc">Уменьши прозрачность, чтобы просвечивали обои. Карточки заметок сохраняют свои цвета.</string>
     <string name="widget_background_value">%1$d%%</string>
     <string name="widget_color_desc">«Системный» следует теме телефона. Любой другой цвет остаётся прежним в светлом и тёмном режимах.</string>

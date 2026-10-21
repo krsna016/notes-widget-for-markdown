@@ -44,12 +44,12 @@
     <string name="notes_folder_plus_hint">小组件上的 + 按钮会在这里新建笔记。</string>
     <string name="notes_folder_select">选择笔记文件夹</string>
     <string name="notes_folder_change">更改笔记文件夹</string>
-    <string name="fast_note_target_title">快速笔记的目标文件</string>
+    <string name="fast_note_target_title">快速笔记的目标文件（可选）</string>
     <string name="fast_note_target_desc">快速笔记会保存到本机的这个 Markdown 文件中。同步仍由你自己的工具负责。</string>
     <string name="vault_root_title">仓库根目录（可选）</string>
     <string name="vault_root_change">更改根文件夹</string>
     <string name="vault_root_select">选择根文件夹</string>
-    <string name="reporting_title">报告</string>
+    <string name="reporting_title">报告（可选）</string>
     <string name="reporting_switch">发送使用情况和崩溃报告</string>
     <string name="sync_section_title">同步状态标签（可选）</string>
     <string name="sync_question">你如何同步笔记？</string>
@@ -60,10 +60,10 @@
     <string name="sync_not_checked_yet">在上方选择笔记文件夹后即会检查。</string>
     <string name="git_folder_change">更改 git 文件夹</string>
     <string name="git_folder_select">选择包含 .git 的文件夹</string>
-    <string name="cards_title">卡片外观</string>
+    <string name="cards_title">卡片外观（可选）</string>
     <string name="cards_desc">为小组件中的每张笔记卡片设置高度和颜色。</string>
     <string name="cards_empty">暂时没有可设置的内容 — 该文件夹中没有 .md 文件。</string>
-    <string name="appearance_title">外观</string>
+    <string name="appearance_title">外观（可选）</string>
     <string name="appearance_desc">适用于本界面和快速笔记对话框。小组件的卡片颜色需单独设置。</string>
     <string name="language_setting">语言</string>
     <string name="action_done">完成</string>
@@ -130,7 +130,7 @@
     <string name="consent_prompt_body">匿名统计数据只会告诉我你使用了哪些功能。不包含你的笔记内容。</string>
     <string name="consent_prompt_yes">好的</string>
     <string name="consent_prompt_no">不了，谢谢</string>
-    <string name="open_with_title">用什么打开笔记</string>
+    <string name="open_with_title">用什么打开笔记（可选）</string>
     <string name="open_with_desc">在小组件上点按笔记时，会用这里选择的方式打开。</string>
     <string name="open_with_obsidian">Obsidian</string>
     <string name="open_with_default">默认应用</string>
@@ -140,8 +140,8 @@
     <string name="open_with_hint_ask">每次由 Android 询问用哪个应用打开。</string>
     <string name="open_note_with">打开笔记</string>
     <string name="new_note_failed">无法创建笔记</string>
-    <string name="extra_notes_title">额外笔记</string>
-    <string name="extra_notes_desc">可选。设备上任意位置的单个 Markdown 文件会与文件夹中的笔记一起显示在小组件中。可以逐个添加。</string>
+    <string name="extra_notes_title">额外笔记（可选）</string>
+    <string name="extra_notes_desc">设备上任意位置的单个 Markdown 文件会与文件夹中的笔记一起显示在小组件中。可以逐个添加。</string>
     <string name="extra_notes_add">添加文件</string>
     <string name="extra_notes_unavailable">不可用。文件已被移动或删除，或已失去访问权限。</string>
     <string name="extra_notes_unknown_name">未知文件</string>
@@ -173,7 +173,7 @@
     <string name="fast_note_style_title">添加为</string>
     <string name="fast_note_style_bullet">项目符号</string>
     <string name="fast_note_style_checkbox">复选框</string>
-    <string name="widget_background_title">小组件背景</string>
+    <string name="widget_background_title">小组件背景（可选）</string>
     <string name="widget_background_desc">调低后，壁纸会透出来。笔记卡片会保留自己的颜色。</string>
     <string name="widget_background_value">%1$d%%</string>
     <string name="widget_color_desc">“系统”跟随手机的主题。其他颜色在浅色和深色模式下保持不变。</string>

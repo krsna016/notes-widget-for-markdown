@@ -57,12 +57,12 @@
     <string name="notes_folder_plus_hint">The + button on the widget creates new notes here.</string>
     <string name="notes_folder_select">Select Notes Folder</string>
     <string name="notes_folder_change">Change Notes Folder</string>
-    <string name="fast_note_target_title">Fast Note Target</string>
+    <string name="fast_note_target_title">Fast Note Target (optional)</string>
     <string name="fast_note_target_desc">Fast notes are saved locally into this Markdown file. Sync remains handled by your notes setup.</string>
     <string name="vault_root_title">Vault root (optional)</string>
     <string name="vault_root_change">Change Root Folder</string>
     <string name="vault_root_select">Select Root Folder</string>
-    <string name="reporting_title">Reporting</string>
+    <string name="reporting_title">Reporting (optional)</string>
     <string name="reporting_switch">Send usage and crash reports</string>
     <string name="sync_section_title">Sync status chip (optional)</string>
     <string name="sync_question">How do you sync your notes?</string>
@@ -73,10 +73,10 @@
     <string name="sync_not_checked_yet">Checked once you pick a notes folder above.</string>
     <string name="git_folder_change">Change Git Folder</string>
     <string name="git_folder_select">Select Folder Containing .git</string>
-    <string name="cards_title">Card Appearance</string>
+    <string name="cards_title">Card Appearance (optional)</string>
     <string name="cards_desc">Set height and color for each note card in the widget.</string>
     <string name="cards_empty">No notes to set up yet — this folder has no .md files.</string>
-    <string name="appearance_title">Appearance</string>
+    <string name="appearance_title">Appearance (optional)</string>
     <string name="appearance_desc">Applies to this screen and the Fast note dialog. Widget card colours are set separately.</string>
     <string name="language_setting">Language</string>
     <string name="action_done">Done</string>
@@ -143,7 +143,7 @@
     <string name="consent_prompt_body">Anonymous stats show me what you use. Nothing from your notes.</string>
     <string name="consent_prompt_yes">Sure</string>
     <string name="consent_prompt_no">No thanks</string>
-    <string name="open_with_title">Open notes with</string>
+    <string name="open_with_title">Open notes with (optional)</string>
     <string name="open_with_desc">Tapping a note on the widget opens it here.</string>
     <string name="open_with_obsidian">Obsidian</string>
     <string name="open_with_default">Default app</string>
@@ -153,8 +153,8 @@
     <string name="open_with_hint_ask">Android asks which app to use each time.</string>
     <string name="open_note_with">Open note with</string>
     <string name="new_note_failed">Could not create the note</string>
-    <string name="extra_notes_title">Extra Notes</string>
-    <string name="extra_notes_desc">Optional. Single Markdown files from anywhere on your device, shown on the widget together with the notes from your folder. Add them one at a time.</string>
+    <string name="extra_notes_title">Extra Notes (optional)</string>
+    <string name="extra_notes_desc">Single Markdown files from anywhere on your device, shown on the widget together with the notes from your folder. Add them one at a time.</string>
     <string name="extra_notes_add">Add File</string>
     <string name="extra_notes_unavailable">Not available. The file was moved or deleted, or access to it was lost.</string>
     <string name="extra_notes_unknown_name">Unknown file</string>
@@ -193,7 +193,7 @@
     <string name="fast_note_style_checkbox">Checkbox</string>
 
     <!-- Widget background opacity -->
-    <string name="widget_background_title">Widget background</string>
+    <string name="widget_background_title">Widget background (optional)</string>
     <string name="widget_background_desc">Lower it to let the wallpaper show through. Note cards keep their colours.</string>
     <string name="widget_background_value">%1$d%%</string>
     <string name="widget_color_desc">System follows the phone\'s theme. Any other colour stays the same in light and dark mode.</string>
