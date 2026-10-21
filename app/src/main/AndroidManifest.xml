@@ -36,12 +36,16 @@
 
         <activity
             android:name=".presentation.widget.AddNoteActivity"
+            android:excludeFromRecents="true"
             android:exported="false"
+            android:taskAffinity=""
             android:theme="@style/Theme.Translucent" />
 
         <activity
             android:name=".presentation.widget.FastNoteActivity"
+            android:excludeFromRecents="true"
             android:exported="false"
+            android:taskAffinity=""
             android:theme="@style/Theme.Translucent" />
 
         <activity
