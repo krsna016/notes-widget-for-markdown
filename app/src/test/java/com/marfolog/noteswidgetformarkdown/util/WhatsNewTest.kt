@@ -111,4 +111,21 @@ class WhatsNewTest {
         assertTrue(WhatsNew.arrivedByUpdate("1.3.0", "1.4.0", installedBefore = true))
         assertFalse(WhatsNew.arrivedByUpdate("1.3.0", "1.3.0-foss", installedBefore = true))
     }
+
+    @Test
+    fun updateFromOlderLineStraightToPatchReleaseStillShowsTheDialog() {
+        assertEquals(WhatsNew.itemsFor("1.3.0"), WhatsNew.itemsFor("1.3.1"))
+        assertTrue(show(versionName = "1.3.1", updatedToVersion = "1.3.1", seenVersion = null))
+    }
+
+    @Test
+    fun patchReleaseIsNotAnUpdateForTheDialog() {
+        assertFalse(WhatsNew.arrivedByUpdate("1.3.0", "1.3.1", installedBefore = true))
+        assertFalse(show(versionName = "1.3.1", updatedToVersion = "1.3.0", seenVersion = "1.3.0"))
+    }
+
+    @Test
+    fun someoneOn130WhoNeverOpenedSettingsStillSeesItAfter131() {
+        assertTrue(show(versionName = "1.3.1", updatedToVersion = "1.3.0", seenVersion = null))
+    }
 }

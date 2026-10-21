@@ -26,15 +26,20 @@ object WhatsNew {
     /** "1.3.0-foss" and "1.3.0" are the same release. */
     fun release(versionName: String): String = versionName.substringBefore('-').trim()
 
+    /** "1.3.1" and "1.3.0" share one dialog: a patch release brings no news of its own. */
+    internal fun line(versionName: String): String = release(versionName).split('.').take(2).joinToString(".")
+
     fun itemsFor(versionName: String, releases: Map<String, List<WhatsNewItem>> = RELEASES): List<WhatsNewItem> =
-        releases[release(versionName)].orEmpty()
+        releases[release(versionName)]
+            ?: releases.entries.firstOrNull { line(it.key) == line(versionName) }?.value
+            ?: emptyList()
 
     /**
      * Whether this start brought a new release to someone who already had the app. With no
      * version recorded yet, data from before is what tells an update from a fresh install.
      */
     internal fun arrivedByUpdate(lastVersionSeen: String?, versionName: String, installedBefore: Boolean): Boolean =
-        if (lastVersionSeen == null) installedBefore else release(lastVersionSeen) != release(versionName)
+        if (lastVersionSeen == null) installedBefore else line(lastVersionSeen) != line(versionName)
 
     /**
      * Once per release, for someone who updated to it, set up and not sent here to fix a failed
@@ -50,9 +55,9 @@ object WhatsNew {
         releases: Map<String, List<WhatsNewItem>> = RELEASES
     ): Boolean {
         if (!setupComplete || !remoteEnabled || openedFrom == UsageEvent.FROM_FAST_NOTE_ERROR) return false
-        val current = release(versionName)
-        if (itemsFor(current, releases).isEmpty()) return false
-        if (updatedToVersion == null || release(updatedToVersion) != current) return false
-        return seenVersion == null || release(seenVersion) != current
+        val current = line(versionName)
+        if (itemsFor(versionName, releases).isEmpty()) return false
+        if (updatedToVersion == null || line(updatedToVersion) != current) return false
+        return seenVersion == null || line(seenVersion) != current
     }
 }
