@@ -141,4 +141,46 @@ class MarkdownPreviewFormatterTest {
             preview
         )
     }
+
+    @Test
+    fun headingThatRepeatsTheCardTitleIsLeftOut() {
+        val preview = formatter.format(
+            """
+            # Groceries
+            - [ ] Olive oil
+            - [ ] Bread
+            """.trimIndent(),
+            title = "Groceries"
+        )
+
+        assertEquals("☐ Olive oil\n☐ Bread", preview)
+    }
+
+    @Test
+    fun repeatedTitleIsMatchedIgnoringCaseAndSpaces() {
+        val preview = formatter.format("#  groceries \nMilk", title = "Groceries")
+
+        assertEquals("Milk", preview)
+    }
+
+    @Test
+    fun headingWithDifferentTextStaysInThePreview() {
+        val preview = formatter.format("# Shopping list\nMilk", title = "Groceries")
+
+        assertEquals("Shopping list\nMilk", preview)
+    }
+
+    @Test
+    fun titleLaterInTheNoteIsKept() {
+        val preview = formatter.format("Intro line\n# Groceries\nMilk", title = "Groceries")
+
+        assertEquals("Intro line\nGroceries\nMilk", preview)
+    }
+
+    @Test
+    fun headingAfterFrontMatterThatRepeatsTitleIsLeftOut() {
+        val preview = formatter.format("---\ntags: [x]\n---\n# Groceries\nMilk", title = "Groceries")
+
+        assertEquals("Milk", preview)
+    }
 }

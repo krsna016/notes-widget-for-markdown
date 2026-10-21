@@ -179,7 +179,7 @@ class FileRepositoryImpl(
         return runCatching {
             val name = docFile.name ?: return null
             val title = name.removeSuffix(".md")
-            val preview = readPreview(docFile.uri)
+            val preview = readPreview(docFile.uri, title)
             val lastModified = docFile.lastModified()
 
             NoteSummary(
@@ -193,7 +193,7 @@ class FileRepositoryImpl(
         }.getOrNull()
     }
 
-    private fun readPreview(uri: Uri): String {
+    private fun readPreview(uri: Uri, title: String): String {
         return runCatching {
             contentResolver.openInputStream(uri)?.use { stream ->
                 BufferedReader(InputStreamReader(stream, Charsets.UTF_8)).use { reader ->
@@ -202,7 +202,7 @@ class FileRepositoryImpl(
                     while (reader.readLine().also { line = it } != null && lines.size < PREVIEW_SOURCE_LINE_COUNT) {
                         lines.add(line.orEmpty())
                     }
-                    previewFormatter.format(lines.joinToString("\n"))
+                    previewFormatter.format(lines.joinToString("\n"), title)
                 }
             } ?: ""
         }.getOrDefault("")

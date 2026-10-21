@@ -28,7 +28,8 @@ class MarkdownPreviewFormatter(
         .extensions(extensions)
         .build()
 
-    fun format(source: String): String {
+    /** A first heading that only repeats [title] is left out; the card already shows the title. */
+    fun format(source: String, title: String? = null): String {
         val markdown = source
             .lineSequence()
             .dropYamlFrontMatter()
@@ -36,6 +37,12 @@ class MarkdownPreviewFormatter(
             .joinToString("\n")
 
         val document = parser.parse(markdown)
+        val firstBlock = document.firstChild
+        if (title != null && firstBlock is Heading &&
+            PreviewVisitor().render(firstBlock).trim().equals(title.trim(), ignoreCase = true)
+        ) {
+            firstBlock.unlink()
+        }
         return PreviewVisitor().render(document)
             .lineSequence()
             .map { cleanupRenderedText(it.trimEnd()) }
