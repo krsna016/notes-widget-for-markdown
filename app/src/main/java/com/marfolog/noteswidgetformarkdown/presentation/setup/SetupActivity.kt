@@ -82,6 +82,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.Lifecycle
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
@@ -578,13 +582,20 @@ private fun SetupScreen(modifier: Modifier = Modifier) {
     }
     var showWhatsNew by rememberSaveable { mutableStateOf(false) }
     // Saved, so a rotation neither asks again nor brings a second dialog.
-    var autoPromptChecked by rememberSaveable { mutableStateOf(false) }
     var autoPrompt by rememberSaveable { mutableStateOf<AutoPrompt?>(null) }
-    // After the guide effect above, so someone who only just got their guide marked done counts
-    // as set up.
-    LaunchedEffect(Unit) {
-        if (autoPromptChecked) return@LaunchedEffect
-        autoPromptChecked = true
+    // Checked on every return to this screen until something shows: adding the widget happens on
+    // the home screen while settings stay open underneath.
+    var resumes by remember { mutableIntStateOf(0) }
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) resumes++
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
+    LaunchedEffect(resumes) {
+        if (resumes == 0 || autoPrompt != null) return@LaunchedEffect
         val now = System.currentTimeMillis()
         val setupComplete = notesUri != null && guideDone
         val openedFrom = (context as? Activity)?.intent?.getStringExtra(SetupActivity.EXTRA_OPENED_FROM)
@@ -767,6 +778,8 @@ private fun SetupScreen(modifier: Modifier = Modifier) {
             // otherwise never arrive.
             if (!enabled) logSettingChanged(UsageEvent.SETTING_TELEMETRY, UsageEvent.onOff(false))
             Telemetry.setEnabled(context, enabled)
+            Telemetry.markAsked(context)
+            askAboutReporting = false
             if (enabled) logSettingChanged(UsageEvent.SETTING_TELEMETRY, UsageEvent.onOff(true))
             AppLog.i(SetupActivity.AREA, "Reporting switched ${if (enabled) "on" else "off"}")
         },
@@ -1088,6 +1101,34 @@ internal fun SetupScreenContent(
         HorizontalDivider()
         Spacer(modifier = Modifier.height(24.dp))
 
+        Text(
+            text = stringResource(R.string.fast_note_target_title),
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.primary
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = stringResource(R.string.fast_note_target_desc),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+
+        FastNoteTargetSection(
+            // Fast notes go into the folder; an extra note is not a target.
+            notes = notes.filterNot { it.isExtra },
+            notesLoadError = notesLoadError,
+            selectedNoteUri = fastNoteTargetUri,
+            onTargetSelected = onFastNoteTargetSelected,
+            folderSelected = notesFolderName != null
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        FastNoteStyleChooser(selected = fastNoteStyle, onSelected = onFastNoteStyleChanged)
+
+        Spacer(modifier = Modifier.height(24.dp))
+        HorizontalDivider()
+        Spacer(modifier = Modifier.height(24.dp))
+
         ExtraNotesSection(
             entries = extraNotes,
             onAddFile = onAddExtraNote,
@@ -1134,34 +1175,6 @@ internal fun SetupScreenContent(
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-
-        Spacer(modifier = Modifier.height(24.dp))
-        HorizontalDivider()
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Text(
-            text = stringResource(R.string.fast_note_target_title),
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.primary
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            text = stringResource(R.string.fast_note_target_desc),
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Spacer(modifier = Modifier.height(12.dp))
-
-        FastNoteTargetSection(
-            // Fast notes go into the folder; an extra note is not a target.
-            notes = notes.filterNot { it.isExtra },
-            notesLoadError = notesLoadError,
-            selectedNoteUri = fastNoteTargetUri,
-            onTargetSelected = onFastNoteTargetSelected,
-            folderSelected = notesFolderName != null
-        )
-        Spacer(modifier = Modifier.height(12.dp))
-        FastNoteStyleChooser(selected = fastNoteStyle, onSelected = onFastNoteStyleChanged)
 
         Spacer(modifier = Modifier.height(32.dp))
 
@@ -1511,25 +1524,6 @@ private fun FastNoteTargetSection(
                     )
                 }
             }
-        }
-    }
-}
-
-@Composable
-private fun FastNoteStyleChooser(selected: FastNoteStyle, onSelected: (FastNoteStyle) -> Unit) {
-    Text(
-        text = stringResource(R.string.fast_note_style_title),
-        style = MaterialTheme.typography.labelMedium,
-        color = MaterialTheme.colorScheme.onSurfaceVariant
-    )
-    Spacer(modifier = Modifier.height(4.dp))
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        FAST_NOTE_STYLE_CHOICES.forEach { (style, labelRes) ->
-            FilterChip(
-                selected = selected == style,
-                onClick = { onSelected(style) },
-                label = { Text(stringResource(labelRes)) }
-            )
         }
     }
 }
@@ -2177,9 +2171,4 @@ private val OPEN_WITH_CHOICES = listOf(
     OpenWith.Obsidian to R.string.open_with_obsidian,
     OpenWith.DefaultApp to R.string.open_with_default,
     OpenWith.AskEveryTime to R.string.open_with_ask
-)
-
-private val FAST_NOTE_STYLE_CHOICES = listOf(
-    FastNoteStyle.Bullet to R.string.fast_note_style_bullet,
-    FastNoteStyle.Checkbox to R.string.fast_note_style_checkbox
 )

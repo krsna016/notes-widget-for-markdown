@@ -59,6 +59,7 @@ import com.marfolog.noteswidgetformarkdown.domain.model.FastNoteStyle
 import com.marfolog.noteswidgetformarkdown.domain.model.NoteSummary
 import com.marfolog.noteswidgetformarkdown.domain.usecase.AppendFastNoteUseCase
 import com.marfolog.noteswidgetformarkdown.domain.usecase.GetNotesUseCase
+import com.marfolog.noteswidgetformarkdown.presentation.setup.FastNoteStyleChooser
 import com.marfolog.noteswidgetformarkdown.presentation.setup.SetupActivity
 import com.marfolog.noteswidgetformarkdown.ui.theme.NotesWidgetForMarkdownTheme
 import com.marfolog.noteswidgetformarkdown.util.AppLog
@@ -80,6 +81,7 @@ class FastNoteActivity : ComponentActivity() {
     private var targetExists by mutableStateOf<Boolean?>(null)
     private var folderNotes by mutableStateOf<Result<List<NoteSummary>>?>(null)
     private var saving by mutableStateOf(false)
+    private var style by mutableStateOf(FastNoteStyle.Bullet)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -87,6 +89,7 @@ class FastNoteActivity : ComponentActivity() {
         val prefs = getSharedPreferences(SetupActivity.PREFS_NAME, MODE_PRIVATE)
         val notesFolderUri = prefs.getString(SetupActivity.KEY_NOTES_URI, null)
         targetUri = prefs.getString(SetupActivity.KEY_FAST_NOTE_TARGET_URI, null)
+        style = FastNoteStyle.from(prefs.getString(SetupActivity.KEY_FAST_NOTE_STYLE, null))
         lifecycleScope.launch {
             val target = targetUri
             if (!target.isNullOrBlank()) {
@@ -107,6 +110,8 @@ class FastNoteActivity : ComponentActivity() {
                             FastNoteStep.Write -> WriteContent(
                                 targetName = targetName,
                                 isSaving = saving,
+                                style = style,
+                                onStyleChange = ::changeStyle,
                                 onCancel = { finish() },
                                 onSave = ::save
                             )
@@ -166,6 +171,20 @@ class FastNoteActivity : ComponentActivity() {
         finish()
     }
 
+    private fun changeStyle(newStyle: FastNoteStyle) {
+        if (newStyle == style) return
+        style = newStyle
+        getSharedPreferences(SetupActivity.PREFS_NAME, MODE_PRIVATE)
+            .edit()
+            .putString(SetupActivity.KEY_FAST_NOTE_STYLE, newStyle.storageValue)
+            .apply()
+        Telemetry.event(
+            UsageEvent.SETTING_CHANGED,
+            UsageEvent.PARAM_SETTING to UsageEvent.SETTING_FAST_NOTE_STYLE,
+            UsageEvent.PARAM_VALUE to newStyle.storageValue
+        )
+    }
+
     private fun save(noteText: String, onError: (String) -> Unit) {
         val target = targetUri
         if (target.isNullOrBlank()) {
@@ -173,10 +192,7 @@ class FastNoteActivity : ComponentActivity() {
             return
         }
         saving = true
-        val style = FastNoteStyle.from(
-            getSharedPreferences(SetupActivity.PREFS_NAME, MODE_PRIVATE)
-                .getString(SetupActivity.KEY_FAST_NOTE_STYLE, null)
-        )
+        val style = style
         lifecycleScope.launch {
             val appendFastNoteUseCase = get<AppendFastNoteUseCase>(AppendFastNoteUseCase::class.java)
             appendFastNoteUseCase(target, noteText, style)
@@ -359,6 +375,8 @@ private fun NoTargetContent(messageRes: Int, onOpenSettings: () -> Unit, onCance
 private fun WriteContent(
     targetName: String?,
     isSaving: Boolean,
+    style: FastNoteStyle,
+    onStyleChange: (FastNoteStyle) -> Unit,
     onCancel: () -> Unit,
     onSave: (String, (String) -> Unit) -> Unit
 ) {
@@ -378,33 +396,37 @@ private fun WriteContent(
     StepLayout(
         title = {
             Column {
-                Text(stringResource(R.string.fast_note_title))
-                targetName?.let { name ->
-                    Text(
-                        text = stringResource(R.string.fast_note_adds_line_to, name),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    Text(stringResource(R.string.fast_note_title))
+                    targetName?.let { name ->
+                        Text(
+                            text = stringResource(R.string.fast_note_adds_line_to, name),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 }
+            },
+            body = {
+                Column {
+                OutlinedTextField(
+                    value = noteText,
+                    onValueChange = {
+                        noteText = it
+                        errorMessage = null
+                    },
+                    label = { Text(stringResource(R.string.fast_note_field_label)) },
+                    // Only speak up when something went wrong. The old hint explained the sync model
+                    // to someone who just wants to jot a line down.
+                    supportingText = errorMessage?.let { message -> { Text(message) } },
+                    isError = errorMessage != null,
+                    minLines = 3,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .focusRequester(focusRequester)
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                FastNoteStyleChooser(selected = style, onSelected = onStyleChange)
             }
-        },
-        body = {
-            OutlinedTextField(
-                value = noteText,
-                onValueChange = {
-                    noteText = it
-                    errorMessage = null
-                },
-                label = { Text(stringResource(R.string.fast_note_field_label)) },
-                // Only speak up when something went wrong. The old hint explained the sync model
-                // to someone who just wants to jot a line down.
-                supportingText = errorMessage?.let { message -> { Text(message) } },
-                isError = errorMessage != null,
-                minLines = 3,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .focusRequester(focusRequester)
-            )
         },
         buttons = {
             TextButton(
