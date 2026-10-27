@@ -143,10 +143,10 @@ internal fun BottomBar(
             .padding(top = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        WidgetSurface(backgroundPercent, cornerRadius = 16.dp) {
+        WidgetSurface(backgroundPercent, cornerRadius = 24.dp) {
             Row(
                 modifier = GlanceModifier
-                    .cornerRadius(16.dp)
+                    .cornerRadius(24.dp)
                     .background(ChromeColors.bar)
                     .padding(horizontal = 8.dp, vertical = 6.dp),
                 verticalAlignment = Alignment.CenterVertically
@@ -209,7 +209,7 @@ private fun RateChip(alternate: RateAlternate) {
     }
     Box(
         modifier = GlanceModifier
-            .cornerRadius(16.dp)
+            .cornerRadius(20.dp)
             .background(GlanceTheme.colors.tertiaryContainer)
     ) {
         AndroidRemoteViews(views)
@@ -247,10 +247,10 @@ private fun GitSyncLabel.Label.text(context: Context): String =
 
 @Composable
 private fun BarChip(onClick: Action, dotColor: ColorProvider, text: String, backgroundPercent: Int) {
-    WidgetSurface(backgroundPercent, cornerRadius = 16.dp) {
+    WidgetSurface(backgroundPercent, cornerRadius = 20.dp) {
         Row(
             modifier = GlanceModifier
-                .cornerRadius(16.dp)
+                .cornerRadius(20.dp)
                 .background(ChromeColors.bar)
                 .padding(horizontal = 10.dp, vertical = 6.dp)
                 .clickable(onClick),
@@ -280,7 +280,7 @@ internal fun QuickActions(vaultName: String?, noteFolderPath: String?) {
     Box(
         modifier = GlanceModifier
             .size(44.dp)
-            .cornerRadius(14.dp)
+            .cornerRadius(22.dp)
             .background(GlanceTheme.colors.primary)
             .clickable(
                 actionStartActivity(
@@ -300,7 +300,7 @@ internal fun QuickActions(vaultName: String?, noteFolderPath: String?) {
     Box(
         modifier = GlanceModifier
             .size(44.dp)
-            .cornerRadius(14.dp)
+            .cornerRadius(22.dp)
             .background(GlanceTheme.colors.primary)
             .clickable(
                 actionStartActivity(

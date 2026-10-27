@@ -70,8 +70,9 @@ class NotesListWidget : GlanceAppWidget() {
                     Box(
                         modifier = GlanceModifier
                             .fillMaxSize()
+                            .cornerRadius(32.dp)
                             .background(widgetBackground(backgroundPercent))
-                            .padding(12.dp),
+                            .padding(14.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         CircularProgressIndicator(color = ChromeColors.progress)
@@ -80,8 +81,9 @@ class NotesListWidget : GlanceAppWidget() {
                     Box(
                         modifier = GlanceModifier
                             .fillMaxSize()
+                            .cornerRadius(32.dp)
                             .background(widgetBackground(backgroundPercent))
-                            .padding(12.dp)
+                            .padding(14.dp)
                     ) {
                         ConfiguredScaffold(current.vaultName, current.noteFolderPath, current.bottomBarChip, backgroundPercent, isLoading) {
                             when (val state = current.state) {
@@ -155,17 +157,17 @@ private fun NoteNameRow(
     Row(
         modifier = GlanceModifier
             .fillMaxWidth()
-            .cornerRadius(12.dp)
+            .cornerRadius(20.dp)
             .background(appearance.backgroundColor())
             .clickable(actionStartActivity(openIntent))
-            .padding(horizontal = 12.dp, vertical = 10.dp),
+            .padding(horizontal = 14.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             text = note.title,
             style = TextStyle(
                 fontWeight = FontWeight.Medium,
-                fontSize = 14.sp,
+                fontSize = 20.sp,
                 color = appearance.contentColor()
             ),
             maxLines = 1,

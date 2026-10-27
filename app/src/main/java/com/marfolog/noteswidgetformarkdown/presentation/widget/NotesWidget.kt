@@ -149,6 +149,7 @@ private fun WidgetRoot(
     Box(
         modifier = GlanceModifier
             .fillMaxSize()
+            .cornerRadius(32.dp)
             .background(widgetBackground(backgroundPercent))
             .padding(16.dp)
     ) {
@@ -176,6 +177,7 @@ private fun LoadingRoot(backgroundPercent: Int) {
     Box(
         modifier = GlanceModifier
             .fillMaxSize()
+            .cornerRadius(32.dp)
             .background(widgetBackground(backgroundPercent))
             .padding(16.dp),
         contentAlignment = Alignment.Center
@@ -195,7 +197,7 @@ private fun UninitializedContent() {
     Column(
         modifier = GlanceModifier
             .fillMaxSize()
-            .cornerRadius(16.dp)
+            .cornerRadius(32.dp)
             .background(GlanceTheme.colors.surfaceVariant)
             .clickable(actionStartActivity(setupIntent))
             .padding(24.dp),
@@ -239,7 +241,7 @@ private fun PermissionLostContent() {
     Column(
         modifier = GlanceModifier
             .fillMaxSize()
-            .cornerRadius(16.dp)
+            .cornerRadius(32.dp)
             .background(GlanceTheme.colors.surfaceVariant)
             .clickable(actionStartActivity(setupIntent))
             .padding(24.dp),
@@ -367,10 +369,10 @@ private fun NoteCard(
         modifier = GlanceModifier
             .fillMaxWidth()
             .height(appearance.size.heightDp.dp)
-            .cornerRadius(16.dp)
+            .cornerRadius(24.dp)
             .background(appearance.backgroundColor())
             .clickable(actionStartActivity(openIntent))
-            .padding(12.dp)
+            .padding(14.dp)
     ) {
         Text(
             text = note.title,
@@ -388,7 +390,7 @@ private fun NoteCard(
                 color = appearance.contentColor()
             ),
             maxLines = appearance.size.previewMaxLines,
-            modifier = GlanceModifier.padding(top = 4.dp)
+            modifier = GlanceModifier.padding(top = 6.dp)
         )
     }
 }
