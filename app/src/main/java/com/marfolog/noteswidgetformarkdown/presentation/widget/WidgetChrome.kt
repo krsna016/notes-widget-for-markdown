@@ -72,28 +72,40 @@ internal fun WidgetActionButtons(isLoading: Boolean = false) {
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             RoundIconButton(
+                icon = R.drawable.ic_add,
+                contentDescription = "New note",
+                onClickModifier = GlanceModifier.clickable(
+                    actionStartActivity(
+                        Intent(LocalContext.current, AddNoteActivity::class.java)
+                    )
+                ),
+                size = 30.dp,
+                iconSize = 15.dp
+            )
+            Spacer(modifier = GlanceModifier.width(5.dp))
+            RoundIconButton(
                 icon = R.drawable.ic_copy,
                 contentDescription = "Copy note",
                 onClickModifier = GlanceModifier.clickable(actionRunCallback<CopyNoteAction>()),
-                size = 32.dp,
-                iconSize = 16.dp
+                size = 30.dp,
+                iconSize = 15.dp
             )
-            Spacer(modifier = GlanceModifier.width(6.dp))
+            Spacer(modifier = GlanceModifier.width(5.dp))
             RoundIconButton(
                 icon = R.drawable.ic_text_size,
                 contentDescription = "Change font size",
                 onClickModifier = GlanceModifier.clickable(actionRunCallback<CycleTextSizeAction>()),
-                size = 32.dp,
-                iconSize = 16.dp
+                size = 30.dp,
+                iconSize = 15.dp
             )
-            Spacer(modifier = GlanceModifier.width(6.dp))
+            Spacer(modifier = GlanceModifier.width(5.dp))
             if (isLoading) {
                 Box(
-                    modifier = GlanceModifier.size(32.dp),
+                    modifier = GlanceModifier.size(30.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     CircularProgressIndicator(
-                        modifier = GlanceModifier.size(16.dp),
+                        modifier = GlanceModifier.size(15.dp),
                         color = ChromeColors.onButton
                     )
                 }
@@ -102,17 +114,17 @@ internal fun WidgetActionButtons(isLoading: Boolean = false) {
                     icon = R.drawable.ic_refresh,
                     contentDescription = LocalContext.current.getString(R.string.action_refresh),
                     onClickModifier = GlanceModifier.clickable(actionRunCallback<RefreshWidgetAction>()),
-                    size = 32.dp,
-                    iconSize = 16.dp
+                    size = 30.dp,
+                    iconSize = 15.dp
                 )
             }
-            Spacer(modifier = GlanceModifier.width(6.dp))
+            Spacer(modifier = GlanceModifier.width(5.dp))
             RoundIconButton(
                 icon = R.drawable.ic_edit,
                 contentDescription = LocalContext.current.getString(R.string.action_open_settings),
                 onClickModifier = GlanceModifier.clickable(actionStartActivity(setupIntent)),
-                size = 32.dp,
-                iconSize = 16.dp
+                size = 30.dp,
+                iconSize = 15.dp
             )
         }
     }
@@ -357,12 +369,9 @@ internal fun ConfiguredScaffold(
     isLoading: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    Column(modifier = GlanceModifier.fillMaxSize()) {
-        Box(modifier = GlanceModifier.defaultWeight().fillMaxWidth()) {
-            content()
-            WidgetActionButtons(isLoading)
-        }
-        BottomBar(vaultName, noteFolderPath, bottomBarChip, backgroundPercent)
+    Box(modifier = GlanceModifier.fillMaxSize()) {
+        content()
+        WidgetActionButtons(isLoading)
     }
 }
 
