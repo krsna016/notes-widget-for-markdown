@@ -207,4 +207,25 @@ class MarkdownPreviewFormatterTest {
         assertTrue(preview.contains("§QUOTE§An inspiring quote"))
         assertTrue(preview.contains("§CODE§println(\"code\")"))
     }
+
+    @Test
+    fun formatsMarkdownTablesIntoCleanTaskAndBulletLists() {
+        val markdown = """
+            ## Pillar 1: Reading
+            | Book Title | Author | Status | Rating | Core Mental Model |
+            | :--- | :--- | :---: | :---: | :--- |
+            | **Linux Basics for Hackers** | OccupyTheWeb | `[⏳] In Progress` | — | Everything in Linux is a file. |
+            | **Thinking, Fast and Slow** | Daniel Kahneman | `[ ] Queued` | — | System 1 vs System 2. |
+            | **How to Read a Book** | Mortimer J. Adler | `[x] Mastered` | ⭐⭐⭐⭐⭐ | The 4 Levels of Reading. |
+        """.trimIndent()
+
+        val preview = formatter.format(markdown, richFormatting = true)
+
+        assertFalse(preview.contains("|"))
+        assertFalse(preview.contains(":---"))
+        assertTrue(preview.contains("§H2§Pillar 1: Reading"))
+        assertTrue(preview.contains("☐ ⏳ Linux Basics for Hackers (OccupyTheWeb) — Everything in Linux is a file."))
+        assertTrue(preview.contains("☐ Thinking, Fast and Slow (Daniel Kahneman) — System 1 vs System 2."))
+        assertTrue(preview.contains("☑ How to Read a Book (Mortimer J. Adler) — ⭐⭐⭐⭐⭐ — The 4 Levels of Reading."))
+    }
 }

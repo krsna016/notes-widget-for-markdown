@@ -38,7 +38,8 @@ class ToggleTaskAction : ActionCallback {
 
             val lines = originalText.lines().toMutableList()
             var modified = false
-            val cleanTarget = taskText.trim().lowercase()
+            val cleanTarget = taskText.trim().lowercase().replace("**", "").replace("⏳", "").trim()
+            val targetSubject = cleanTarget.substringBefore("(").substringBefore("—").trim()
 
             for (i in lines.indices) {
                 val line = lines[i]
@@ -49,11 +50,24 @@ class ToggleTaskAction : ActionCallback {
                     val cleanContent = content.trim().lowercase()
 
                     if (isLineChecked == currentlyChecked &&
-                        (cleanContent == cleanTarget || cleanContent.contains(cleanTarget) || cleanTarget.contains(cleanContent))) {
+                        (cleanContent == cleanTarget || cleanContent.contains(cleanTarget) || cleanTarget.contains(cleanContent) || (targetSubject.isNotEmpty() && cleanContent.contains(targetSubject)))) {
                         val newMark = if (currentlyChecked) " " else "x"
                         lines[i] = "$prefix$newMark$bracketSpace$content"
                         modified = true
                         break
+                    }
+                } else if (line.contains("|")) {
+                    val tableMatch = Regex("""^(.*\[)([ xX⏳])(\].*)$""").find(line)
+                    if (tableMatch != null) {
+                        val (before, mark, after) = tableMatch.destructured
+                        val isLineChecked = mark.equals("x", ignoreCase = true)
+                        val lineLower = line.lowercase()
+                        if (isLineChecked == currentlyChecked && (targetSubject.isNotEmpty() && lineLower.contains(targetSubject))) {
+                            val newMark = if (currentlyChecked) " " else "x"
+                            lines[i] = "$before$newMark$after"
+                            modified = true
+                            break
+                        }
                     }
                 }
             }

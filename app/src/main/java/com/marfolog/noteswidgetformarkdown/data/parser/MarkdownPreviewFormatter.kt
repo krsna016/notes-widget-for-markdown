@@ -37,6 +37,7 @@ class MarkdownPreviewFormatter(
         val markdown = source
             .lineSequence()
             .dropYamlFrontMatter()
+            .let { transformMarkdownTables(it, richFormatting) }
             .map { normalizeObsidianMarkdown(it, richFormatting) }
             .joinToString("\n")
 
@@ -82,7 +83,7 @@ class MarkdownPreviewFormatter(
     }
 
     private fun cleanupRenderedText(line: String, richFormatting: Boolean = false): String {
-        if (richFormatting && line.startsWith("§CODE§")) {
+        if (richFormatting && (line.startsWith("§CODE§") || line.startsWith("§H1§") || line.startsWith("§H2§") || line.startsWith("§H3§") || line.startsWith("§H4§") || line.startsWith("§QUOTE§") || line == "§HR§")) {
             return line.trimEnd()
         }
         return line
@@ -90,6 +91,122 @@ class MarkdownPreviewFormatter(
             .replace(renderedQuotedInlineRegex) { match -> match.groupValues[1] }
             .replace(renderedWrappedInlineRegex) { match -> match.groupValues[1] }
             .trimEnd()
+    }
+
+    private fun transformMarkdownTables(source: Sequence<String>, richFormatting: Boolean): Sequence<String> = sequence {
+        val lines = source.toList()
+        var inCodeBlock = false
+        var i = 0
+        while (i < lines.size) {
+            val line = lines[i]
+            val trimmed = line.trim()
+            if (trimmed.startsWith("```")) {
+                inCodeBlock = !inCodeBlock
+                yield(line)
+                i++
+                continue
+            }
+            if (inCodeBlock) {
+                yield(line)
+                i++
+                continue
+            }
+
+            val isCurrentRow = isPotentialTableRow(trimmed)
+            val nextTrimmed = if (i + 1 < lines.size) lines[i + 1].trim() else ""
+            val isNextSeparator = isTableSeparator(nextTrimmed)
+
+            if (isCurrentRow && isNextSeparator) {
+                // Table header found, skip header and separator
+                i += 2
+                // Process table data rows
+                while (i < lines.size) {
+                    val rowLine = lines[i].trim()
+                    if (!isPotentialTableRow(rowLine)) {
+                        break
+                    }
+                    if (isTableSeparator(rowLine)) {
+                        i++
+                        continue
+                    }
+                    val cells = splitTableCells(rowLine)
+                    if (cells.isNotEmpty()) {
+                        val formatted = formatTableRow(cells, richFormatting)
+                        if (formatted.isNotBlank()) {
+                            yield(formatted)
+                        }
+                    }
+                    i++
+                }
+                continue
+            }
+
+            if (isTableSeparator(trimmed)) {
+                // Isolated separator line, skip
+                i++
+                continue
+            }
+
+            yield(line)
+            i++
+        }
+    }
+
+    private fun isPotentialTableRow(line: String): Boolean {
+        return line.startsWith("|") && line.endsWith("|") && line.length > 2
+    }
+
+    private fun splitTableCells(line: String): List<String> {
+        val trimmed = line.trim().removePrefix("|").removeSuffix("|")
+        return trimmed.split("|").map { it.trim() }
+    }
+
+    private fun isTableSeparator(line: String): Boolean {
+        if (!line.contains("|")) return false
+        val cells = splitTableCells(line)
+        return cells.isNotEmpty() && cells.all { it.matches(tableSeparatorRegex) }
+    }
+
+    private fun formatTableRow(cells: List<String>, richFormatting: Boolean): String {
+        var hasChecked = false
+        var hasUnchecked = false
+        var hasInProgress = false
+
+        for (c in cells) {
+            when {
+                Regex("""\[[xX]\]""").containsMatchIn(c) -> hasChecked = true
+                Regex("""\[\s*\]""").containsMatchIn(c) -> hasUnchecked = true
+                c.contains("[⏳]") || c.contains("⏳") -> hasInProgress = true
+            }
+        }
+
+        val prefix = when {
+            hasChecked -> "- [x] "
+            hasInProgress -> "- [ ] ⏳ "
+            hasUnchecked -> "- [ ] "
+            else -> "- "
+        }
+
+        val meaningfulCells = cells.map { cell ->
+            cell.replace("`", "")
+                .replace(Regex("""\[[ xX⏳]\]"""), "")
+                .trim()
+        }.filter { cell ->
+            cell.isNotBlank() && cell != "—" && cell != "-" && !cell.equals("n/a", ignoreCase = true) &&
+                !cell.equals("queued", ignoreCase = true) &&
+                (!hasInProgress || !cell.equals("in progress", ignoreCase = true)) &&
+                (!hasChecked || !cell.equals("mastered", ignoreCase = true))
+        }
+
+        if (meaningfulCells.isEmpty()) return ""
+
+        val title = if (meaningfulCells[0].startsWith("**")) meaningfulCells[0] else "**${meaningfulCells[0]}**"
+
+        return when {
+            meaningfulCells.size == 1 -> "$prefix$title"
+            meaningfulCells.size == 2 -> "$prefix$title — ${meaningfulCells[1]}"
+            else -> "$prefix$title (${meaningfulCells[1]}) — ${meaningfulCells.drop(2).joinToString(" — ")}"
+        }
     }
 
     private fun Sequence<String>.dropYamlFrontMatter(): Sequence<String> {
@@ -240,7 +357,7 @@ class MarkdownPreviewFormatter(
         }
 
         override fun visit(softLineBreak: SoftLineBreak) {
-            builder.append('\n')
+            builder.append(' ')
         }
 
         override fun visit(hardLineBreak: HardLineBreak) {
@@ -308,6 +425,7 @@ class MarkdownPreviewFormatter(
 
     companion object {
         private const val DEFAULT_PREVIEW_LINE_COUNT = 100
+        private val tableSeparatorRegex = Regex("^:?-{2,}:?$")
         private val extensions: List<Extension> = listOf(
             TaskListItemsExtension.create(),
             StrikethroughExtension.create()
