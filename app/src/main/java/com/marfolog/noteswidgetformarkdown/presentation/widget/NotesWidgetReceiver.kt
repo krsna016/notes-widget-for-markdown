@@ -10,8 +10,32 @@ import androidx.work.WorkManager
 import com.marfolog.noteswidgetformarkdown.worker.RefreshWorker
 import java.util.concurrent.TimeUnit
 
+import android.content.Intent
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import com.marfolog.noteswidgetformarkdown.util.AppLog
+
 class NotesWidgetReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = NotesWidget()
+
+    override fun onReceive(context: Context, intent: Intent) {
+        super.onReceive(context, intent)
+        val action = intent.action
+        if (action == "com.marfolog.noteswidgetformarkdown.REFRESH" || action == Intent.ACTION_MY_PACKAGE_REPLACED) {
+            AppLog.d("WidgetReceiver", "Explicit refresh broadcast received: $action")
+            val pending = goAsync()
+            CoroutineScope(Dispatchers.Default).launch {
+                try {
+                    NotesWidget.updateAll(context.applicationContext)
+                } catch (t: Throwable) {
+                    AppLog.w("WidgetReceiver", "Failed on explicit refresh broadcast", t)
+                } finally {
+                    pending.finish()
+                }
+            }
+        }
+    }
 
     // Only bookkeeping here: calling NotesWidget.updateAll() from onUpdate would loop.
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {

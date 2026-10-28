@@ -65,8 +65,8 @@ class NotesFolderObserverJob : JobService() {
         private const val JOB_ID = 4711
 
         /** Coalesce bursts — a sync client writing ten files should cause one refresh. */
-        private const val UPDATE_DELAY_MILLIS = 2_000L
-        private const val MAX_DELAY_MILLIS = 10_000L
+        private const val UPDATE_DELAY_MILLIS = 500L
+        private const val MAX_DELAY_MILLIS = 2_000L
         private const val KEY_FOLDER_FINGERPRINT = "notes_folder_fingerprint"
 
         /**
@@ -88,16 +88,18 @@ class NotesFolderObserverJob : JobService() {
                     ?: return@runCatching null
                 val markdown = folder.listFiles()
                     .filter { it.isFile && it.name?.endsWith(".md", ignoreCase = true) == true }
-                val newest = markdown.maxOfOrNull { it.lastModified() } ?: 0L
+                val notesData = markdown.sortedBy { it.name }
+                    .joinToString(";") { "${it.name}:${it.lastModified()}:${it.length()}" }
                 // Extra notes sit outside the folder, so the listing above never sees them
                 // change. The MediaStore trigger does fire for them; without their own times in
                 // the fingerprint that event would be thrown away as "nothing new".
                 val extras = ExtraNotesStore(context).getAll().joinToString(",") { fileUri ->
                     runCatching {
-                        DocumentFile.fromSingleUri(context, Uri.parse(fileUri))?.lastModified() ?: 0L
-                    }.getOrDefault(0L).toString()
+                        val doc = DocumentFile.fromSingleUri(context, Uri.parse(fileUri))
+                        "${doc?.name}:${doc?.lastModified()}:${doc?.length()}"
+                    }.getOrDefault("0")
                 }
-                "${markdown.size}:$newest|$extras"
+                "$notesData|$extras"
             }.getOrNull() ?: run {
                 AppLog.d(AREA, "Fingerprint check failed, assuming changed")
                 return true

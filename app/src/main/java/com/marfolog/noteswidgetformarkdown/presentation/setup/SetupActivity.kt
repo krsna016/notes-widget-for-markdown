@@ -271,6 +271,15 @@ private fun SetupScreen(modifier: Modifier = Modifier) {
     var extraNoteUris by remember { mutableStateOf(extraNotesStore.getAll()) }
     var extraNoteEntries by remember { mutableStateOf<List<ExtraNoteEntry>>(emptyList()) }
     var extraNoteToRemove by remember { mutableStateOf<ExtraNoteEntry?>(null) }
+    var resumes by remember { mutableIntStateOf(0) }
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) resumes++
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
 
     LaunchedEffect(extraNoteUris) {
         val getExtraNotesUseCase = get<GetExtraNotesUseCase>(GetExtraNotesUseCase::class.java)
@@ -285,7 +294,7 @@ private fun SetupScreen(modifier: Modifier = Modifier) {
         }
     }
 
-    LaunchedEffect(notesUri, extraNoteUris) {
+    LaunchedEffect(notesUri, extraNoteUris, resumes) {
         val currentNotesUri = notesUri
         if (currentNotesUri.isNullOrEmpty()) {
             notesForSettings = emptyList()
@@ -588,17 +597,6 @@ private fun SetupScreen(modifier: Modifier = Modifier) {
     var showWhatsNew by rememberSaveable { mutableStateOf(false) }
     // Saved, so a rotation neither asks again nor brings a second dialog.
     var autoPrompt by rememberSaveable { mutableStateOf<AutoPrompt?>(null) }
-    // Checked on every return to this screen until something shows: adding the widget happens on
-    // the home screen while settings stay open underneath.
-    var resumes by remember { mutableIntStateOf(0) }
-    val lifecycleOwner = LocalLifecycleOwner.current
-    DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME) resumes++
-        }
-        lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
-    }
     LaunchedEffect(resumes) {
         if (resumes == 0 || autoPrompt != null) return@LaunchedEffect
         val now = System.currentTimeMillis()
