@@ -67,19 +67,17 @@ internal fun WidgetActionButtons(isLoading: Boolean = false) {
     val setupIntent = SetupActivity.intent(LocalContext.current, UsageEvent.FROM_WIDGET)
 
     Box(
-        modifier = GlanceModifier.fillMaxSize().padding(4.dp),
+        modifier = GlanceModifier.fillMaxSize().padding(6.dp),
         contentAlignment = Alignment.TopEnd
     ) {
-        Column(horizontalAlignment = Alignment.End) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
             if (isLoading) {
-                // Same slot the refresh button sits in, so a refresh in flight reads as "in
-                // progress" without the rest of the widget going blank to show it.
                 Box(
-                    modifier = GlanceModifier.size(40.dp),
+                    modifier = GlanceModifier.size(32.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     CircularProgressIndicator(
-                        modifier = GlanceModifier.size(20.dp),
+                        modifier = GlanceModifier.size(16.dp),
                         color = ChromeColors.onButton
                     )
                 }
@@ -87,14 +85,18 @@ internal fun WidgetActionButtons(isLoading: Boolean = false) {
                 RoundIconButton(
                     icon = R.drawable.ic_refresh,
                     contentDescription = LocalContext.current.getString(R.string.action_refresh),
-                    onClickModifier = GlanceModifier.clickable(actionRunCallback<RefreshWidgetAction>())
+                    onClickModifier = GlanceModifier.clickable(actionRunCallback<RefreshWidgetAction>()),
+                    size = 32.dp,
+                    iconSize = 16.dp
                 )
             }
-            Spacer(modifier = GlanceModifier.height(8.dp))
+            Spacer(modifier = GlanceModifier.width(6.dp))
             RoundIconButton(
                 icon = R.drawable.ic_edit,
                 contentDescription = LocalContext.current.getString(R.string.action_open_settings),
-                onClickModifier = GlanceModifier.clickable(actionStartActivity(setupIntent))
+                onClickModifier = GlanceModifier.clickable(actionStartActivity(setupIntent)),
+                size = 32.dp,
+                iconSize = 16.dp
             )
         }
     }
@@ -104,12 +106,14 @@ internal fun WidgetActionButtons(isLoading: Boolean = false) {
 internal fun RoundIconButton(
     icon: Int,
     contentDescription: String,
-    onClickModifier: GlanceModifier
+    onClickModifier: GlanceModifier,
+    size: Dp = 32.dp,
+    iconSize: Dp = 16.dp
 ) {
     Box(
         modifier = GlanceModifier
-            .size(40.dp)
-            .cornerRadius(20.dp)
+            .size(size)
+            .cornerRadius(size / 2)
             .background(ChromeColors.button)
             .then(onClickModifier),
         contentAlignment = Alignment.Center
@@ -117,7 +121,7 @@ internal fun RoundIconButton(
         Image(
             provider = ImageProvider(icon),
             contentDescription = contentDescription,
-            modifier = GlanceModifier.size(20.dp),
+            modifier = GlanceModifier.size(iconSize),
             colorFilter = ColorFilter.tint(ChromeColors.onButton)
         )
     }
@@ -279,8 +283,8 @@ private fun BarChip(onClick: Action, dotColor: ColorProvider, text: String, back
 internal fun QuickActions(vaultName: String?, noteFolderPath: String?) {
     Box(
         modifier = GlanceModifier
-            .size(44.dp)
-            .cornerRadius(22.dp)
+            .size(34.dp)
+            .cornerRadius(17.dp)
             .background(GlanceTheme.colors.primary)
             .clickable(
                 actionStartActivity(
@@ -292,15 +296,15 @@ internal fun QuickActions(vaultName: String?, noteFolderPath: String?) {
         Image(
             provider = ImageProvider(R.drawable.ic_add),
             contentDescription = LocalContext.current.getString(R.string.action_add_note),
-            modifier = GlanceModifier.size(24.dp),
+            modifier = GlanceModifier.size(18.dp),
             colorFilter = ColorFilter.tint(GlanceTheme.colors.onPrimary)
         )
     }
-    Spacer(modifier = GlanceModifier.width(8.dp))
+    Spacer(modifier = GlanceModifier.width(6.dp))
     Box(
         modifier = GlanceModifier
-            .size(44.dp)
-            .cornerRadius(22.dp)
+            .size(34.dp)
+            .cornerRadius(17.dp)
             .background(GlanceTheme.colors.primary)
             .clickable(
                 actionStartActivity(
@@ -315,7 +319,7 @@ internal fun QuickActions(vaultName: String?, noteFolderPath: String?) {
         Image(
             provider = ImageProvider(R.drawable.ic_fast_note),
             contentDescription = LocalContext.current.getString(R.string.action_add_fast_note),
-            modifier = GlanceModifier.size(22.dp),
+            modifier = GlanceModifier.size(18.dp),
             colorFilter = ColorFilter.tint(GlanceTheme.colors.onPrimary)
         )
     }
@@ -472,6 +476,15 @@ internal fun NoteCardAppearance.contentColor(): ColorProvider {
     }
     val fixed = custom ?: NoteCardPalette.content(color)
     return fixed?.let { ColorProvider(it) } ?: GlanceTheme.colors.onSurfaceVariant
+}
+
+internal fun NoteCardAppearance.accentRibbonColor(): Color {
+    val custom = if (color == NoteCardColor.Custom) {
+        NoteCardPalette.parseCustom(customColorHex)
+    } else {
+        null
+    }
+    return custom ?: NoteCardPalette.accent(color)
 }
 
 // endregion

@@ -16,7 +16,8 @@ enum class NoteCardSize(
     Compact("compact", "Compact", 120, 4),
     Medium("medium", "Medium", 190, 8),
     Large("large", "Large", 300, 16),
-    ExtraLarge("extra_large", "XL", 400, 24);
+    ExtraLarge("extra_large", "XL", 400, 24),
+    Full("full", "Full", 540, 36);
 
     companion object {
         fun fromStorage(value: String?): NoteCardSize {
@@ -30,6 +31,9 @@ enum class NoteCardColor(
     val label: String
 ) {
     Default("default", "Default"),
+    Obsidian("obsidian", "Obsidian"),
+    Oled("oled", "OLED"),
+    Nord("nord", "Nord"),
     Rose("rose", "Rose"),
     Red("red", "Red"),
     Amber("amber", "Amber"),

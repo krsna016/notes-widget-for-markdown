@@ -34,9 +34,11 @@ import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
+import androidx.glance.layout.width
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
+import androidx.glance.unit.ColorProvider
 import com.marfolog.noteswidgetformarkdown.R
 import com.marfolog.noteswidgetformarkdown.domain.model.NoteCardAppearance
 import com.marfolog.noteswidgetformarkdown.ui.theme.WidgetPalette
@@ -72,7 +74,7 @@ class NotesListWidget : GlanceAppWidget() {
                             .fillMaxSize()
                             .cornerRadius(32.dp)
                             .background(widgetBackground(backgroundPercent))
-                            .padding(14.dp),
+                            .padding(10.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         CircularProgressIndicator(color = ChromeColors.progress)
@@ -83,7 +85,7 @@ class NotesListWidget : GlanceAppWidget() {
                             .fillMaxSize()
                             .cornerRadius(32.dp)
                             .background(widgetBackground(backgroundPercent))
-                            .padding(14.dp)
+                            .padding(10.dp)
                     ) {
                         ConfiguredScaffold(current.vaultName, current.noteFolderPath, current.bottomBarChip, backgroundPercent, isLoading) {
                             when (val state = current.state) {
@@ -153,20 +155,31 @@ private fun NoteNameRow(
     appearance: NoteCardAppearance
 ) {
     val openIntent = widgetNoteOpenIntent(LocalContext.current, note, vaultName, noteFolderPath)
+    val ribbonColor = ColorProvider(appearance.accentRibbonColor())
 
     Row(
         modifier = GlanceModifier
             .fillMaxWidth()
-            .cornerRadius(20.dp)
+            .cornerRadius(22.dp)
             .background(appearance.backgroundColor())
             .clickable(actionStartActivity(openIntent))
             .padding(horizontal = 14.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        Box(
+            modifier = GlanceModifier
+                .width(4.dp)
+                .height(20.dp)
+                .cornerRadius(2.dp)
+                .background(ribbonColor)
+        ) {}
+
+        Spacer(modifier = GlanceModifier.width(10.dp))
+
         Text(
             text = note.title,
             style = TextStyle(
-                fontWeight = FontWeight.Medium,
+                fontWeight = FontWeight.Bold,
                 fontSize = 20.sp,
                 color = appearance.contentColor()
             ),

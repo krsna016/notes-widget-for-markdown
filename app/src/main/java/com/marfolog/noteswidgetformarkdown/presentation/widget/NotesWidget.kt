@@ -36,6 +36,7 @@ import androidx.glance.layout.Box
 import androidx.glance.layout.Column
 import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
+import androidx.glance.layout.fillMaxHeight
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
@@ -151,7 +152,7 @@ private fun WidgetRoot(
             .fillMaxSize()
             .cornerRadius(32.dp)
             .background(widgetBackground(backgroundPercent))
-            .padding(16.dp)
+            .padding(10.dp)
     ) {
         when (state) {
             is WidgetState.Uninitialized -> UninitializedContent()
@@ -179,7 +180,7 @@ private fun LoadingRoot(backgroundPercent: Int) {
             .fillMaxSize()
             .cornerRadius(32.dp)
             .background(widgetBackground(backgroundPercent))
-            .padding(16.dp),
+            .padding(10.dp),
         contentAlignment = Alignment.Center
     ) {
         CircularProgressIndicator(color = ChromeColors.progress)
@@ -364,34 +365,53 @@ private fun NoteCard(
     appearance: NoteCardAppearance
 ) {
     val openIntent = widgetNoteOpenIntent(LocalContext.current, note, vaultName, noteFolderPath)
+    val ribbonColor = ColorProvider(appearance.accentRibbonColor())
 
-    Column(
+    Row(
         modifier = GlanceModifier
             .fillMaxWidth()
             .height(appearance.size.heightDp.dp)
-            .cornerRadius(24.dp)
+            .cornerRadius(28.dp)
             .background(appearance.backgroundColor())
             .clickable(actionStartActivity(openIntent))
-            .padding(14.dp)
+            .padding(14.dp),
+        verticalAlignment = Alignment.Top
     ) {
-        Text(
-            text = note.title,
-            style = TextStyle(
-                fontWeight = FontWeight.Bold,
-                fontSize = appearance.textSize.titleSp.sp,
-                color = appearance.contentColor()
-            ),
-            maxLines = 1
-        )
-        Text(
-            text = note.preview,
-            style = TextStyle(
-                fontSize = appearance.textSize.previewSp.sp,
-                color = appearance.contentColor()
-            ),
-            maxLines = appearance.size.previewMaxLines,
-            modifier = GlanceModifier.padding(top = 6.dp)
-        )
+        // Luxury Left-Edge Accent Ribbon
+        Box(
+            modifier = GlanceModifier
+                .width(4.dp)
+                .fillMaxHeight()
+                .cornerRadius(2.dp)
+                .background(ribbonColor)
+        ) {}
+
+        Spacer(modifier = GlanceModifier.width(10.dp))
+
+        Column(
+            modifier = GlanceModifier
+                .defaultWeight()
+                .fillMaxHeight()
+        ) {
+            Text(
+                text = note.title,
+                style = TextStyle(
+                    fontWeight = FontWeight.Bold,
+                    fontSize = appearance.textSize.titleSp.sp,
+                    color = appearance.contentColor()
+                ),
+                maxLines = 1
+            )
+            Spacer(modifier = GlanceModifier.height(4.dp))
+            Text(
+                text = note.preview,
+                style = TextStyle(
+                    fontSize = appearance.textSize.previewSp.sp,
+                    color = appearance.contentColor()
+                ),
+                maxLines = appearance.size.previewMaxLines
+            )
+        }
     }
 }
 

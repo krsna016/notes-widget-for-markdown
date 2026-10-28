@@ -16,6 +16,9 @@ object NoteCardPalette {
 
     fun background(color: NoteCardColor): Color? = when (color) {
         NoteCardColor.Default -> null
+        NoteCardColor.Obsidian -> Color(0xFF1E1A2E)
+        NoteCardColor.Oled -> Color(0xFF0F0F12)
+        NoteCardColor.Nord -> Color(0xFF242933)
         NoteCardColor.Rose -> Color(0xFFFFDAD6)
         NoteCardColor.Red -> Color(0xFFFFB4AB)
         NoteCardColor.Amber -> Color(0xFFFFDEA6)
@@ -30,6 +33,9 @@ object NoteCardPalette {
 
     fun content(color: NoteCardColor): Color? = when (color) {
         NoteCardColor.Default -> null
+        NoteCardColor.Obsidian -> Color(0xFFF3E8FF)
+        NoteCardColor.Oled -> Color(0xFFF8FAFC)
+        NoteCardColor.Nord -> Color(0xFFECEFF4)
         NoteCardColor.Rose -> Color(0xFF410002)
         NoteCardColor.Red -> Color(0xFF690005)
         NoteCardColor.Amber -> Color(0xFF2A1800)
@@ -40,6 +46,23 @@ object NoteCardPalette {
         NoteCardColor.Blue -> Color(0xFF001D36)
         NoteCardColor.Lavender -> Color(0xFF1D1735)
         NoteCardColor.Custom -> null
+    }
+
+    fun accent(color: NoteCardColor): Color = when (color) {
+        NoteCardColor.Default -> Color(0xFF8B5CF6)
+        NoteCardColor.Obsidian -> Color(0xFFA855F7)
+        NoteCardColor.Oled -> Color(0xFF38BDF8)
+        NoteCardColor.Nord -> Color(0xFF88C0D0)
+        NoteCardColor.Rose -> Color(0xFFE11D48)
+        NoteCardColor.Red -> Color(0xFFDC2626)
+        NoteCardColor.Amber -> Color(0xFFD97706)
+        NoteCardColor.Orange -> Color(0xFFEA580C)
+        NoteCardColor.Mint -> Color(0xFF059669)
+        NoteCardColor.Green -> Color(0xFF16A34A)
+        NoteCardColor.Sky -> Color(0xFF0284C7)
+        NoteCardColor.Blue -> Color(0xFF2563EB)
+        NoteCardColor.Lavender -> Color(0xFF7C3AED)
+        NoteCardColor.Custom -> Color(0xFF8B5CF6)
     }
 
     /** Accepts `#RRGGBB` or `RRGGBB`; anything else is not a colour and returns null. */
