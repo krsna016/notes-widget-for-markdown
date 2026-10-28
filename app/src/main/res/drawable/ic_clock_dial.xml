@@ -4,13 +4,6 @@
     android:viewportWidth="200"
     android:viewportHeight="200">
 
-    <!-- Pure Transparent Dial Base with Ultra Subtle Border -->
-    <path
-        android:fillColor="#00000000"
-        android:strokeColor="#30FFFFFF"
-        android:strokeWidth="1.5"
-        android:pathData="M100,100 m -96,0 a 96,96 0 1,0 192,0 a 96,96 0 1,0 -192,0" />
-
     <!-- 12 O'Clock (Bold Swiss Marker) -->
     <path
         android:fillColor="#00000000"
