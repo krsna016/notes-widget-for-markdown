@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Obsidian</string>
+    <string name="app_name">Obsidian Widget</string>
     <string name="widget_description">Zobrazí vaše Markdown poznámky v posuvném widgetu</string>
     <string name="list_widget_description">Úsporný seznam názvů poznámek s časem poslední změny</string>
     <string name="action_refresh">Načíst poznámky znovu</string>

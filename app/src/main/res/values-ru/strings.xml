@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Obsidian</string>
+    <string name="app_name">Obsidian Widget</string>
     <string name="widget_description">Показывает твои заметки Markdown в прокручиваемом виджете</string>
     <string name="list_widget_description">Компактный список названий заметок с датой последнего изменения</string>
     <string name="action_refresh">Обновить заметки</string>
