@@ -36,6 +36,11 @@ class ToggleTaskAction : ActionCallback {
                 stream.bufferedReader(Charsets.UTF_8).readText()
             } ?: return@runCatching
 
+            if (originalText.isBlank()) {
+                AppLog.w("TaskAction", "Note content is blank; aborting toggle")
+                return@runCatching
+            }
+
             val lines = originalText.lines().toMutableList()
             var modified = false
             val cleanTarget = taskText.trim().lowercase().replace("**", "").replace("⏳", "").trim()
@@ -50,7 +55,7 @@ class ToggleTaskAction : ActionCallback {
                     val cleanContent = content.trim().lowercase()
 
                     if (isLineChecked == currentlyChecked &&
-                        (cleanContent == cleanTarget || cleanContent.contains(cleanTarget) || cleanTarget.contains(cleanContent) || (targetSubject.isNotEmpty() && cleanContent.contains(targetSubject)))) {
+                        (cleanContent == cleanTarget || cleanContent.contains(cleanTarget) || cleanTarget.contains(cleanContent) || (targetSubject.length >= 3 && cleanContent.contains(targetSubject)))) {
                         val newMark = if (currentlyChecked) " " else "x"
                         lines[i] = "$prefix$newMark$bracketSpace$content"
                         modified = true
@@ -62,7 +67,7 @@ class ToggleTaskAction : ActionCallback {
                         val (before, mark, after) = tableMatch.destructured
                         val isLineChecked = mark.equals("x", ignoreCase = true)
                         val lineLower = line.lowercase()
-                        if (isLineChecked == currentlyChecked && (targetSubject.isNotEmpty() && lineLower.contains(targetSubject))) {
+                        if (isLineChecked == currentlyChecked && (targetSubject.length >= 3 && lineLower.contains(targetSubject))) {
                             val newMark = if (currentlyChecked) " " else "x"
                             lines[i] = "$before$newMark$after"
                             modified = true
@@ -73,14 +78,28 @@ class ToggleTaskAction : ActionCallback {
             }
 
             if (modified) {
-                val newText = lines.joinToString("\n")
-                contentResolver.openOutputStream(uri, "wt")?.use { stream ->
-                    stream.writer(Charsets.UTF_8).write(newText)
-                }
+                val oldBytes = originalText.toByteArray(Charsets.UTF_8)
+                val newBytes = lines.joinToString("\n").toByteArray(Charsets.UTF_8)
+                val writeSuccess = runCatching {
+                    contentResolver.openOutputStream(uri, "wt")?.use { stream ->
+                        stream.write(newBytes)
+                        stream.flush()
+                        true
+                    } ?: false
+                }.getOrDefault(false)
 
-                Handler(Looper.getMainLooper()).post {
-                    val status = if (currentlyChecked) "Marked uncompleted" else "Marked completed"
-                    Toast.makeText(context, "$status: $taskText", Toast.LENGTH_SHORT).show()
+                if (!writeSuccess) {
+                    runCatching {
+                        contentResolver.openOutputStream(uri, "wt")?.use { stream ->
+                            stream.write(oldBytes)
+                            stream.flush()
+                        }
+                    }
+                } else {
+                    Handler(Looper.getMainLooper()).post {
+                        val status = if (currentlyChecked) "Unchecked" else "Completed"
+                        Toast.makeText(context, "$status: $taskText", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
         }.onFailure { e ->
