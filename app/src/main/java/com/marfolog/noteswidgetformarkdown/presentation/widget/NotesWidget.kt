@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
+import android.widget.RemoteViews
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -22,6 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.glance.appwidget.AndroidRemoteViews
 import androidx.glance.appwidget.CircularProgressIndicator
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetManager
@@ -353,6 +355,12 @@ private fun SingleNoteView(
     val openIntent = widgetNoteOpenIntent(context, note, vaultName, noteFolder)
     val ribbonColor = ColorProvider(appearance.accentRibbonColor())
 
+    val currentMode = prefs.getString(ToggleWidgetModeAction.KEY_WIDGET_MODE, ToggleWidgetModeAction.MODE_NOTES) ?: ToggleWidgetModeAction.MODE_NOTES
+    if (currentMode == ToggleWidgetModeAction.MODE_CLOCK) {
+        WidgetClockView(appearance = appearance, note = note)
+        return
+    }
+
     Row(
         modifier = GlanceModifier
             .fillMaxSize()
@@ -377,20 +385,46 @@ private fun SingleNoteView(
                 .defaultWeight()
                 .fillMaxHeight()
         ) {
-            // Title Header (Clickable to open in Obsidian)
-            Text(
-                text = note.title,
-                style = TextStyle(
-                    fontWeight = FontWeight.Bold,
-                    fontSize = appearance.textSize.titleSp.sp,
-                    fontFamily = FontFamily.SansSerif,
-                    color = appearance.contentColor()
-                ),
-                maxLines = 1,
-                modifier = GlanceModifier
-                    .fillMaxWidth()
-                    .clickable(actionStartActivity(openIntent))
-            )
+            // Title Header Row (Clickable Title + ⏱ Instant Clock Camouflage Button)
+            Row(
+                modifier = GlanceModifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = note.title,
+                    style = TextStyle(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = appearance.textSize.titleSp.sp,
+                        fontFamily = FontFamily.SansSerif,
+                        color = appearance.contentColor()
+                    ),
+                    maxLines = 1,
+                    modifier = GlanceModifier
+                        .defaultWeight()
+                        .clickable(actionStartActivity(openIntent))
+                )
+
+                val clockAction = actionRunCallback<ToggleWidgetModeAction>(
+                    actionParametersOf(ToggleWidgetModeAction.PARAM_TARGET_MODE to ToggleWidgetModeAction.MODE_CLOCK)
+                )
+                Box(
+                    modifier = GlanceModifier
+                        .size(24.dp)
+                        .cornerRadius(12.dp)
+                        .background(ColorProvider(Color(0x22888888)))
+                        .clickable(clockAction),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "⏱",
+                        style = TextStyle(
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = appearance.contentColor()
+                        )
+                    )
+                }
+            }
 
             Spacer(modifier = GlanceModifier.height(6.dp))
 
@@ -706,6 +740,88 @@ private fun SingleNoteView(
                 }
             }
         }
+        }
+    }
+}
+
+@Composable
+private fun WidgetClockView(
+    appearance: NoteCardAppearance,
+    note: NoteSummary
+) {
+    val context = LocalContext.current
+    val prefs = context.getSharedPreferences(SetupActivity.PREFS_NAME, Context.MODE_PRIVATE)
+    val clockStyle = prefs.getString(ToggleClockStyleAction.KEY_CLOCK_STYLE, ToggleClockStyleAction.STYLE_DIGITAL) ?: ToggleClockStyleAction.STYLE_DIGITAL
+
+    val wakeAction = actionRunCallback<ToggleWidgetModeAction>(
+        actionParametersOf(ToggleWidgetModeAction.PARAM_TARGET_MODE to ToggleWidgetModeAction.MODE_NOTES)
+    )
+    val toggleStyleAction = actionRunCallback<ToggleClockStyleAction>()
+
+    val layoutId = if (clockStyle == ToggleClockStyleAction.STYLE_ANALOG) {
+        R.layout.widget_analog_clock
+    } else {
+        R.layout.widget_digital_clock
+    }
+    val rv = RemoteViews(context.packageName, layoutId)
+
+    Column(
+        modifier = GlanceModifier
+            .fillMaxSize()
+            .cornerRadius(28.dp)
+            .background(appearance.backgroundColor())
+            .padding(14.dp)
+            .clickable(wakeAction),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Top Switcher Bar: Minimalist Style Indicator + Switcher Pill
+        Row(
+            modifier = GlanceModifier
+                .fillMaxWidth()
+                .padding(horizontal = 4.dp, vertical = 2.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = if (clockStyle == ToggleClockStyleAction.STYLE_ANALOG) "✦ SWISS ANALOG" else "✦ APPLE DIGITAL",
+                style = TextStyle(
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = FontFamily.SansSerif,
+                    color = ColorProvider(Color(0xA0FFFFFF))
+                ),
+                modifier = GlanceModifier.defaultWeight()
+            )
+
+            // Switch Clock Style Pill (Digital <-> Analog)
+            Box(
+                modifier = GlanceModifier
+                    .cornerRadius(8.dp)
+                    .background(ColorProvider(Color(0x28888888)))
+                    .padding(horizontal = 8.dp, vertical = 3.dp)
+                    .clickable(toggleStyleAction),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = if (clockStyle == ToggleClockStyleAction.STYLE_ANALOG) "Digital ↻" else "Analog ↻",
+                    style = TextStyle(
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        fontFamily = FontFamily.SansSerif,
+                        color = ColorProvider(Color(0xFFC084FC))
+                    )
+                )
+            }
+        }
+
+        // Live Clock Face RemoteViews (Ticking independently in SystemUI with zero battery drain)
+        Box(
+            modifier = GlanceModifier
+                .fillMaxWidth()
+                .defaultWeight(),
+            contentAlignment = Alignment.Center
+        ) {
+            AndroidRemoteViews(rv)
         }
     }
 }

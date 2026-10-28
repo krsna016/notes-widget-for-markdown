@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/digital_clock_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="16dp">
+
+    <!-- Date Header (e.g. WEDNESDAY, OCTOBER 28) -->
+    <TextClock
+        android:id="@+id/digital_clock_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:format12Hour="EEEE, MMMM d"
+        android:format24Hour="EEEE, MMMM d"
+        android:textColor="#C0FFFFFF"
+        android:textSize="12sp"
+        android:fontFamily="sans-serif-medium"
+        android:letterSpacing="0.08"
+        android:textAllCaps="true" />
+
+    <!-- Big Bold Time -->
+    <TextClock
+        android:id="@+id/digital_clock_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:format12Hour="h:mm"
+        android:format24Hour="HH:mm"
+        android:textColor="#FFFFFFFF"
+        android:textSize="54sp"
+        android:fontFamily="sans-serif-black"
+        android:includeFontPadding="false" />
+
+    <!-- Subtle Wakeup Pill / Status -->
+    <TextView
+        android:id="@+id/digital_clock_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:text="✦ TAP TO REVEAL DINCHARYA ✦"
+        android:textColor="#A78BFA"
+        android:textSize="10sp"
+        android:fontFamily="sans-serif-medium"
+        android:letterSpacing="0.05" />
+
+</LinearLayout>

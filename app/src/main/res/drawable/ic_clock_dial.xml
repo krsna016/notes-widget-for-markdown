@@ -1,0 +1,122 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+
+    <!-- Dark Luxury Outer Dial Base -->
+    <path
+        android:fillColor="#141417"
+        android:strokeColor="#2E2E38"
+        android:strokeWidth="2"
+        android:pathData="M100,100 m -96,0 a 96,96 0 1,0 192,0 a 96,96 0 1,0 -192,0" />
+
+    <!-- Subtle Inner Ring -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#1E1E26"
+        android:strokeWidth="1"
+        android:pathData="M100,100 m -82,0 a 82,82 0 1,0 164,0 a 82,82 0 1,0 -164,0" />
+
+    <!-- 12 O'Clock (Bold Swiss Marker) -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:pathData="M100,12 L100,28" />
+
+    <!-- 1 O'Clock -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#70FFFFFF"
+        android:strokeWidth="1.8"
+        android:strokeLineCap="round"
+        android:pathData="M144,23.8 L136,37.6" />
+
+    <!-- 2 O'Clock -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#70FFFFFF"
+        android:strokeWidth="1.8"
+        android:strokeLineCap="round"
+        android:pathData="M176.2,56 L162.4,64" />
+
+    <!-- 3 O'Clock (Bold Swiss Marker) -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:pathData="M188,100 L172,100" />
+
+    <!-- 4 O'Clock -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#70FFFFFF"
+        android:strokeWidth="1.8"
+        android:strokeLineCap="round"
+        android:pathData="M176.2,144 L162.4,136" />
+
+    <!-- 5 O'Clock -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#70FFFFFF"
+        android:strokeWidth="1.8"
+        android:strokeLineCap="round"
+        android:pathData="M144,176.2 L136,162.4" />
+
+    <!-- 6 O'Clock (Bold Swiss Marker) -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:pathData="M100,188 L100,172" />
+
+    <!-- 7 O'Clock -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#70FFFFFF"
+        android:strokeWidth="1.8"
+        android:strokeLineCap="round"
+        android:pathData="M56,176.2 L64,162.4" />
+
+    <!-- 8 O'Clock -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#70FFFFFF"
+        android:strokeWidth="1.8"
+        android:strokeLineCap="round"
+        android:pathData="M23.8,144 L37.6,136" />
+
+    <!-- 9 O'Clock (Bold Swiss Marker) -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:pathData="M12,100 L28,100" />
+
+    <!-- 10 O'Clock -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#70FFFFFF"
+        android:strokeWidth="1.8"
+        android:strokeLineCap="round"
+        android:pathData="M23.8,56 L37.6,64" />
+
+    <!-- 11 O'Clock -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#70FFFFFF"
+        android:strokeWidth="1.8"
+        android:strokeLineCap="round"
+        android:pathData="M56,23.8 L64,37.6" />
+
+    <!-- Center Accent Dot -->
+    <path
+        android:fillColor="#A78BFA"
+        android:pathData="M100,100 m -3,0 a 3,3 0 1,0 6,0 a 3,3 0 1,0 -6,0" />
+
+</vector>

@@ -106,6 +106,7 @@ class ToggleTaskAction : ActionCallback {
             AppLog.e("TaskAction", "Failed to toggle task", e)
         }
 
+        AutoFlipScheduler.scheduleAutoFlip(context)
         NotesWidget.updateAll(context)
     }
 }

@@ -1,0 +1,19 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+
+    <!-- Minute Hand -->
+    <path
+        android:strokeColor="#E2E8F0"
+        android:strokeWidth="3.2"
+        android:strokeLineCap="round"
+        android:pathData="M100,112 L100,28" />
+
+    <!-- Center Pivot Cap -->
+    <path
+        android:fillColor="#E2E8F0"
+        android:pathData="M100,100 m -3,0 a 3,3 0 1,0 6,0 a 3,3 0 1,0 -6,0" />
+
+</vector>
