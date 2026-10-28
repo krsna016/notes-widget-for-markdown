@@ -4,15 +4,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:gravity="center"
+    android:gravity="top|center_horizontal"
     android:background="@android:color/transparent"
     android:padding="0dp">
 
     <!-- Date Header (e.g. WEDNESDAY, OCTOBER 28) -->
     <TextClock
         android:id="@+id/digital_clock_date"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginTop="4dp"
         android:layout_marginBottom="2dp"
         android:format12Hour="EEEE, MMMM d"
         android:format24Hour="EEEE, MMMM d"
@@ -26,12 +28,11 @@
         android:shadowDy="2"
         android:shadowRadius="6" />
 
-    <!-- Big Bold Apple/Mac Lockscreen Time with Live Seconds (Spanning Full Area) -->
+    <!-- Big Bold Apple/Mac Lockscreen Time with Live Seconds (Anchored Top, Full Width) -->
     <TextClock
         android:id="@+id/digital_clock_time"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="wrap_content"
         android:gravity="center"
         android:autoSizeTextType="uniform"
         android:autoSizeMinTextSize="48sp"
