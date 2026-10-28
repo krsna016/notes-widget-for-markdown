@@ -647,7 +647,10 @@ private fun WidgetClockView(
             .clickable(doubleTapAction),
         contentAlignment = Alignment.TopCenter
     ) {
-        AndroidRemoteViews(rv)
+        AndroidRemoteViews(
+            remoteViews = rv,
+            modifier = GlanceModifier.fillMaxWidth()
+        )
     }
 }
 
