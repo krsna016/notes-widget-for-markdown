@@ -357,7 +357,7 @@ class MarkdownPreviewFormatter(
         }
 
         override fun visit(softLineBreak: SoftLineBreak) {
-            builder.append(' ')
+            builder.append('\n')
         }
 
         override fun visit(hardLineBreak: HardLineBreak) {
