@@ -5,12 +5,15 @@ import org.commonmark.ext.gfm.strikethrough.StrikethroughExtension
 import org.commonmark.ext.task.list.items.TaskListItemMarker
 import org.commonmark.ext.task.list.items.TaskListItemsExtension
 import org.commonmark.node.AbstractVisitor
+import org.commonmark.node.BlockQuote
 import org.commonmark.node.BulletList
 import org.commonmark.node.Code
 import org.commonmark.node.Document
 import org.commonmark.node.Emphasis
+import org.commonmark.node.FencedCodeBlock
 import org.commonmark.node.HardLineBreak
 import org.commonmark.node.Heading
+import org.commonmark.node.IndentedCodeBlock
 import org.commonmark.node.Link
 import org.commonmark.node.ListItem
 import org.commonmark.node.Node
@@ -19,6 +22,7 @@ import org.commonmark.node.Paragraph
 import org.commonmark.node.SoftLineBreak
 import org.commonmark.node.StrongEmphasis
 import org.commonmark.node.Text
+import org.commonmark.node.ThematicBreak
 import org.commonmark.parser.Parser
 
 class MarkdownPreviewFormatter(
@@ -29,36 +33,55 @@ class MarkdownPreviewFormatter(
         .build()
 
     /** A first heading that only repeats [title] is left out; the card already shows the title. */
-    fun format(source: String, title: String? = null): String {
+    fun format(source: String, title: String? = null, richFormatting: Boolean = false): String {
         val markdown = source
             .lineSequence()
             .dropYamlFrontMatter()
-            .map(::normalizeObsidianMarkdown)
+            .map { normalizeObsidianMarkdown(it, richFormatting) }
             .joinToString("\n")
 
         val document = parser.parse(markdown)
         val firstBlock = document.firstChild
         if (title != null && firstBlock is Heading &&
-            PreviewVisitor().render(firstBlock).trim().equals(title.trim(), ignoreCase = true)
+            PreviewVisitor(richFormatting = false).render(firstBlock).trim().equals(title.trim(), ignoreCase = true)
         ) {
             firstBlock.unlink()
         }
-        return PreviewVisitor().render(document)
+        return PreviewVisitor(richFormatting).render(document)
             .lineSequence()
-            .map { cleanupRenderedText(it.trimEnd()) }
+            .map { cleanupRenderedText(it.trimEnd(), richFormatting) }
             .filter { it.isNotBlank() }
             .take(previewLineCount)
             .joinToString("\n")
     }
 
-    private fun normalizeObsidianMarkdown(line: String): String {
-        return line
-            .replace(calloutMarkerRegex, "")
+    private fun normalizeObsidianMarkdown(line: String, richFormatting: Boolean = false): String {
+        val processedLine = if (richFormatting) {
+            val calloutMatch = calloutPatternRegex.find(line)
+            if (calloutMatch != null) {
+                val (type, rest) = calloutMatch.destructured
+                val icon = when (type.lowercase()) {
+                    "tip", "hint" -> "✨ TIP"
+                    "warning", "caution", "danger", "bug" -> "⚠ WARNING"
+                    "important" -> "★ IMPORTANT"
+                    "quote" -> "❝ QUOTE"
+                    "todo" -> "☑ TODO"
+                    else -> "💡 NOTE"
+                }
+                if (rest.isNotBlank()) "> **$icon**: $rest" else "> **$icon**"
+            } else {
+                line
+            }
+        } else {
+            line.replace(calloutMarkerRegex, "")
+        }
+
+        return processedLine
             .replace(wikiLinkWithAliasRegex) { match -> match.groupValues[2] }
             .replace(wikiLinkRegex) { match -> match.groupValues[1] }
     }
 
-    private fun cleanupRenderedText(line: String): String {
+    private fun cleanupRenderedText(line: String, richFormatting: Boolean = false): String {
         return line
             .replace(renderedLinkRegex) { match -> match.groupValues[1] }
             .replace(renderedQuotedInlineRegex) { match -> match.groupValues[1] }
@@ -80,7 +103,7 @@ class MarkdownPreviewFormatter(
         }
     }
 
-    private class PreviewVisitor : AbstractVisitor() {
+    private class PreviewVisitor(private val richFormatting: Boolean = false) : AbstractVisitor() {
         private val builder = StringBuilder()
         private var listDepth = 0
         private val orderedCounters = mutableListOf<Int>()
@@ -95,7 +118,66 @@ class MarkdownPreviewFormatter(
         }
 
         override fun visit(heading: Heading) {
-            appendLineFromChildren(heading)
+            appendNewLineIfNeeded()
+            if (richFormatting) {
+                val level = heading.level.coerceIn(1, 4)
+                builder.append("§H${level}§")
+            }
+            visitChildren(heading)
+            appendNewLineIfNeeded()
+        }
+
+        override fun visit(thematicBreak: ThematicBreak) {
+            appendNewLineIfNeeded()
+            if (richFormatting) {
+                builder.append("§HR§\n")
+            }
+        }
+
+        override fun visit(blockQuote: BlockQuote) {
+            appendNewLineIfNeeded()
+            if (richFormatting) {
+                val innerVisitor = PreviewVisitor(richFormatting = false)
+                val innerText = innerVisitor.render(blockQuote).trim()
+                innerText.lines().forEach { line ->
+                    if (line.isNotBlank()) {
+                        builder.append("§QUOTE§").append(line.trim()).append('\n')
+                    }
+                }
+            } else {
+                visitChildren(blockQuote)
+                appendNewLineIfNeeded()
+            }
+        }
+
+        override fun visit(fencedCodeBlock: FencedCodeBlock) {
+            appendNewLineIfNeeded()
+            val text = fencedCodeBlock.literal.trim()
+            if (richFormatting) {
+                text.lines().forEach { line ->
+                    if (line.isNotBlank()) {
+                        builder.append("§CODE§").append(line).append('\n')
+                    }
+                }
+            } else {
+                builder.append(text)
+                appendNewLineIfNeeded()
+            }
+        }
+
+        override fun visit(indentedCodeBlock: IndentedCodeBlock) {
+            appendNewLineIfNeeded()
+            val text = indentedCodeBlock.literal.trim()
+            if (richFormatting) {
+                text.lines().forEach { line ->
+                    if (line.isNotBlank()) {
+                        builder.append("§CODE§").append(line).append('\n')
+                    }
+                }
+            } else {
+                builder.append(text)
+                appendNewLineIfNeeded()
+            }
         }
 
         override fun visit(paragraph: Paragraph) {
@@ -229,6 +311,7 @@ class MarkdownPreviewFormatter(
         )
         private val parsedTaskItemRegex = Regex("^\\s*\\[([ xX])]\\s+")
         private val calloutMarkerRegex = Regex("^\\s*>\\s*\\[![A-Za-z]+]\\s*")
+        private val calloutPatternRegex = Regex("^\\s*>\\s*\\[!([A-Za-z]+)\\]\\s*(.*)$")
         private val wikiLinkWithAliasRegex = Regex("\\[\\[([^]|]+)\\|([^]]+)]]")
         private val wikiLinkRegex = Regex("\\[\\[([^]]+)]]")
         private val renderedLinkRegex = Regex("\"([^\"]+)\" \\([^)]*\\)")

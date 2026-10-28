@@ -214,7 +214,7 @@ class FileRepositoryImpl(
                     while (reader.readLine().also { line = it } != null && lines.size < PREVIEW_SOURCE_LINE_COUNT) {
                         lines.add(line.orEmpty())
                     }
-                    previewFormatter.format(lines.joinToString("\n"), title)
+                    previewFormatter.format(lines.joinToString("\n"), title, richFormatting = true)
                 }
             } ?: ""
         }.getOrDefault("")

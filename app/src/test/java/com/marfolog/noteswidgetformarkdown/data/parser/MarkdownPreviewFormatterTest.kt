@@ -183,4 +183,28 @@ class MarkdownPreviewFormatterTest {
 
         assertEquals("Milk", preview)
     }
+
+    @Test
+    fun richFormattingFormatsHeadingsAndThematicBreaksAndQuotes() {
+        val preview = formatter.format(
+            """
+            # Chapter One
+            ## Section A
+            ### Details
+            ---
+            > An inspiring quote
+            ```
+            println("code")
+            ```
+            """.trimIndent(),
+            richFormatting = true
+        )
+
+        assertTrue(preview.contains("§H1§Chapter One"))
+        assertTrue(preview.contains("§H2§Section A"))
+        assertTrue(preview.contains("§H3§Details"))
+        assertTrue(preview.contains("§HR§"))
+        assertTrue(preview.contains("§QUOTE§An inspiring quote"))
+        assertTrue(preview.contains("§CODE§println(\"code\")"))
+    }
 }
