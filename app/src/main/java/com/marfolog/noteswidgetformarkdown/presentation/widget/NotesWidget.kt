@@ -450,14 +450,37 @@ private fun SingleNoteView(
                     )
                 }
             } else {
+                val maxDisplayCount = minOf(lines.size, 40)
+                val hasMore = lines.size > 40
+                val totalCount = if (hasMore) maxDisplayCount + 1 else maxDisplayCount
+
                 LazyColumn(
                     modifier = GlanceModifier
                         .fillMaxWidth()
                         .defaultWeight()
                 ) {
-                    items(count = lines.size, itemId = { it.toLong() }) { index ->
-                    val line = lines[index]
-                    when {
+                    items(count = totalCount, itemId = { it.toLong() }) { index ->
+                        if (hasMore && index == maxDisplayCount) {
+                            Row(
+                                modifier = GlanceModifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 6.dp)
+                                    .clickable(actionStartActivity(openIntent)),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = "✦ +${lines.size - 40} more items • Tap to open in Obsidian ✦",
+                                    style = TextStyle(
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        fontFamily = FontFamily.SansSerif,
+                                        color = ColorProvider(Color(0xFFC084FC))
+                                    )
+                                )
+                            }
+                        } else {
+                            val line = lines[index]
+                            when {
                         line.startsWith("§H1§") -> {
                             val text = line.removePrefix("§H1§")
                             Column(
@@ -737,6 +760,7 @@ private fun SingleNoteView(
                             }
                         }
                     }
+                }
                 }
             }
         }

@@ -222,7 +222,7 @@ class FileRepositoryImpl(
 
     companion object {
         private const val TAG = "FileRepository"
-        private const val PREVIEW_SOURCE_LINE_COUNT = 2000
+        private const val PREVIEW_SOURCE_LINE_COUNT = 80
     }
 }
 
