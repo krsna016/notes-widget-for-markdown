@@ -613,7 +613,7 @@ private fun SingleNoteView(
                                         fontFamily = FontFamily.SansSerif,
                                         color = appearance.contentColor()
                                     ),
-                                    maxLines = 4,
+                                    maxLines = 20,
                                     modifier = GlanceModifier.defaultWeight()
                                 )
                             }
@@ -635,7 +635,7 @@ private fun SingleNoteView(
                                         fontSize = (appearance.textSize.previewSp - 2).sp,
                                         color = appearance.contentColor()
                                     ),
-                                    maxLines = 2
+                                    maxLines = 20
                                 )
                             }
                         }
@@ -678,7 +678,7 @@ private fun SingleNoteView(
                                         textDecoration = if (isChecked) TextDecoration.LineThrough else TextDecoration.None,
                                         color = if (isChecked) ColorProvider(Color(0xFF9E9E9E)) else appearance.contentColor()
                                     ),
-                                    maxLines = 3,
+                                    maxLines = 10,
                                     modifier = GlanceModifier.defaultWeight()
                                 )
                             }
@@ -713,7 +713,7 @@ private fun SingleNoteView(
                                         fontFamily = FontFamily.SansSerif,
                                         color = appearance.contentColor()
                                     ),
-                                    maxLines = 3,
+                                    maxLines = 10,
                                     modifier = GlanceModifier.defaultWeight()
                                 )
                             }
@@ -732,7 +732,7 @@ private fun SingleNoteView(
                                         fontFamily = FontFamily.SansSerif,
                                         color = appearance.contentColor()
                                     ),
-                                    maxLines = 4
+                                    maxLines = 50
                                 )
                             }
                         }
@@ -806,7 +806,7 @@ private fun WidgetClockView(
                     text = if (clockStyle == ToggleClockStyleAction.STYLE_ANALOG) "Digital ↻" else "Analog ↻",
                     style = TextStyle(
                         fontSize = 10.sp,
-                        fontWeight = FontWeight.SemiBold,
+                        fontWeight = FontWeight.Bold,
                         fontFamily = FontFamily.SansSerif,
                         color = ColorProvider(Color(0xFFC084FC))
                     )

@@ -424,7 +424,7 @@ class MarkdownPreviewFormatter(
     }
 
     companion object {
-        private const val DEFAULT_PREVIEW_LINE_COUNT = 100
+        private const val DEFAULT_PREVIEW_LINE_COUNT = 2000
         private val tableSeparatorRegex = Regex("^:?-{2,}:?$")
         private val extensions: List<Extension> = listOf(
             TaskListItemsExtension.create(),
