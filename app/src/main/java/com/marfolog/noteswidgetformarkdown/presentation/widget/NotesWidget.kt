@@ -361,14 +361,25 @@ private fun SingleNoteView(
             .padding(14.dp),
         verticalAlignment = Alignment.Top
     ) {
-        // Luxury Left-Edge Accent Ribbon
-        Box(
-            modifier = GlanceModifier
-                .width(4.dp)
-                .fillMaxHeight()
-                .cornerRadius(2.dp)
-                .background(ribbonColor)
-        ) {}
+        // Luxury Left-Edge Accent Ribbon with Physical Metallic Side Clip
+        Column(
+            modifier = GlanceModifier.fillMaxHeight(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Image(
+                provider = ImageProvider(R.drawable.ic_widget_clip),
+                contentDescription = "Widget Clip",
+                modifier = GlanceModifier.width(16.dp).height(44.dp)
+            )
+            Spacer(modifier = GlanceModifier.height(4.dp))
+            Box(
+                modifier = GlanceModifier
+                    .width(4.dp)
+                    .defaultWeight()
+                    .cornerRadius(2.dp)
+                    .background(ribbonColor)
+            ) {}
+        }
 
         Spacer(modifier = GlanceModifier.width(10.dp))
 
