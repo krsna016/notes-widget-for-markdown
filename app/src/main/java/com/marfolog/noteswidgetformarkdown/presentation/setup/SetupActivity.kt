@@ -264,6 +264,7 @@ private fun SetupScreen(modifier: Modifier = Modifier) {
     var fastNoteTargetUri by rememberSaveable { mutableStateOf(prefs.getString(SetupActivity.KEY_FAST_NOTE_TARGET_URI, null)) }
     var notesForSettings by remember { mutableStateOf<List<NoteSummary>>(emptyList()) }
     var cardSettings by remember { mutableStateOf(cardSettingsStore.getAll()) }
+    var defaultAppearance by remember { mutableStateOf(cardSettingsStore.getDefaultAppearance()) }
     var notesLoadError by rememberSaveable { mutableStateOf<String?>(null) }
     val extraNotesStore = remember { ExtraNotesStore(context.applicationContext) }
     var extraNoteUris by remember { mutableStateOf(extraNotesStore.getAll()) }
@@ -299,6 +300,7 @@ private fun SetupScreen(modifier: Modifier = Modifier) {
         }.onSuccess { notes ->
             notesForSettings = notes
             cardSettings = cardSettingsStore.getAll()
+            defaultAppearance = cardSettingsStore.getDefaultAppearance()
             notesLoadError = null
         }.onFailure { error ->
             AppLog.w(SetupActivity.AREA, "Could not list notes in $currentNotesUri", error)
@@ -700,6 +702,33 @@ private fun SetupScreen(modifier: Modifier = Modifier) {
             prefs.edit().putString(SetupActivity.KEY_SELECTED_NOTE_URI, note.fileUri).apply()
             scope.launch { NotesWidget.updateAll(context) }
         },
+        defaultAppearance = defaultAppearance,
+        onDefaultSizeSelected = { size ->
+            val updated = defaultAppearance.copy(size = size)
+            defaultAppearance = updated
+            cardSettingsStore.applyToAll(updated, notesForSettings.map { it.fileUri })
+            cardSettings = cardSettingsStore.getAll()
+            scope.launch { NotesWidget.updateAll(context) }
+        },
+        onDefaultColorSelected = { color ->
+            val updated = defaultAppearance.copy(color = color)
+            defaultAppearance = updated
+            cardSettingsStore.applyToAll(updated, notesForSettings.map { it.fileUri })
+            cardSettings = cardSettingsStore.getAll()
+            scope.launch { NotesWidget.updateAll(context) }
+        },
+        onDefaultTextSizeSelected = { textSize ->
+            val updated = defaultAppearance.copy(textSize = textSize)
+            defaultAppearance = updated
+            cardSettingsStore.applyToAll(updated, notesForSettings.map { it.fileUri })
+            cardSettings = cardSettingsStore.getAll()
+            scope.launch { NotesWidget.updateAll(context) }
+        },
+        onApplyDefaultToAll = {
+            cardSettingsStore.applyToAll(defaultAppearance, notesForSettings.map { it.fileUri })
+            cardSettings = cardSettingsStore.getAll()
+            scope.launch { NotesWidget.updateAll(context) }
+        },
         onCardSizeSelected = { note, size ->
             val updated = (cardSettings[note.fileUri] ?: NoteCardAppearance()).copy(size = size)
             cardSettingsStore.save(note.fileUri, updated)
@@ -1008,6 +1037,11 @@ internal fun SetupScreenContent(
     onWidgetCustomColorChanged: (String) -> Unit = {},
     selectedSingleNoteUri: String? = null,
     onSelectSingleNote: (NoteSummary) -> Unit = {},
+    defaultAppearance: NoteCardAppearance = NoteCardAppearance(),
+    onDefaultSizeSelected: (NoteCardSize) -> Unit = {},
+    onDefaultColorSelected: (NoteCardColor) -> Unit = {},
+    onDefaultTextSizeSelected: (NoteCardTextSize) -> Unit = {},
+    onApplyDefaultToAll: () -> Unit = {},
     onCardSizeSelected: (NoteSummary, NoteCardSize) -> Unit = { _, _ -> },
     onCardColorSelected: (NoteSummary, NoteCardColor) -> Unit = { _, _ -> },
     onCardTextSizeSelected: (NoteSummary, NoteCardTextSize) -> Unit = { _, _ -> },
@@ -1404,6 +1438,11 @@ internal fun SetupScreenContent(
         CardSettingsSection(
             notes = notes,
             cardSettings = cardSettings,
+            defaultAppearance = defaultAppearance,
+            onDefaultSizeSelected = onDefaultSizeSelected,
+            onDefaultColorSelected = onDefaultColorSelected,
+            onDefaultTextSizeSelected = onDefaultTextSizeSelected,
+            onApplyDefaultToAll = onApplyDefaultToAll,
             notesLoadError = notesLoadError,
             selectedSingleNoteUri = selectedSingleNoteUri,
             onSelectSingleNote = onSelectSingleNote,
@@ -1682,6 +1721,11 @@ private fun RateChipSetting(enabled: Boolean, onChanged: (Boolean) -> Unit) {
 private fun CardSettingsSection(
     notes: List<NoteSummary>,
     cardSettings: Map<String, NoteCardAppearance>,
+    defaultAppearance: NoteCardAppearance,
+    onDefaultSizeSelected: (NoteCardSize) -> Unit,
+    onDefaultColorSelected: (NoteCardColor) -> Unit,
+    onDefaultTextSizeSelected: (NoteCardTextSize) -> Unit,
+    onApplyDefaultToAll: () -> Unit,
     notesLoadError: String?,
     selectedSingleNoteUri: String? = null,
     onSelectSingleNote: (NoteSummary) -> Unit = {},
@@ -1727,6 +1771,116 @@ private fun CardSettingsSection(
                 prefs.edit().putBoolean(KEY_SWIPE_HINT_SHOWN, true).apply()
                 hintPending = false
             }
+
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                tonalElevation = 2.dp
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(
+                            modifier = Modifier
+                                .size(16.dp)
+                                .background(cardColorPreview(defaultAppearance.color), RoundedCornerShape(4.dp))
+                        )
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = "Default Styling (All Notes)",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Text(
+                                text = "Applies unified style across all notes",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(
+                        text = "Default Compactness",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.horizontalScroll(rememberScrollState())
+                    ) {
+                        NoteCardSize.entries.forEach { size ->
+                            FilterChip(
+                                selected = defaultAppearance.size == size,
+                                onClick = { onDefaultSizeSelected(size) },
+                                label = { Text(size.label) }
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = "Default Text Size",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.horizontalScroll(rememberScrollState())
+                    ) {
+                        NoteCardTextSize.entries.forEach { textSize ->
+                            FilterChip(
+                                selected = defaultAppearance.textSize == textSize,
+                                onClick = { onDefaultTextSizeSelected(textSize) },
+                                label = { Text(textSize.label) }
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = "Default Color",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.horizontalScroll(rememberScrollState())
+                    ) {
+                        NoteCardColor.entries.filterNot { it == NoteCardColor.Custom }.forEach { color ->
+                            FilterChip(
+                                selected = defaultAppearance.color == color,
+                                onClick = { onDefaultColorSelected(color) },
+                                leadingIcon = {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(12.dp)
+                                            .background(cardColorPreview(color), RoundedCornerShape(3.dp))
+                                    )
+                                },
+                                label = { Text(color.label) }
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(14.dp))
+                    Button(
+                        onClick = onApplyDefaultToAll,
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(10.dp)
+                    ) {
+                        Text("Apply to All Notes")
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
             ReorderableColumn(
                 list = notes,
                 onSettle = onReorder,

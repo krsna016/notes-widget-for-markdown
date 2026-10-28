@@ -348,7 +348,7 @@ private fun SingleNoteView(
         return
     }
 
-    val appearance = cardSettings[note.fileUri] ?: NoteCardAppearance()
+    val appearance = cardSettings[note.fileUri] ?: cardSettings["__default__"] ?: NoteCardAppearance()
     val noteFolder = noteFolderPathFor(note, noteFolderPath, extraNoteFolders)
     val openIntent = widgetNoteOpenIntent(context, note, vaultName, noteFolder)
     val ribbonColor = ColorProvider(appearance.accentRibbonColor())
@@ -476,25 +476,14 @@ private fun SingleNoteView(
                 .defaultWeight(),
             verticalAlignment = Alignment.Top
         ) {
-        // Luxury Left-Edge Accent Ribbon with Physical Metallic Side Clip
-        Column(
-            modifier = GlanceModifier.fillMaxHeight(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Image(
-                provider = ImageProvider(R.drawable.ic_widget_clip),
-                contentDescription = "Widget Clip",
-                modifier = GlanceModifier.width(16.dp).height(44.dp)
-            )
-            Spacer(modifier = GlanceModifier.height(4.dp))
-            Box(
-                modifier = GlanceModifier
-                    .width(4.dp)
-                    .defaultWeight()
-                    .cornerRadius(2.dp)
-                    .background(ribbonColor)
-            ) {}
-        }
+        // Luxury Left-Edge Accent Ribbon
+        Box(
+            modifier = GlanceModifier
+                .width(4.dp)
+                .fillMaxHeight()
+                .cornerRadius(2.dp)
+                .background(ribbonColor)
+        ) {}
 
         Spacer(modifier = GlanceModifier.width(10.dp))
 
@@ -826,7 +815,7 @@ private fun NotesList(
             .fillMaxSize()
     ) {
         items(notes, itemId = { note ->
-            val appearance = cardSettings[note.fileUri] ?: NoteCardAppearance()
+            val appearance = cardSettings[note.fileUri] ?: cardSettings["__default__"] ?: NoteCardAppearance()
             "${note.id}:${appearance.size.storageValue}:${appearance.color.storageValue}:${appearance.textSize.storageValue}:${appearance.customColorHex.orEmpty()}"
                 .hashCode()
                 .toLong()

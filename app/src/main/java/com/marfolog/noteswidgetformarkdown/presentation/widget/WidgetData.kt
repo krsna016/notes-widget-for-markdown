@@ -129,11 +129,21 @@ internal suspend fun loadWidgetData(context: Context): WidgetData {
         "vault=${vaultName ?: "?"} folder=${noteFolderPath ?: "?"} " +
             "state=${state::class.simpleName} git=${gitSyncStatus?.let { it::class.simpleName } ?: "off"}"
     )
+    val cardSettingsMap = cardSettingsStore.getAll().toMutableMap()
+    val defaultAppearance = cardSettingsStore.getDefaultAppearance()
+    cardSettingsMap["__default__"] = defaultAppearance
+    if (state is WidgetState.Success) {
+        state.notes.forEach { note ->
+            if (!cardSettingsMap.containsKey(note.fileUri)) {
+                cardSettingsMap[note.fileUri] = defaultAppearance
+            }
+        }
+    }
     return WidgetData(
         state = state,
         vaultName = vaultName,
         noteFolderPath = noteFolderPath,
-        cardSettings = cardSettingsStore.getAll(),
+        cardSettings = cardSettingsMap,
         gitSyncStatus = gitSyncStatus,
         extraNoteFolders = extraNoteFolders,
         bottomBarChip = bottomBarChip

@@ -15,7 +15,48 @@ class NoteCardSettingsStore(context: Context) {
 
     private val prefs = context.getSharedPreferences(SetupActivity.PREFS_NAME, Context.MODE_PRIVATE)
 
+    fun getDefaultAppearance(): NoteCardAppearance {
+        val raw = prefs.getString(KEY_DEFAULT_APPEARANCE_JSON, null) ?: return NoteCardAppearance()
+        return runCatching {
+            val item = JSONObject(raw)
+            NoteCardAppearance(
+                size = NoteCardSize.fromStorage(item.optString(KEY_SIZE)),
+                color = NoteCardColor.fromStorage(item.optString(KEY_COLOR)),
+                textSize = NoteCardTextSize.fromStorage(item.optString(KEY_TEXT_SIZE)),
+                customColorHex = item.optString(KEY_CUSTOM_COLOR_HEX).takeIf { it.isNotBlank() }
+            )
+        }.getOrElse { NoteCardAppearance() }
+    }
+
+    fun saveDefaultAppearance(appearance: NoteCardAppearance) {
+        val item = JSONObject()
+            .put(KEY_SIZE, appearance.size.storageValue)
+            .put(KEY_COLOR, appearance.color.storageValue)
+            .put(KEY_TEXT_SIZE, appearance.textSize.storageValue)
+            .put(KEY_CUSTOM_COLOR_HEX, appearance.customColorHex.orEmpty())
+        prefs.edit()
+            .putString(KEY_DEFAULT_APPEARANCE_JSON, item.toString())
+            .commit()
+    }
+
+    fun applyToAll(appearance: NoteCardAppearance, noteUris: List<String>) {
+        saveDefaultAppearance(appearance)
+        val item = JSONObject()
+            .put(KEY_SIZE, appearance.size.storageValue)
+            .put(KEY_COLOR, appearance.color.storageValue)
+            .put(KEY_TEXT_SIZE, appearance.textSize.storageValue)
+            .put(KEY_CUSTOM_COLOR_HEX, appearance.customColorHex.orEmpty())
+        val newRoot = JSONObject()
+        noteUris.forEach { uri ->
+            newRoot.put(uri, JSONObject(item.toString()))
+        }
+        prefs.edit()
+            .putString(KEY_CARD_SETTINGS_JSON, newRoot.toString())
+            .commit()
+    }
+
     fun getAll(): Map<String, NoteCardAppearance> {
+        val defaultApp = getDefaultAppearance()
         val raw = prefs.getString(KEY_CARD_SETTINGS_JSON, null) ?: return emptyMap()
         return runCatching {
             val root = JSONObject(raw)
@@ -25,10 +66,10 @@ class NoteCardSettingsStore(context: Context) {
                 val noteId = keys.next()
                 val item = root.optJSONObject(noteId) ?: continue
                 result[noteId] = NoteCardAppearance(
-                    size = NoteCardSize.fromStorage(item.optString(KEY_SIZE)),
-                    color = NoteCardColor.fromStorage(item.optString(KEY_COLOR)),
-                    textSize = NoteCardTextSize.fromStorage(item.optString(KEY_TEXT_SIZE)),
-                    customColorHex = item.optString(KEY_CUSTOM_COLOR_HEX).takeIf { it.isNotBlank() }
+                    size = NoteCardSize.fromStorage(item.optString(KEY_SIZE, defaultApp.size.storageValue)),
+                    color = NoteCardColor.fromStorage(item.optString(KEY_COLOR, defaultApp.color.storageValue)),
+                    textSize = NoteCardTextSize.fromStorage(item.optString(KEY_TEXT_SIZE, defaultApp.textSize.storageValue)),
+                    customColorHex = item.optString(KEY_CUSTOM_COLOR_HEX).takeIf { it.isNotBlank() } ?: defaultApp.customColorHex
                 )
             }
             result
@@ -39,7 +80,7 @@ class NoteCardSettingsStore(context: Context) {
     }
 
     fun get(noteId: String): NoteCardAppearance {
-        return getAll()[noteId] ?: NoteCardAppearance()
+        return getAll()[noteId] ?: getDefaultAppearance()
     }
 
     fun getOrder(): List<String> {
@@ -111,6 +152,7 @@ class NoteCardSettingsStore(context: Context) {
 
     companion object {
         private const val AREA = "CardSettings"
+        const val KEY_DEFAULT_APPEARANCE_JSON = "default_card_appearance_json"
         const val KEY_CARD_SETTINGS_JSON = "note_card_settings_json"
         const val KEY_CARD_ORDER_JSON = "note_card_order_json"
         private const val KEY_SIZE = "size"
