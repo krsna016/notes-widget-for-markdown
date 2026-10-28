@@ -619,8 +619,6 @@ private fun SingleNoteView(
                     }
                 }
             }
-            }
-        }
         }
     }
 }
