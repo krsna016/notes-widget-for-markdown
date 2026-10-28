@@ -58,10 +58,10 @@ enum class NoteCardTextSize(
     val titleSp: Int,
     val previewSp: Int
 ) {
-    Default("default", "Default", 22, 18),
-    Large("large", "Large", 26, 22),
-    ExtraLarge("extra_large", "Extra", 30, 26),
-    Huge("huge", "Huge", 36, 30);
+    Default("default", "Normal (22sp)", 22, 18),
+    Large("large", "Large (26sp)", 26, 22),
+    ExtraLarge("extra_large", "XL (30sp)", 30, 26),
+    Huge("huge", "Huge (36sp)", 36, 30);
 
     companion object {
         fun fromStorage(value: String?): NoteCardTextSize {

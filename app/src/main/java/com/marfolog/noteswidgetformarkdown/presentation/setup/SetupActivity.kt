@@ -1737,7 +1737,7 @@ private fun CardSettingsSection(
                 NoteCardSettingsRow(
                     note = note,
                     appearance = appearance,
-                    expanded = expandedNoteUri == note.fileUri,
+                    expanded = (expandedNoteUri == note.fileUri) || (notes.size == 1),
                     isDragging = isDragging,
                     dragHandleModifier = Modifier.draggableHandle(),
                     onToggleExpanded = { onToggleExpanded(note) },
@@ -1791,6 +1791,19 @@ private fun NoteCardSettingsRow(
                         .weight(1f)
                         .clickable(onClick = onToggleExpanded)
                 )
+                Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    color = MaterialTheme.colorScheme.primaryContainer,
+                    modifier = Modifier.clickable(onClick = onToggleExpanded)
+                ) {
+                    Text(
+                        text = appearance.textSize.label,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                    )
+                }
+                Spacer(modifier = Modifier.size(4.dp))
                 Icon(
                     imageVector = Icons.Default.DragHandle,
                     contentDescription = stringResource(R.string.card_drag_hint),

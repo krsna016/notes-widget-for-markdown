@@ -71,6 +71,22 @@ internal fun WidgetActionButtons(isLoading: Boolean = false) {
         contentAlignment = Alignment.TopEnd
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
+            RoundIconButton(
+                icon = R.drawable.ic_copy,
+                contentDescription = "Copy note",
+                onClickModifier = GlanceModifier.clickable(actionRunCallback<CopyNoteAction>()),
+                size = 32.dp,
+                iconSize = 16.dp
+            )
+            Spacer(modifier = GlanceModifier.width(6.dp))
+            RoundIconButton(
+                icon = R.drawable.ic_text_size,
+                contentDescription = "Change font size",
+                onClickModifier = GlanceModifier.clickable(actionRunCallback<CycleTextSizeAction>()),
+                size = 32.dp,
+                iconSize = 16.dp
+            )
+            Spacer(modifier = GlanceModifier.width(6.dp))
             if (isLoading) {
                 Box(
                     modifier = GlanceModifier.size(32.dp),
