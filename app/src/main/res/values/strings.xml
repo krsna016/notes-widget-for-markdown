@@ -50,7 +50,7 @@
     <string name="no_app_opens_notes">No app can open this note. Is Obsidian installed?</string>
 
     <!-- Settings screen -->
-    <string name="settings_title">Notes Widget Settings</string>
+    <string name="settings_title">Obsidian Widget Settings</string>
     <string name="notes_folder_title">Notes Folder</string>
     <string name="notes_folder_title_first">Start here — Notes Folder</string>
     <string name="notes_folder_desc">The folder the widget will read .md files from. Can be the root folder or a subfolder.</string>
