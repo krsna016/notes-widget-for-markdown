@@ -113,6 +113,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.documentfile.provider.DocumentFile
+import com.marfolog.noteswidgetformarkdown.presentation.widget.ToggleClockStyleAction
 import com.marfolog.noteswidgetformarkdown.BuildConfig
 import com.marfolog.noteswidgetformarkdown.R
 import com.marfolog.noteswidgetformarkdown.data.preferences.ExtraNotesStore
@@ -1491,6 +1492,51 @@ internal fun SetupScreenContent(
         if (languageName != null) {
             Spacer(modifier = Modifier.height(12.dp))
             LanguageSetting(languageName = languageName, onClick = onOpenLanguage)
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+        HorizontalDivider()
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Text(
+            text = "Clock Camouflage Style",
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.primary
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = "Select resident clock face for widget camouflage mode. Double-tap the clock anytime on your home screen to reveal notes.",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        val clockPrefs = appearanceContext.getSharedPreferences(SetupActivity.PREFS_NAME, Context.MODE_PRIVATE)
+        val clockScope = rememberCoroutineScope()
+        var currentClockStyle by remember {
+            mutableStateOf(
+                clockPrefs.getString(ToggleClockStyleAction.KEY_CLOCK_STYLE, ToggleClockStyleAction.STYLE_ANALOG)
+                    ?: ToggleClockStyleAction.STYLE_ANALOG
+            )
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            FilterChip(
+                selected = currentClockStyle == ToggleClockStyleAction.STYLE_ANALOG,
+                onClick = {
+                    currentClockStyle = ToggleClockStyleAction.STYLE_ANALOG
+                    clockPrefs.edit().putString(ToggleClockStyleAction.KEY_CLOCK_STYLE, ToggleClockStyleAction.STYLE_ANALOG).apply()
+                    clockScope.launch { NotesWidget.updateAll(appearanceContext) }
+                },
+                label = { Text("✦ Swiss Analog") }
+            )
+            FilterChip(
+                selected = currentClockStyle == ToggleClockStyleAction.STYLE_DIGITAL,
+                onClick = {
+                    currentClockStyle = ToggleClockStyleAction.STYLE_DIGITAL
+                    clockPrefs.edit().putString(ToggleClockStyleAction.KEY_CLOCK_STYLE, ToggleClockStyleAction.STYLE_DIGITAL).apply()
+                    clockScope.launch { NotesWidget.updateAll(appearanceContext) }
+                },
+                label = { Text("✦ Apple Digital") }
+            )
         }
 
         Spacer(modifier = Modifier.height(32.dp))

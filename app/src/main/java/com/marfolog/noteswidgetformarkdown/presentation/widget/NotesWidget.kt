@@ -786,12 +786,9 @@ private fun WidgetClockView(
 ) {
     val context = LocalContext.current
     val prefs = context.getSharedPreferences(SetupActivity.PREFS_NAME, Context.MODE_PRIVATE)
-    val clockStyle = prefs.getString(ToggleClockStyleAction.KEY_CLOCK_STYLE, ToggleClockStyleAction.STYLE_DIGITAL) ?: ToggleClockStyleAction.STYLE_DIGITAL
+    val clockStyle = prefs.getString(ToggleClockStyleAction.KEY_CLOCK_STYLE, ToggleClockStyleAction.STYLE_ANALOG) ?: ToggleClockStyleAction.STYLE_ANALOG
 
-    val wakeAction = actionRunCallback<ToggleWidgetModeAction>(
-        actionParametersOf(ToggleWidgetModeAction.PARAM_TARGET_MODE to ToggleWidgetModeAction.MODE_NOTES)
-    )
-    val toggleStyleAction = actionRunCallback<ToggleClockStyleAction>()
+    val doubleTapAction = actionRunCallback<DoubleTapClockAction>()
 
     val layoutId = if (clockStyle == ToggleClockStyleAction.STYLE_ANALOG) {
         R.layout.widget_analog_clock
@@ -800,72 +797,13 @@ private fun WidgetClockView(
     }
     val rv = RemoteViews(context.packageName, layoutId)
 
-    Column(
+    Box(
         modifier = GlanceModifier
             .fillMaxSize()
-            .padding(horizontal = 4.dp, vertical = 2.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalAlignment = Alignment.CenterVertically
+            .clickable(doubleTapAction),
+        contentAlignment = Alignment.Center
     ) {
-        // Discreet Top Switcher Bar: Minimalist style & notes toggle pills
-        Row(
-            modifier = GlanceModifier
-                .fillMaxWidth()
-                .padding(horizontal = 4.dp, vertical = 2.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Style Switch Pill (Digital <-> Analog)
-            Box(
-                modifier = GlanceModifier
-                    .cornerRadius(12.dp)
-                    .background(ColorProvider(Color(0x33000000)))
-                    .padding(horizontal = 10.dp, vertical = 4.dp)
-                    .clickable(toggleStyleAction),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = if (clockStyle == ToggleClockStyleAction.STYLE_ANALOG) "✦ Swiss Analog ↻" else "✦ Apple Digital ↻",
-                    style = TextStyle(
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = FontFamily.SansSerif,
-                        color = ColorProvider(Color.White)
-                    )
-                )
-            }
-
-            Spacer(modifier = GlanceModifier.defaultWeight())
-
-            // Switch back to Notes / Dincharya Pill
-            Box(
-                modifier = GlanceModifier
-                    .cornerRadius(12.dp)
-                    .background(ColorProvider(Color(0x33000000)))
-                    .padding(horizontal = 10.dp, vertical = 4.dp)
-                    .clickable(wakeAction),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "📝 Dincharya",
-                    style = TextStyle(
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = FontFamily.SansSerif,
-                        color = ColorProvider(Color(0xFFC084FC))
-                    )
-                )
-            }
-        }
-
-        // Live Clock Face RemoteViews - Expanding to fill available area
-        Box(
-            modifier = GlanceModifier
-                .fillMaxSize()
-                .defaultWeight(),
-            contentAlignment = Alignment.Center
-        ) {
-            AndroidRemoteViews(rv)
-        }
+        AndroidRemoteViews(rv)
     }
 }
 
