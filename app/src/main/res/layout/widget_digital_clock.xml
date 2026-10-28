@@ -6,13 +6,14 @@
     android:orientation="vertical"
     android:gravity="center"
     android:background="@android:color/transparent"
-    android:padding="2dp">
+    android:padding="0dp">
 
     <!-- Date Header (e.g. WEDNESDAY, OCTOBER 28) -->
     <TextClock
         android:id="@+id/digital_clock_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="2dp"
         android:format12Hour="EEEE, MMMM d"
         android:format24Hour="EEEE, MMMM d"
         android:textColor="#E6FFFFFF"
@@ -25,7 +26,7 @@
         android:shadowDy="2"
         android:shadowRadius="6" />
 
-    <!-- Big Bold Apple/Mac Lockscreen Time (Spanning Full Area) -->
+    <!-- Big Bold Apple/Mac Lockscreen Time with Live Seconds (Spanning Full Area) -->
     <TextClock
         android:id="@+id/digital_clock_time"
         android:layout_width="match_parent"
@@ -33,18 +34,18 @@
         android:layout_weight="1"
         android:gravity="center"
         android:autoSizeTextType="uniform"
-        android:autoSizeMinTextSize="64sp"
-        android:autoSizeMaxTextSize="140sp"
+        android:autoSizeMinTextSize="48sp"
+        android:autoSizeMaxTextSize="160sp"
         android:autoSizeStepGranularity="2sp"
-        android:format12Hour="h:mm"
-        android:format24Hour="HH:mm"
+        android:format12Hour="h:mm:ss"
+        android:format24Hour="HH:mm:ss"
         android:textColor="#FFFFFFFF"
-        android:textSize="115sp"
+        android:textSize="120sp"
         android:fontFamily="sans-serif-black"
         android:includeFontPadding="false"
         android:shadowColor="#B0000000"
         android:shadowDx="0"
         android:shadowDy="4"
-        android:shadowRadius="12" />
+        android:shadowRadius="14" />
 
 </LinearLayout>

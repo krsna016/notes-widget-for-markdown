@@ -23,7 +23,8 @@ class ToggleTaskAction : ActionCallback {
         glanceId: GlanceId,
         parameters: ActionParameters
     ) {
-        val uriStr = parameters[PARAM_NOTE_URI] ?: return
+        val prefs = context.getSharedPreferences(SetupActivity.PREFS_NAME, Context.MODE_PRIVATE)
+        val uriStr = parameters[PARAM_NOTE_URI] ?: prefs.getString(SetupActivity.KEY_SELECTED_NOTE_URI, null) ?: return
         val taskText = parameters[PARAM_TASK_TEXT] ?: return
         val currentlyChecked = parameters[PARAM_IS_CHECKED] ?: false
 

@@ -461,207 +461,86 @@ private fun SingleNoteView(
                     )
                 }
             } else {
-                val maxDisplayCount = minOf(lines.size, 40)
-                val hasMore = lines.size > 40
-                val totalCount = if (hasMore) maxDisplayCount + 1 else maxDisplayCount
-
                 LazyColumn(
                     modifier = GlanceModifier
                         .fillMaxWidth()
                         .defaultWeight()
                 ) {
-                    items(count = totalCount, itemId = { it.toLong() }) { index ->
-                        if (hasMore && index == maxDisplayCount) {
-                            Row(
-                                modifier = GlanceModifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 6.dp)
-                                    .clickable(actionStartActivity(openIntent)),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
+                    items(count = lines.size, itemId = { it.toLong() }) { index ->
+                        val line = lines[index]
+                        when {
+                            line.startsWith("§H1§") -> {
+                                val text = line.removePrefix("§H1§")
                                 Text(
-                                    text = "✦ +${lines.size - 40} more items • Tap to open in Obsidian ✦",
+                                    text = "✦  $text",
                                     style = TextStyle(
-                                        fontSize = 11.sp,
                                         fontWeight = FontWeight.Bold,
+                                        fontSize = (appearance.textSize.titleSp + 2).sp,
                                         fontFamily = FontFamily.SansSerif,
-                                        color = ColorProvider(Color(0xFFC084FC))
-                                    )
-                                )
-                            }
-                        } else {
-                            val line = lines[index]
-                            when {
-                        line.startsWith("§H1§") -> {
-                            val text = line.removePrefix("§H1§")
-                            Column(
-                                modifier = GlanceModifier
-                                    .fillMaxWidth()
-                                    .padding(top = 10.dp, bottom = 4.dp)
-                                    .clickable(actionStartActivity(openIntent))
-                            ) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Box(
-                                        modifier = GlanceModifier
-                                            .width(4.dp)
-                                            .height(20.dp)
-                                            .cornerRadius(2.dp)
-                                            .background(ribbonColor)
-                                    ) {}
-                                    Spacer(modifier = GlanceModifier.width(8.dp))
-                                    Text(
-                                        text = text,
-                                        style = TextStyle(
-                                            fontWeight = FontWeight.Bold,
-                                            fontSize = (appearance.textSize.titleSp + 2).sp,
-                                            fontFamily = FontFamily.SansSerif,
-                                            color = appearance.contentColor()
-                                        ),
-                                        maxLines = 2
-                                    )
-                                }
-                                Spacer(modifier = GlanceModifier.height(4.dp))
-                                Box(
+                                        color = ribbonColor
+                                    ),
                                     modifier = GlanceModifier
                                         .fillMaxWidth()
-                                        .height(1.dp)
-                                        .background(ColorProvider(Color(0x30888888)))
-                                ) {}
-                            }
-                        }
-                        line.startsWith("§H2§") -> {
-                            val text = line.removePrefix("§H2§")
-                            Row(
-                                modifier = GlanceModifier
-                                    .fillMaxWidth()
-                                    .padding(top = 8.dp, bottom = 3.dp)
-                                    .clickable(actionStartActivity(openIntent)),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = "✦ ",
-                                    style = TextStyle(
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 12.sp,
-                                        color = ribbonColor
-                                    )
+                                        .padding(top = 10.dp, bottom = 4.dp)
                                 )
+                            }
+                            line.startsWith("§H2§") -> {
+                                val text = line.removePrefix("§H2§")
                                 Text(
-                                    text = text,
+                                    text = "•  $text",
                                     style = TextStyle(
                                         fontWeight = FontWeight.Bold,
                                         fontSize = appearance.textSize.titleSp.sp,
                                         fontFamily = FontFamily.SansSerif,
                                         color = appearance.contentColor()
                                     ),
-                                    maxLines = 2
+                                    modifier = GlanceModifier
+                                        .fillMaxWidth()
+                                        .padding(top = 8.dp, bottom = 3.dp)
                                 )
                             }
-                        }
-                        line.startsWith("§H3§") -> {
-                            val text = line.removePrefix("§H3§")
-                            Text(
-                                text = text,
-                                style = TextStyle(
-                                    fontWeight = FontWeight.Medium,
-                                    fontSize = (appearance.textSize.previewSp + 2).sp,
-                                    fontFamily = FontFamily.SansSerif,
-                                    color = appearance.contentColor()
-                                ),
-                                maxLines = 2,
-                                modifier = GlanceModifier
-                                    .fillMaxWidth()
-                                    .padding(top = 6.dp, bottom = 2.dp)
-                                    .clickable(actionStartActivity(openIntent))
-                            )
-                        }
-                        line.startsWith("§H4§") -> {
-                            val text = line.removePrefix("§H4§")
-                            Text(
-                                text = text.uppercase(),
-                                style = TextStyle(
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = (appearance.textSize.previewSp - 2).sp,
-                                    color = ColorProvider(Color(0xFF9E9E9E))
-                                ),
-                                modifier = GlanceModifier
-                                    .fillMaxWidth()
-                                    .padding(top = 5.dp, bottom = 2.dp)
-                                    .clickable(actionStartActivity(openIntent))
-                            )
-                        }
-                        line == "§HR§" -> {
-                            Row(
-                                modifier = GlanceModifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 6.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Box(
-                                    modifier = GlanceModifier
-                                        .defaultWeight()
-                                        .height(1.dp)
-                                        .background(ColorProvider(Color(0x28888888)))
-                                ) {}
-                                Text(
-                                    text = "  ❦  ",
-                                    style = TextStyle(
-                                        fontSize = 10.sp,
-                                        color = ColorProvider(Color(0x55888888))
-                                    )
-                                )
-                                Box(
-                                    modifier = GlanceModifier
-                                        .defaultWeight()
-                                        .height(1.dp)
-                                        .background(ColorProvider(Color(0x28888888)))
-                                ) {}
-                            }
-                        }
-                        line.startsWith("§QUOTE§") -> {
-                            val text = line.removePrefix("§QUOTE§")
-                            Row(
-                                modifier = GlanceModifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 3.dp)
-                                    .cornerRadius(8.dp)
-                                    .background(ColorProvider(Color(0x14888888)))
-                                    .clickable(actionStartActivity(openIntent))
-                                    .padding(horizontal = 8.dp, vertical = 6.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Box(
-                                    modifier = GlanceModifier
-                                        .width(3.dp)
-                                        .height(20.dp)
-                                        .cornerRadius(1.5.dp)
-                                        .background(ColorProvider(Color(0xFF38BDF8)))
-                                ) {}
-                                Spacer(modifier = GlanceModifier.width(8.dp))
+                            line.startsWith("§H3§") || line.startsWith("§H4§") -> {
+                                val text = line.removePrefix("§H3§").removePrefix("§H4§")
                                 Text(
                                     text = text,
                                     style = TextStyle(
-                                        fontStyle = FontStyle.Italic,
+                                        fontWeight = FontWeight.Medium,
                                         fontSize = appearance.textSize.previewSp.sp,
                                         fontFamily = FontFamily.SansSerif,
                                         color = appearance.contentColor()
                                     ),
-                                    maxLines = 20,
-                                    modifier = GlanceModifier.defaultWeight()
+                                    modifier = GlanceModifier
+                                        .fillMaxWidth()
+                                        .padding(top = 6.dp, bottom = 2.dp)
                                 )
                             }
-                        }
-                        line.startsWith("§CODE§") -> {
-                            val text = line.removePrefix("§CODE§")
-                            Box(
-                                modifier = GlanceModifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 2.dp)
-                                    .cornerRadius(6.dp)
-                                    .background(ColorProvider(Color(0x20000000)))
-                                    .padding(horizontal = 8.dp, vertical = 4.dp)
-                            ) {
+                            line == "§HR§" -> {
+                                Box(
+                                    modifier = GlanceModifier
+                                        .fillMaxWidth()
+                                        .height(1.dp)
+                                        .padding(vertical = 4.dp)
+                                        .background(ColorProvider(Color(0x30888888)))
+                                ) {}
+                            }
+                            line.startsWith("§QUOTE§") -> {
+                                val text = line.removePrefix("§QUOTE§")
+                                Text(
+                                    text = "❝  $text",
+                                    style = TextStyle(
+                                        fontStyle = FontStyle.Italic,
+                                        fontSize = appearance.textSize.previewSp.sp,
+                                        fontFamily = FontFamily.SansSerif,
+                                        color = ColorProvider(Color(0xFF38BDF8))
+                                    ),
+                                    maxLines = 10,
+                                    modifier = GlanceModifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 3.dp)
+                                )
+                            }
+                            line.startsWith("§CODE§") -> {
+                                val text = line.removePrefix("§CODE§")
                                 Text(
                                     text = text,
                                     style = TextStyle(
@@ -669,96 +548,60 @@ private fun SingleNoteView(
                                         fontSize = (appearance.textSize.previewSp - 2).sp,
                                         color = appearance.contentColor()
                                     ),
-                                    maxLines = 20
-                                )
-                            }
-                        }
-                        taskRegex.find(line) != null -> {
-                            val taskMatch = taskRegex.find(line)!!
-                            val (indent, symbol, taskText) = taskMatch.destructured
-                            val isChecked = (symbol == "☑")
-                            val toggleAction = actionRunCallback<ToggleTaskAction>(
-                                actionParametersOf(
-                                    ToggleTaskAction.PARAM_NOTE_URI to note.fileUri,
-                                    ToggleTaskAction.PARAM_TASK_TEXT to taskText.trim(),
-                                    ToggleTaskAction.PARAM_IS_CHECKED to isChecked
-                                )
-                            )
-
-                            Row(
-                                modifier = GlanceModifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 3.dp)
-                                    .clickable(toggleAction),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                if (indent.isNotEmpty()) {
-                                    Spacer(modifier = GlanceModifier.width((indent.length * 6).dp))
-                                }
-                                Text(
-                                    text = if (isChecked) "☑ " else "☐ ",
-                                    style = TextStyle(
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = appearance.textSize.previewSp.sp,
-                                        color = if (isChecked) ColorProvider(Color(0xFF10B981)) else appearance.contentColor()
-                                    )
-                                )
-                                Spacer(modifier = GlanceModifier.width(4.dp))
-                                Text(
-                                    text = taskText,
-                                    style = TextStyle(
-                                        fontSize = appearance.textSize.previewSp.sp,
-                                        fontFamily = FontFamily.SansSerif,
-                                        textDecoration = if (isChecked) TextDecoration.LineThrough else TextDecoration.None,
-                                        color = if (isChecked) ColorProvider(Color(0xFF9E9E9E)) else appearance.contentColor()
-                                    ),
                                     maxLines = 10,
-                                    modifier = GlanceModifier.defaultWeight()
+                                    modifier = GlanceModifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 2.dp)
                                 )
                             }
-                        }
-                        listRegex.find(line) != null -> {
-                            val listMatch = listRegex.find(line)!!
-                            val (indent, marker, content) = listMatch.destructured
-                            Row(
-                                modifier = GlanceModifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 2.dp)
-                                    .clickable(actionStartActivity(openIntent)),
-                                verticalAlignment = Alignment.Top
-                            ) {
-                                if (indent.isNotEmpty()) {
-                                    Spacer(modifier = GlanceModifier.width((indent.length * 6).dp))
-                                }
-                                Text(
-                                    text = marker,
-                                    style = TextStyle(
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = appearance.textSize.previewSp.sp,
-                                        fontFamily = FontFamily.SansSerif,
-                                        color = ribbonColor
+                            taskRegex.find(line) != null -> {
+                                val taskMatch = taskRegex.find(line)!!
+                                val (indent, symbol, taskText) = taskMatch.destructured
+                                val isChecked = (symbol == "☑")
+                                val toggleAction = actionRunCallback<ToggleTaskAction>(
+                                    actionParametersOf(
+                                        ToggleTaskAction.PARAM_NOTE_URI to note.fileUri,
+                                        ToggleTaskAction.PARAM_TASK_TEXT to taskText.trim(),
+                                        ToggleTaskAction.PARAM_IS_CHECKED to isChecked
                                     )
                                 )
-                                Spacer(modifier = GlanceModifier.width(4.dp))
+
+                                Row(
+                                    modifier = GlanceModifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 2.5.dp)
+                                        .clickable(toggleAction),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = "$indent${if (isChecked) "☑  " else "☐  "}$taskText",
+                                        style = TextStyle(
+                                            fontSize = appearance.textSize.previewSp.sp,
+                                            fontFamily = FontFamily.SansSerif,
+                                            textDecoration = if (isChecked) TextDecoration.LineThrough else TextDecoration.None,
+                                            color = if (isChecked) ColorProvider(Color(0xFF9E9E9E)) else appearance.contentColor()
+                                        ),
+                                        maxLines = 10
+                                    )
+                                }
+                            }
+                            listRegex.find(line) != null -> {
+                                val listMatch = listRegex.find(line)!!
+                                val (indent, marker, content) = listMatch.destructured
                                 Text(
-                                    text = content,
+                                    text = "$indent$marker $content",
                                     style = TextStyle(
                                         fontSize = appearance.textSize.previewSp.sp,
                                         fontFamily = FontFamily.SansSerif,
                                         color = appearance.contentColor()
                                     ),
                                     maxLines = 10,
-                                    modifier = GlanceModifier.defaultWeight()
+                                    modifier = GlanceModifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 2.dp)
                                 )
                             }
-                        }
-                        else -> {
-                            Row(
-                                modifier = GlanceModifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 2.dp)
-                                    .clickable(actionStartActivity(openIntent))
-                            ) {
+                            else -> {
                                 Text(
                                     text = line,
                                     style = TextStyle(
@@ -766,13 +609,16 @@ private fun SingleNoteView(
                                         fontFamily = FontFamily.SansSerif,
                                         color = appearance.contentColor()
                                     ),
-                                    maxLines = 50
+                                    maxLines = 20,
+                                    modifier = GlanceModifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 2.dp)
                                 )
                             }
                         }
                     }
                 }
-                }
+            }
             }
         }
         }
