@@ -371,7 +371,6 @@ internal fun ConfiguredScaffold(
 ) {
     Box(modifier = GlanceModifier.fillMaxSize()) {
         content()
-        WidgetActionButtons(isLoading)
     }
 }
 

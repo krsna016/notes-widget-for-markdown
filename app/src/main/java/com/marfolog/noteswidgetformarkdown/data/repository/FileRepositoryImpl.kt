@@ -49,13 +49,25 @@ class FileRepositoryImpl(
         // (e.g. Projects/Projects.md). Obsidian hides it as the
         // folder itself, so hide it here too to match what the user sees.
         val folderName = folder.name
-        val notes = folder.listFiles()
-            .filter { it.isFile && it.name?.endsWith(".md", ignoreCase = true) == true }
-            .filterNot { docFile ->
-                folderName != null &&
-                    docFile.name?.removeSuffix(".md").equals(folderName, ignoreCase = true)
+        val allDocFiles = mutableListOf<DocumentFile>()
+
+        fun scanFolder(dir: DocumentFile, depth: Int = 4) {
+            if (depth < 0) return
+            dir.listFiles().forEach { child ->
+                val name = child.name.orEmpty()
+                if (child.isDirectory && !name.startsWith(".")) {
+                    scanFolder(child, depth - 1)
+                } else if (child.isFile && name.endsWith(".md", ignoreCase = true)) {
+                    val isFolderNote = folderName != null && name.removeSuffix(".md").equals(folderName, ignoreCase = true)
+                    if (!isFolderNote) {
+                        allDocFiles.add(child)
+                    }
+                }
             }
-            .mapNotNull { docFile -> fileToNoteSummary(docFile) }
+        }
+        scanFolder(folder)
+
+        val notes = allDocFiles.mapNotNull { docFile -> fileToNoteSummary(docFile) }
 
         AppLog.d("Files", "Loaded ${notes.size} notes in ${System.currentTimeMillis() - startedAt}ms from $folderUri")
         AppLog.d("Files", notes.joinToString { "${it.fileName}@${it.lastModified}" })
@@ -210,7 +222,7 @@ class FileRepositoryImpl(
 
     companion object {
         private const val TAG = "FileRepository"
-        private const val PREVIEW_SOURCE_LINE_COUNT = 36
+        private const val PREVIEW_SOURCE_LINE_COUNT = 150
     }
 }
 

@@ -235,6 +235,7 @@ class SetupActivity : ComponentActivity() {
         const val KEY_WIDGET_BACKGROUND = "widget_background_percent"
         const val KEY_WIDGET_COLOR = "widget_color"
         const val KEY_WIDGET_COLOR_HEX = "widget_color_hex"
+        const val KEY_SELECTED_NOTE_URI = "selected_single_note_uri"
 
         /** One of the `UsageEvent.FROM_*` values; none means the launcher. */
         const val EXTRA_OPENED_FROM = "opened_from"
@@ -306,6 +307,7 @@ private fun SetupScreen(modifier: Modifier = Modifier) {
         }
     }
 
+    var selectedSingleNoteUri by rememberSaveable { mutableStateOf(prefs.getString(SetupActivity.KEY_SELECTED_NOTE_URI, null)) }
     var expandedNoteUri by rememberSaveable { mutableStateOf<String?>(null) }
     var noteToDelete by remember { mutableStateOf<NoteSummary?>(null) }
     var gitStatus by remember { mutableStateOf<GitSyncStatus>(GitSyncStatus.NotTracked) }
@@ -692,6 +694,12 @@ private fun SetupScreen(modifier: Modifier = Modifier) {
             }
         },
         onWidgetCustomColorChanged = { hex -> changeWidgetColor(WidgetColorChoice(WidgetColor.Custom, hex)) },
+        selectedSingleNoteUri = selectedSingleNoteUri,
+        onSelectSingleNote = { note ->
+            selectedSingleNoteUri = note.fileUri
+            prefs.edit().putString(SetupActivity.KEY_SELECTED_NOTE_URI, note.fileUri).apply()
+            scope.launch { NotesWidget.updateAll(context) }
+        },
         onCardSizeSelected = { note, size ->
             val updated = (cardSettings[note.fileUri] ?: NoteCardAppearance()).copy(size = size)
             cardSettingsStore.save(note.fileUri, updated)
@@ -998,6 +1006,8 @@ internal fun SetupScreenContent(
     widgetColor: WidgetColorChoice = WidgetColorChoice(),
     onWidgetColorSelected: (WidgetColor) -> Unit = {},
     onWidgetCustomColorChanged: (String) -> Unit = {},
+    selectedSingleNoteUri: String? = null,
+    onSelectSingleNote: (NoteSummary) -> Unit = {},
     onCardSizeSelected: (NoteSummary, NoteCardSize) -> Unit = { _, _ -> },
     onCardColorSelected: (NoteSummary, NoteCardColor) -> Unit = { _, _ -> },
     onCardTextSizeSelected: (NoteSummary, NoteCardTextSize) -> Unit = { _, _ -> },
@@ -1395,6 +1405,8 @@ internal fun SetupScreenContent(
             notes = notes,
             cardSettings = cardSettings,
             notesLoadError = notesLoadError,
+            selectedSingleNoteUri = selectedSingleNoteUri,
+            onSelectSingleNote = onSelectSingleNote,
             onCardSizeSelected = onCardSizeSelected,
             onCardColorSelected = onCardColorSelected,
             onCardTextSizeSelected = onCardTextSizeSelected,
@@ -1671,6 +1683,8 @@ private fun CardSettingsSection(
     notes: List<NoteSummary>,
     cardSettings: Map<String, NoteCardAppearance>,
     notesLoadError: String?,
+    selectedSingleNoteUri: String? = null,
+    onSelectSingleNote: (NoteSummary) -> Unit = {},
     onCardSizeSelected: (NoteSummary, NoteCardSize) -> Unit,
     onCardColorSelected: (NoteSummary, NoteCardColor) -> Unit,
     onCardTextSizeSelected: (NoteSummary, NoteCardTextSize) -> Unit,
@@ -1734,12 +1748,15 @@ private fun CardSettingsSection(
                     hintOffset = if (index == 0) hintOffset.value else 0f,
                     removesFromWidgetOnly = note.isExtra
                 ) {
+                val isSelectedForWidget = (note.fileUri == selectedSingleNoteUri) || (selectedSingleNoteUri == null && index == 0)
                 NoteCardSettingsRow(
                     note = note,
                     appearance = appearance,
                     expanded = (expandedNoteUri == note.fileUri) || (notes.size == 1),
                     isDragging = isDragging,
                     dragHandleModifier = Modifier.draggableHandle(),
+                    isSelectedForWidget = isSelectedForWidget,
+                    onSelectForWidget = { onSelectSingleNote(note) },
                     onToggleExpanded = { onToggleExpanded(note) },
                     onSizeSelected = { size -> onCardSizeSelected(note, size) },
                     onColorSelected = { color -> onCardColorSelected(note, color) },
@@ -1761,6 +1778,8 @@ private fun NoteCardSettingsRow(
     expanded: Boolean,
     isDragging: Boolean,
     dragHandleModifier: Modifier,
+    isSelectedForWidget: Boolean,
+    onSelectForWidget: () -> Unit,
     onToggleExpanded: () -> Unit,
     onSizeSelected: (NoteCardSize) -> Unit,
     onColorSelected: (NoteCardColor) -> Unit,
@@ -1791,6 +1810,19 @@ private fun NoteCardSettingsRow(
                         .weight(1f)
                         .clickable(onClick = onToggleExpanded)
                 )
+                Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    color = if (isSelectedForWidget) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
+                    modifier = Modifier.clickable(onClick = onSelectForWidget)
+                ) {
+                    Text(
+                        text = if (isSelectedForWidget) "★ On Widget" else "Show on Widget",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = if (isSelectedForWidget) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                    )
+                }
+                Spacer(modifier = Modifier.size(6.dp))
                 Surface(
                     shape = RoundedCornerShape(8.dp),
                     color = MaterialTheme.colorScheme.primaryContainer,

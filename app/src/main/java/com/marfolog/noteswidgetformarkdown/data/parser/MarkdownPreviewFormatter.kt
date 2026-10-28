@@ -222,7 +222,7 @@ class MarkdownPreviewFormatter(
     }
 
     companion object {
-        private const val DEFAULT_PREVIEW_LINE_COUNT = 18
+        private const val DEFAULT_PREVIEW_LINE_COUNT = 100
         private val extensions: List<Extension> = listOf(
             TaskListItemsExtension.create(),
             StrikethroughExtension.create()

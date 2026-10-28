@@ -15,6 +15,7 @@ import androidx.glance.LocalContext
 import androidx.glance.GlanceTheme
 import androidx.glance.Image
 import androidx.glance.ImageProvider
+import androidx.glance.action.actionParametersOf
 import androidx.glance.action.clickable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -291,7 +292,7 @@ private fun ConfiguredContent(
     backgroundPercent: Int = WidgetBackground.DEFAULT_PERCENT
 ) {
     ConfiguredScaffold(vaultName, noteFolderPath, bottomBarChip, backgroundPercent, isLoading) {
-        NotesList(notes, vaultName, noteFolderPath, cardSettings, extraNoteFolders)
+        SingleNoteView(notes, vaultName, noteFolderPath, cardSettings, extraNoteFolders)
     }
 }
 
@@ -324,7 +325,144 @@ private fun ConfiguredContentError(
 
 // endregion
 
-// region Notes List
+// region Single Note View & Notes List
+
+@Composable
+private fun SingleNoteView(
+    notes: List<NoteSummary>,
+    vaultName: String?,
+    noteFolderPath: String?,
+    cardSettings: Map<String, NoteCardAppearance>,
+    extraNoteFolders: Map<String, String>
+) {
+    val context = LocalContext.current
+    val prefs = context.getSharedPreferences(SetupActivity.PREFS_NAME, Context.MODE_PRIVATE)
+    val selectedUri = prefs.getString(SetupActivity.KEY_SELECTED_NOTE_URI, null)
+
+    val note = notes.firstOrNull { it.fileUri == selectedUri } ?: notes.firstOrNull()
+    if (note == null) {
+        EmptyContent(WidgetBackground.DEFAULT_PERCENT)
+        return
+    }
+
+    val appearance = cardSettings[note.fileUri] ?: NoteCardAppearance()
+    val noteFolder = noteFolderPathFor(note, noteFolderPath, extraNoteFolders)
+    val openIntent = widgetNoteOpenIntent(context, note, vaultName, noteFolder)
+    val ribbonColor = ColorProvider(appearance.accentRibbonColor())
+
+    Row(
+        modifier = GlanceModifier
+            .fillMaxSize()
+            .cornerRadius(28.dp)
+            .background(appearance.backgroundColor())
+            .padding(14.dp),
+        verticalAlignment = Alignment.Top
+    ) {
+        // Luxury Left-Edge Accent Ribbon
+        Box(
+            modifier = GlanceModifier
+                .width(4.dp)
+                .fillMaxHeight()
+                .cornerRadius(2.dp)
+                .background(ribbonColor)
+        ) {}
+
+        Spacer(modifier = GlanceModifier.width(10.dp))
+
+        Column(
+            modifier = GlanceModifier
+                .defaultWeight()
+                .fillMaxHeight()
+        ) {
+            // Title Header (Clickable to open in Obsidian)
+            Text(
+                text = note.title,
+                style = TextStyle(
+                    fontWeight = FontWeight.Bold,
+                    fontSize = appearance.textSize.titleSp.sp,
+                    color = appearance.contentColor()
+                ),
+                maxLines = 1,
+                modifier = GlanceModifier
+                    .fillMaxWidth()
+                    .clickable(actionStartActivity(openIntent))
+            )
+
+            Spacer(modifier = GlanceModifier.height(6.dp))
+
+            val lines = note.preview.lines().filter { it.isNotBlank() }
+            val taskRegex = Regex("""^(\s*)([☑☐])\s+(.*)$""")
+
+            LazyColumn(
+                modifier = GlanceModifier
+                    .fillMaxWidth()
+                    .defaultWeight()
+            ) {
+                items(count = lines.size, itemId = { it.toLong() }) { index ->
+                    val line = lines[index]
+                    val taskMatch = taskRegex.find(line)
+                    if (taskMatch != null) {
+                        val (indent, symbol, taskText) = taskMatch.destructured
+                        val isChecked = (symbol == "☑")
+                        val toggleAction = actionRunCallback<ToggleTaskAction>(
+                            actionParametersOf(
+                                ToggleTaskAction.PARAM_NOTE_URI to note.fileUri,
+                                ToggleTaskAction.PARAM_TASK_TEXT to taskText.trim(),
+                                ToggleTaskAction.PARAM_IS_CHECKED to isChecked
+                            )
+                        )
+
+                        Row(
+                            modifier = GlanceModifier
+                                .fillMaxWidth()
+                                .padding(vertical = 3.dp)
+                                .clickable(toggleAction),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            if (indent.isNotEmpty()) {
+                                Spacer(modifier = GlanceModifier.width((indent.length * 6).dp))
+                            }
+                            Text(
+                                text = if (isChecked) "☑ " else "☐ ",
+                                style = TextStyle(
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = appearance.textSize.previewSp.sp,
+                                    color = if (isChecked) ColorProvider(Color(0xFF10B981)) else appearance.contentColor()
+                                )
+                            )
+                            Spacer(modifier = GlanceModifier.width(4.dp))
+                            Text(
+                                text = taskText,
+                                style = TextStyle(
+                                    fontSize = appearance.textSize.previewSp.sp,
+                                    color = if (isChecked) ColorProvider(Color(0xFF9E9E9E)) else appearance.contentColor()
+                                ),
+                                maxLines = 3,
+                                modifier = GlanceModifier.defaultWeight()
+                            )
+                        }
+                    } else {
+                        Row(
+                            modifier = GlanceModifier
+                                .fillMaxWidth()
+                                .padding(vertical = 2.dp)
+                                .clickable(actionStartActivity(openIntent))
+                        ) {
+                            Text(
+                                text = line,
+                                style = TextStyle(
+                                    fontSize = appearance.textSize.previewSp.sp,
+                                    color = appearance.contentColor()
+                                ),
+                                maxLines = 4
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
 
 @Composable
 private fun NotesList(
