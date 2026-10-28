@@ -82,6 +82,9 @@ class MarkdownPreviewFormatter(
     }
 
     private fun cleanupRenderedText(line: String, richFormatting: Boolean = false): String {
+        if (richFormatting && line.startsWith("§CODE§")) {
+            return line.trimEnd()
+        }
         return line
             .replace(renderedLinkRegex) { match -> match.groupValues[1] }
             .replace(renderedQuotedInlineRegex) { match -> match.groupValues[1] }
