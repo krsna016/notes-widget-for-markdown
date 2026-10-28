@@ -7,9 +7,11 @@ import android.widget.Toast
 import androidx.glance.GlanceId
 import androidx.glance.action.ActionParameters
 import androidx.glance.appwidget.action.ActionCallback
+import com.marfolog.noteswidgetformarkdown.data.preferences.ExtraNotesStore
 import com.marfolog.noteswidgetformarkdown.data.preferences.NoteCardSettingsStore
 import com.marfolog.noteswidgetformarkdown.domain.model.NoteCardTextSize
 import com.marfolog.noteswidgetformarkdown.domain.usecase.GetNotesUseCase
+import com.marfolog.noteswidgetformarkdown.presentation.setup.SetupActivity
 import com.marfolog.noteswidgetformarkdown.util.AppLog
 import kotlinx.coroutines.flow.firstOrNull
 import org.koin.java.KoinJavaComponent.get
@@ -30,8 +32,14 @@ class CycleTextSizeAction : ActionCallback {
         val nextSize = entries[(currentIndex + 1) % entries.size]
 
         // Update all configured cards or existing notes
-        val getNotesUseCase: GetNotesUseCase = get(GetNotesUseCase::class.java)
-        val currentNotes = getNotesUseCase().firstOrNull() ?: emptyList()
+        val prefs = context.getSharedPreferences(SetupActivity.PREFS_NAME, Context.MODE_PRIVATE)
+        val folderUri = prefs.getString(SetupActivity.KEY_NOTES_URI, null)
+        val currentNotes = if (!folderUri.isNullOrEmpty()) {
+            runCatching {
+                val getNotesUseCase: GetNotesUseCase = get(GetNotesUseCase::class.java)
+                getNotesUseCase(folderUri, ExtraNotesStore(context).getAll()).firstOrNull() ?: emptyList()
+            }.getOrDefault(emptyList())
+        } else emptyList()
 
         if (allSettings.isEmpty() && currentNotes.isNotEmpty()) {
             currentNotes.forEach { note ->
