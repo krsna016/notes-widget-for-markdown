@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Notes Widget for Markdown</string>
+    <string name="app_name">Obsidian</string>
     <string name="widget_description">Displays your Markdown notes in a scrollable widget</string>
     <string name="list_widget_description">Compact list of note names with their last change</string>
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Notes Widget for Markdown</string>
+    <string name="app_name">Obsidian</string>
     <string name="widget_description">Показує твої нотатки Markdown у віджеті з прокручуванням</string>
     <string name="list_widget_description">Компактний список назв нотаток із датою останньої зміни</string>
     <string name="action_refresh">Оновити нотатки</string>

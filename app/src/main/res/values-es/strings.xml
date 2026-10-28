@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Notes Widget for Markdown</string>
+    <string name="app_name">Obsidian</string>
     <string name="widget_description">Muestra tus notas Markdown en un widget con desplazamiento</string>
     <string name="list_widget_description">Lista compacta de nombres de notas con su último cambio</string>
     <string name="action_refresh">Recargar notas</string>

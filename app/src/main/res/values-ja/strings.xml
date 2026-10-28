@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Notes Widget for Markdown</string>
+    <string name="app_name">Obsidian</string>
     <string name="widget_description">Markdown のノートをスクロールできるウィジェットに表示します</string>
     <string name="list_widget_description">ノート名と最終更新をコンパクトに一覧表示</string>
     <string name="action_refresh">ノートを読み込み直す</string>

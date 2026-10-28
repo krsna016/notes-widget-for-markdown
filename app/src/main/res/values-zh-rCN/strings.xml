@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Notes Widget for Markdown</string>
+    <string name="app_name">Obsidian</string>
     <string name="widget_description">在可滚动的小组件中显示你的 Markdown 笔记</string>
     <string name="list_widget_description">紧凑列出笔记名称及最后修改时间</string>
     <string name="action_refresh">重新加载笔记</string>
