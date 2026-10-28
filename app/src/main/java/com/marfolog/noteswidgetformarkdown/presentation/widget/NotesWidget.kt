@@ -353,14 +353,129 @@ private fun SingleNoteView(
     val openIntent = widgetNoteOpenIntent(context, note, vaultName, noteFolder)
     val ribbonColor = ColorProvider(appearance.accentRibbonColor())
 
-    Row(
+    // Slider state
+    val totalNotes = notes.size
+    val currentSelectedIdx = notes.indexOfFirst { it.fileUri == note.fileUri }.coerceAtLeast(0)
+    var sliderOffset = prefs.getInt(SelectWidgetNoteAction.KEY_SLIDER_OFFSET, currentSelectedIdx)
+    if (sliderOffset !in 0 until totalNotes) {
+        sliderOffset = currentSelectedIdx
+    }
+
+    Column(
         modifier = GlanceModifier
             .fillMaxSize()
             .cornerRadius(28.dp)
             .background(appearance.backgroundColor())
-            .padding(14.dp),
-        verticalAlignment = Alignment.Top
+            .padding(12.dp)
     ) {
+        // TOP SLIDER: Cards of all notes with slide arrows
+        if (totalNotes > 1) {
+            Row(
+                modifier = GlanceModifier
+                    .fillMaxWidth()
+                    .padding(bottom = 6.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Left slide button
+                val prevOffset = (sliderOffset - 1 + totalNotes) % totalNotes
+                val prevAction = actionRunCallback<SelectWidgetNoteAction>(
+                    actionParametersOf(SelectWidgetNoteAction.PARAM_SLIDER_OFFSET to prevOffset)
+                )
+                Box(
+                    modifier = GlanceModifier
+                        .size(24.dp)
+                        .cornerRadius(12.dp)
+                        .background(ColorProvider(Color(0x28888888)))
+                        .clickable(prevAction),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "‹",
+                        style = TextStyle(
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp,
+                            color = appearance.contentColor()
+                        )
+                    )
+                }
+
+                Spacer(modifier = GlanceModifier.width(5.dp))
+
+                // Up to 3 visible note cards in the slider window
+                val visibleCount = minOf(3, totalNotes)
+                for (i in 0 until visibleCount) {
+                    val noteIdx = (sliderOffset + i) % totalNotes
+                    val sliderNote = notes[noteIdx]
+                    val isCurrent = (sliderNote.fileUri == note.fileUri)
+                    val cardClickAction = actionRunCallback<SelectWidgetNoteAction>(
+                        actionParametersOf(
+                            SelectWidgetNoteAction.PARAM_NOTE_URI to sliderNote.fileUri,
+                            SelectWidgetNoteAction.PARAM_SLIDER_OFFSET to sliderOffset
+                        )
+                    )
+
+                    Box(
+                        modifier = GlanceModifier
+                            .defaultWeight()
+                            .height(28.dp)
+                            .cornerRadius(10.dp)
+                            .background(
+                                if (isCurrent) ColorProvider(Color(0xFF7C3AED)) else ColorProvider(Color(0x22888888))
+                            )
+                            .clickable(cardClickAction)
+                            .padding(horizontal = 6.dp, vertical = 5.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = sliderNote.title,
+                            style = TextStyle(
+                                fontWeight = if (isCurrent) FontWeight.Bold else FontWeight.Normal,
+                                fontSize = 11.sp,
+                                color = if (isCurrent) ColorProvider(Color.White) else appearance.contentColor()
+                            ),
+                            maxLines = 1
+                        )
+                    }
+
+                    if (i < visibleCount - 1) {
+                        Spacer(modifier = GlanceModifier.width(4.dp))
+                    }
+                }
+
+                Spacer(modifier = GlanceModifier.width(5.dp))
+
+                // Right slide button
+                val nextOffset = (sliderOffset + 1) % totalNotes
+                val nextAction = actionRunCallback<SelectWidgetNoteAction>(
+                    actionParametersOf(SelectWidgetNoteAction.PARAM_SLIDER_OFFSET to nextOffset)
+                )
+                Box(
+                    modifier = GlanceModifier
+                        .size(24.dp)
+                        .cornerRadius(12.dp)
+                        .background(ColorProvider(Color(0x28888888)))
+                        .clickable(nextAction),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "›",
+                        style = TextStyle(
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp,
+                            color = appearance.contentColor()
+                        )
+                    )
+                }
+            }
+        }
+
+        // MAIN NOTE AREA
+        Row(
+            modifier = GlanceModifier
+                .fillMaxWidth()
+                .defaultWeight(),
+            verticalAlignment = Alignment.Top
+        ) {
         // Luxury Left-Edge Accent Ribbon with Physical Metallic Side Clip
         Column(
             modifier = GlanceModifier.fillMaxHeight(),
@@ -695,6 +810,7 @@ private fun SingleNoteView(
             }
         }
     }
+}
 }
 
 @Composable
