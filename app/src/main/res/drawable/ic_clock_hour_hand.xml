@@ -1,19 +1,19 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="200dp"
-    android:height="200dp"
+    android:width="500dp"
+    android:height="500dp"
     android:viewportWidth="200"
     android:viewportHeight="200">
 
-    <!-- Hour Hand -->
+    <!-- Hour Hand (Crisp Pure White) -->
     <path
         android:strokeColor="#FFFFFF"
-        android:strokeWidth="5"
+        android:strokeWidth="6"
         android:strokeLineCap="round"
-        android:pathData="M100,108 L100,52" />
+        android:pathData="M100,110 L100,48" />
 
     <!-- Center Pivot Cap -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M100,100 m -4,0 a 4,4 0 1,0 8,0 a 4,4 0 1,0 -8,0" />
+        android:pathData="M100,100 m -4.5,0 a 4.5,4.5 0 1,0 9,0 a 4.5,4.5 0 1,0 -9,0" />
 
 </vector>

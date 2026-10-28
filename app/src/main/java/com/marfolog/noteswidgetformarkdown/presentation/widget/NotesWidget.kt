@@ -153,12 +153,23 @@ private fun WidgetRoot(
     extraNoteFolders: Map<String, String> = emptyMap(),
     backgroundPercent: Int = WidgetBackground.DEFAULT_PERCENT
 ) {
-    Box(
-        modifier = GlanceModifier
+    val context = LocalContext.current
+    val prefs = context.getSharedPreferences(SetupActivity.PREFS_NAME, Context.MODE_PRIVATE)
+    val currentMode = prefs.getString(ToggleWidgetModeAction.KEY_WIDGET_MODE, ToggleWidgetModeAction.MODE_NOTES) ?: ToggleWidgetModeAction.MODE_NOTES
+    val isClockMode = (currentMode == ToggleWidgetModeAction.MODE_CLOCK)
+
+    val rootModifier = if (isClockMode) {
+        GlanceModifier.fillMaxSize()
+    } else {
+        GlanceModifier
             .fillMaxSize()
             .cornerRadius(32.dp)
             .background(widgetBackground(backgroundPercent))
             .padding(10.dp)
+    }
+
+    Box(
+        modifier = rootModifier
     ) {
         when (state) {
             is WidgetState.Uninitialized -> UninitializedContent()
@@ -792,44 +803,52 @@ private fun WidgetClockView(
     Column(
         modifier = GlanceModifier
             .fillMaxSize()
-            .cornerRadius(28.dp)
-            .background(appearance.backgroundColor())
-            .padding(14.dp)
-            .clickable(wakeAction),
+            .padding(horizontal = 4.dp, vertical = 2.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Top Switcher Bar: Minimalist Style Indicator + Switcher Pill
+        // Discreet Top Switcher Bar: Minimalist style & notes toggle pills
         Row(
             modifier = GlanceModifier
                 .fillMaxWidth()
                 .padding(horizontal = 4.dp, vertical = 2.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = if (clockStyle == ToggleClockStyleAction.STYLE_ANALOG) "✦ SWISS ANALOG" else "✦ APPLE DIGITAL",
-                style = TextStyle(
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = FontFamily.SansSerif,
-                    color = ColorProvider(Color(0xA0FFFFFF))
-                ),
-                modifier = GlanceModifier.defaultWeight()
-            )
-
-            // Switch Clock Style Pill (Digital <-> Analog)
+            // Style Switch Pill (Digital <-> Analog)
             Box(
                 modifier = GlanceModifier
-                    .cornerRadius(8.dp)
-                    .background(ColorProvider(Color(0x28888888)))
-                    .padding(horizontal = 8.dp, vertical = 3.dp)
+                    .cornerRadius(12.dp)
+                    .background(ColorProvider(Color(0x33000000)))
+                    .padding(horizontal = 10.dp, vertical = 4.dp)
                     .clickable(toggleStyleAction),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = if (clockStyle == ToggleClockStyleAction.STYLE_ANALOG) "Digital ↻" else "Analog ↻",
+                    text = if (clockStyle == ToggleClockStyleAction.STYLE_ANALOG) "✦ Swiss Analog ↻" else "✦ Apple Digital ↻",
                     style = TextStyle(
-                        fontSize = 10.sp,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = FontFamily.SansSerif,
+                        color = ColorProvider(Color.White)
+                    )
+                )
+            }
+
+            Spacer(modifier = GlanceModifier.defaultWeight())
+
+            // Switch back to Notes / Dincharya Pill
+            Box(
+                modifier = GlanceModifier
+                    .cornerRadius(12.dp)
+                    .background(ColorProvider(Color(0x33000000)))
+                    .padding(horizontal = 10.dp, vertical = 4.dp)
+                    .clickable(wakeAction),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "📝 Dincharya",
+                    style = TextStyle(
+                        fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
                         fontFamily = FontFamily.SansSerif,
                         color = ColorProvider(Color(0xFFC084FC))
@@ -838,10 +857,10 @@ private fun WidgetClockView(
             }
         }
 
-        // Live Clock Face RemoteViews (Ticking independently in SystemUI with zero battery drain)
+        // Live Clock Face RemoteViews - Expanding to fill available area
         Box(
             modifier = GlanceModifier
-                .fillMaxWidth()
+                .fillMaxSize()
                 .defaultWeight(),
             contentAlignment = Alignment.Center
         ) {

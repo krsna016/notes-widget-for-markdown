@@ -34,8 +34,15 @@ class ToggleWidgetModeAction : ActionCallback {
             .putLong(KEY_LAST_TOUCH_TIME, System.currentTimeMillis())
             .apply()
 
-        if (targetMode == MODE_NOTES) {
-            AutoFlipScheduler.scheduleAutoFlip(context)
+        if (targetMode == MODE_CLOCK) {
+            AutoFlipScheduler.cancelAutoFlip(context)
+        } else if (targetMode == MODE_NOTES) {
+            val autoFlipEnabled = prefs.getBoolean("widget_clock_autoflip", false)
+            if (autoFlipEnabled) {
+                AutoFlipScheduler.scheduleAutoFlip(context)
+            } else {
+                AutoFlipScheduler.cancelAutoFlip(context)
+            }
         }
 
         NotesWidget.updateAll(context)

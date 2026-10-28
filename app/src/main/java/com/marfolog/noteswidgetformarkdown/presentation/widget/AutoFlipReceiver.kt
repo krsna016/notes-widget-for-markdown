@@ -16,7 +16,7 @@ class AutoFlipReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         val prefs = context.getSharedPreferences(SetupActivity.PREFS_NAME, Context.MODE_PRIVATE)
-        val autoFlipEnabled = prefs.getBoolean("widget_clock_autoflip", true)
+        val autoFlipEnabled = prefs.getBoolean("widget_clock_autoflip", false)
         if (!autoFlipEnabled) return
 
         val lastTouch = prefs.getLong(ToggleWidgetModeAction.KEY_LAST_TOUCH_TIME, 0L)
@@ -53,7 +53,7 @@ object AutoFlipScheduler {
 
     fun scheduleAutoFlip(context: Context, delayMs: Long = AUTO_FLIP_DELAY_MILLIS) {
         val prefs = context.getSharedPreferences(SetupActivity.PREFS_NAME, Context.MODE_PRIVATE)
-        val autoFlipEnabled = prefs.getBoolean("widget_clock_autoflip", true)
+        val autoFlipEnabled = prefs.getBoolean("widget_clock_autoflip", false)
         if (!autoFlipEnabled) return
 
         prefs.edit()
@@ -79,5 +79,19 @@ object AutoFlipScheduler {
         } catch (e: Throwable) {
             alarmManager.set(AlarmManager.RTC_WAKEUP, triggerAtMillis, pending)
         }
+    }
+
+    fun cancelAutoFlip(context: Context) {
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as? AlarmManager ?: return
+        val intent = Intent(context, AutoFlipReceiver::class.java)
+        val pending = PendingIntent.getBroadcast(
+            context,
+            9922,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        try {
+            alarmManager.cancel(pending)
+        } catch (_: Throwable) {}
     }
 }
