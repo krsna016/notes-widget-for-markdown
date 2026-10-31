@@ -13,6 +13,7 @@ class ToggleClockStyleAction : ActionCallback {
         const val KEY_CLOCK_STYLE = "widget_clock_style"
         const val STYLE_DIGITAL = "digital"
         const val STYLE_ANALOG = "analog"
+        const val STYLE_MINIMAL = "minimal"
     }
 
     override suspend fun onAction(
@@ -21,8 +22,12 @@ class ToggleClockStyleAction : ActionCallback {
         parameters: ActionParameters
     ) {
         val prefs = context.getSharedPreferences(SetupActivity.PREFS_NAME, Context.MODE_PRIVATE)
-        val currentStyle = prefs.getString(KEY_CLOCK_STYLE, STYLE_DIGITAL) ?: STYLE_DIGITAL
-        val newStyle = if (currentStyle == STYLE_DIGITAL) STYLE_ANALOG else STYLE_DIGITAL
+        val currentStyle = prefs.getString(KEY_CLOCK_STYLE, STYLE_ANALOG) ?: STYLE_ANALOG
+        val newStyle = when (currentStyle) {
+            STYLE_ANALOG -> STYLE_MINIMAL
+            STYLE_MINIMAL -> STYLE_DIGITAL
+            else -> STYLE_ANALOG
+        }
 
         AppLog.d("ClockStyle", "Toggling clock style from $currentStyle to $newStyle")
 

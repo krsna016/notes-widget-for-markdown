@@ -1,0 +1,17 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="500dp"
+    android:height="500dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+
+    <!-- Transparent Bounds Anchor to lock 500dp/200x200 clock face geometry -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M0,0 L200,0 L200,200 L0,200 Z" />
+
+    <!-- Center Accent Dot (Swiss Coral) -->
+    <path
+        android:fillColor="#FF6038"
+        android:pathData="M100,100 m -3,0 a 3,3 0 1,0 6,0 a 3,3 0 1,0 -6,0" />
+
+</vector>

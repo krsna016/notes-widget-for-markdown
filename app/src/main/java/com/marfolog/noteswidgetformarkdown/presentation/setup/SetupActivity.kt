@@ -1518,7 +1518,10 @@ internal fun SetupScreenContent(
                     ?: ToggleClockStyleAction.STYLE_ANALOG
             )
         }
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(
+            modifier = Modifier.horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
             FilterChip(
                 selected = currentClockStyle == ToggleClockStyleAction.STYLE_ANALOG,
                 onClick = {
@@ -1527,6 +1530,15 @@ internal fun SetupScreenContent(
                     clockScope.launch { NotesWidget.updateAll(appearanceContext) }
                 },
                 label = { Text("✦ Swiss Analog") }
+            )
+            FilterChip(
+                selected = currentClockStyle == ToggleClockStyleAction.STYLE_MINIMAL,
+                onClick = {
+                    currentClockStyle = ToggleClockStyleAction.STYLE_MINIMAL
+                    clockPrefs.edit().putString(ToggleClockStyleAction.KEY_CLOCK_STYLE, ToggleClockStyleAction.STYLE_MINIMAL).apply()
+                    clockScope.launch { NotesWidget.updateAll(appearanceContext) }
+                },
+                label = { Text("✦ Minimal (3 Hands)") }
             )
             FilterChip(
                 selected = currentClockStyle == ToggleClockStyleAction.STYLE_DIGITAL,

@@ -634,10 +634,10 @@ private fun WidgetClockView(
 
     val doubleTapAction = actionRunCallback<DoubleTapClockAction>()
 
-    val layoutId = if (clockStyle == ToggleClockStyleAction.STYLE_ANALOG) {
-        R.layout.widget_analog_clock
-    } else {
-        R.layout.widget_digital_clock
+    val layoutId = when (clockStyle) {
+        ToggleClockStyleAction.STYLE_ANALOG -> R.layout.widget_analog_clock
+        ToggleClockStyleAction.STYLE_MINIMAL -> R.layout.widget_minimal_clock
+        else -> R.layout.widget_digital_clock
     }
     val rv = RemoteViews(context.packageName, layoutId)
 
